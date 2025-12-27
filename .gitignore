@@ -1,0 +1,13 @@
+# folder yang jangan dipush
+node_modules/
+
+# environment
+.env
+
+# build artifacts (opsional)
+dist/
+build/
+
+# OS
+.DS_Store
+*.log
