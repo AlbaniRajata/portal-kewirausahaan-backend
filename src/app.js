@@ -3,7 +3,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 
-const testRoutes = require("./routes/test.routes");
+const routes = require("./routes");
 
 const app = express();
 
@@ -11,11 +11,12 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
 app.get("/health", (req, res) => {
   res.json({ message: "API is running" });
 });
 
-app.use("/test", testRoutes);
+app.use("/api", routes);
 
 module.exports = app;
