@@ -4,6 +4,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 
 const routes = require("./routes");
+const adminVerificationRoute = require("./routes/adminVerification.route");
 
 const app = express();
 
@@ -18,5 +19,6 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api", routes);
+app.use("/api/admin", adminVerificationRoute);
 
 module.exports = app;
