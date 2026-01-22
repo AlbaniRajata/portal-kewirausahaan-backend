@@ -1,4 +1,4 @@
-const pool = require("../config/db");
+const pool = require("../../../config/db");
 
 const getPendingMahasiswaDb = async () => {
   const q = `
@@ -16,7 +16,7 @@ const getPendingMahasiswaDb = async () => {
     JOIN m_mahasiswa m ON m.id_user = u.id_user
     WHERE u.id_role = 1
       AND u.email_verified_at IS NOT NULL
-      AND u.is_active = 0
+      AND u.is_active = FALSE
       AND m.status_verifikasi = 0
     ORDER BY u.id_user DESC
   `;
@@ -51,7 +51,7 @@ const approveMahasiswaDb = async (id_user) => {
     await client.query("BEGIN");
 
     await client.query(
-      `UPDATE m_user SET is_active = 1 WHERE id_user = $1`,
+      `UPDATE m_user SET is_active = TRUE WHERE id_user = $1`,
       [id_user]
     );
 

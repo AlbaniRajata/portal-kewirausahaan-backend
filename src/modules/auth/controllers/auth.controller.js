@@ -69,14 +69,10 @@ const registerHandler = async (req, res) => {
             foto_ktm,
         });
 
-        let verificationLink = null;
-        try {
-            const token = await createVerificationToken(user.id_user);
-            verificationLink = `http://localhost:4000/api/auth/verify-email?token=${token}`;
-            console.log(verificationLink);
-        } catch (err) {
-            console.error("Error creating verification token:", err);
-        }
+        const token = await createVerificationToken(user.id_user);
+        const verificationLink = `http://localhost:4000/api/auth/verify-email?token=${token}`;
+        
+        console.log(verificationLink);
 
         return res.status(201).json({
             message: "Registrasi berhasil",
@@ -100,23 +96,40 @@ const registerHandler = async (req, res) => {
 
         return res.status(500).json({
             message: "Terjadi kesalahan pada sistem",
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined,
         });
     }
 };
 
 const loginHandler = async (req, res) => {
-    const result = await login(req.body);
+    try {
+        const { email, password } = req.body;
 
-    if (result.error) {
-        return res.status(401).json({
-            message: result.error,
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email dan password wajib diisi",
+            });
+        }
+
+        const result = await login({ email, password });
+
+        if (result.error) {
+            return res.status(401).json({
+                message: result.error,
+            });
+        }
+
+        return res.json({
+            message: "Login berhasil",
+            data: result,
+        });
+    } catch (err) {
+        console.error("ERROR LOGIN:", err);
+        return res.status(500).json({
+            message: "Terjadi kesalahan pada sistem",
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined,
         });
     }
-
-    return res.json({
-        message: "Login berhasil",
-        data: result,
-    });
 };
 
 module.exports = {

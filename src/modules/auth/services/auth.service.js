@@ -39,19 +39,19 @@ const register = async (data) => {
 const login = async ({ email, password }) => {
     const user = await getUserForLoginDb(email);
 
-    if (!user) return { error: "EMAIL_TIDAK_TERDAFTAR" };
-    if (!user.email_verified_at) return { error: "EMAIL_BELUM_VERIFIED" };
-    if (user.is_active !== 1) return { error: "AKUN_TIDAK_AKTIF" };
+    if (!user) return { error: "Email tidak terdaftar dalam sistem. Silakan lakukan registrasi terlebih dahulu." };
+    if (!user.email_verified_at) return { error: "Email Anda belum diverifikasi. Silakan cek inbox email Anda dan klik link verifikasi yang telah dikirimkan." };
+    if (user.is_active !== true) return { error: "Akun Anda tidak aktif. Silakan hubungi administrator untuk mengaktifkan kembali akun Anda." };
 
     if (
         user.nama_role === "mahasiswa" &&
         user.status_verifikasi !== 1
     ) {
-        return { error: "BELUM_DIVERIFIKASI_ADMIN" };
+        return { error: "Akun mahasiswa Anda masih dalam proses verifikasi oleh admin. Silakan tunggu konfirmasi lebih lanjut." };
     }
 
     const match = await bcrypt.compare(password, user.password_hash);
-    if (!match) return { error: "PASSWORD_SALAH" };
+    if (!match) return { error: "Password yang Anda masukkan salah. Silakan periksa kembali password Anda." };
 
     const token = jwt.sign(
         {

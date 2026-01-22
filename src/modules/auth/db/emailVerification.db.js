@@ -1,4 +1,4 @@
-const pool = require("../config/db");
+const pool = require("../../../config/db");
 
 const createEmailTokenDb = async ({ id_user, token, expired_at }) => {
   await pool.query(

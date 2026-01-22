@@ -4,7 +4,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 
 const routes = require("./routes");
-const adminVerificationRoute = require("./routes/adminVerification.route");
+const adminVerificationRoute = require("./modules/admin/routes/adminVerification.route");
 
 const app = express();
 
