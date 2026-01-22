@@ -5,12 +5,10 @@ const {
   login,
 } = require("../controllers/auth.controller");
 const { verifyEmailController } = require("../controllers/emailVerification.controller");
-const upload = require("../../../middlewares/upload.middleware");
+const { uploadKTM } = require("../../../middlewares/upload.middleware");
 
-router.post("/register", upload.single("foto_ktm"), register);
-
+router.post("/register", uploadKTM.single("foto_ktm"), register);
 router.post("/login", login);
-
 router.get("/verify-email", verifyEmailController);
 
 module.exports = router;

@@ -5,7 +5,7 @@ const createUserDb = async ({
     email,
     password_hash,
     id_role,
-}) => {
+}, client = null) => {
     const q = `
         INSERT INTO m_user (
             id_role, username, email, password_hash, is_active
@@ -14,7 +14,8 @@ const createUserDb = async ({
         RETURNING id_user, username, email, id_role, is_active
     `;
 
-    const { rows } = await pool.query(q, [
+    const dbClient = client || pool;
+    const { rows } = await dbClient.query(q, [
         id_role,
         username,
         email,
@@ -27,30 +28,35 @@ const createUserDb = async ({
 const createMahasiswaDb = async ({
     id_user,
     nim,
-    prodi,
+    id_prodi,
+    tahun_masuk,
     foto_ktm,
-}) => {
+}, client = null) => {
     const q = `
         INSERT INTO m_mahasiswa (
-            id_user, nim, prodi, status_verifikasi, foto_ktm
+            id_user, nim, id_prodi, tahun_masuk, foto_ktm, status_verifikasi
         )
-        VALUES ($1, $2, $3, 0, $4)
+        VALUES ($1, $2, $3, $4, $5, 0)
+        RETURNING id_user, nim, id_prodi, tahun_masuk, status_verifikasi
     `;
 
-    await pool.query(q, [
+    const dbClient = client || pool;
+    const { rows } = await dbClient.query(q, [
         id_user,
         nim,
-        prodi,
+        id_prodi,
+        tahun_masuk,
         foto_ktm,
     ]);
 
-    return true;
+    return rows[0];
 };
 
 const getUserForLoginDb = async (email) => {
     const q = `
         SELECT
             u.id_user,
+            u.username,
             u.email,
             u.password_hash,
             u.is_active,

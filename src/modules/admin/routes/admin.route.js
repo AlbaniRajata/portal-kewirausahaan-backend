@@ -6,7 +6,7 @@ const {
     getDetailMahasiswa,
     approveMahasiswaController,
     rejectMahasiswaController,
-} = require("../controllers/adminVerification.controller");
+} = require("../controllers/verification.controller");
 
 const authMiddleware = require("../../../middlewares/auth.middleware");
 const roleMiddleware = require("../../../middlewares/role.middleware");
