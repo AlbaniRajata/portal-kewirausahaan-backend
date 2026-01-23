@@ -2,7 +2,7 @@ const {
   getProfile,
   updateBiodata,
   updatePassword,
-} = require("../services/profile.services");
+} = require("../services/profile.service");
 
 const getProfileController = async (req, res) => {
   try {

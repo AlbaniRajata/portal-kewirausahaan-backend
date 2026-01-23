@@ -63,9 +63,10 @@ const approveMahasiswaDb = async (id_user) => {
         await client.query("BEGIN");
 
         const checkQuery = `
-            SELECT m.status_verifikasi
-            FROM m_mahasiswa m
-            WHERE m.id_user = $1
+            SELECT u.email_verified_at, m.status_verifikasi
+            FROM m_user u
+            JOIN m_mahasiswa m ON m.id_user = u.id_user
+            WHERE u.id_user = $1
         `;
         const checkResult = await client.query(checkQuery, [id_user]);
 
@@ -74,9 +75,16 @@ const approveMahasiswaDb = async (id_user) => {
             return null;
         }
 
+        if (!checkResult.rows[0].email_verified_at) {
+            await client.query("ROLLBACK");
+            return {
+                error: "EMAIL_NOT_VERIFIED"
+            };
+        }
+
         if (checkResult.rows[0].status_verifikasi !== 0) {
             await client.query("ROLLBACK");
-            return { 
+            return {
                 error: "ALREADY_VERIFIED",
                 status_verifikasi: checkResult.rows[0].status_verifikasi,
             };
@@ -100,12 +108,9 @@ const approveMahasiswaDb = async (id_user) => {
                 u.email,
                 u.is_active,
                 m.nim,
-                p.nama_prodi,
-                m.tahun_masuk,
                 m.status_verifikasi
             FROM m_user u
             JOIN m_mahasiswa m ON m.id_user = u.id_user
-            LEFT JOIN m_prodi p ON p.id_prodi = m.id_prodi
             WHERE u.id_user = $1
             `,
             [id_user]
@@ -120,6 +125,7 @@ const approveMahasiswaDb = async (id_user) => {
         client.release();
     }
 };
+
 
 const rejectMahasiswaDb = async (id_user, catatan) => {
     const client = await pool.connect();

@@ -12,40 +12,65 @@ const listPendingMahasiswa = async () => {
 const detailMahasiswa = async (id_user) => {
     const data = await getDetailMahasiswaDb(id_user);
     if (!data) {
-        return { error: "NOT_FOUND" };
+        return {
+            error: "Data mahasiswa tidak ditemukan.",
+            field: "id_user"
+        };
     }
     return data;
 };
 
 const approveMahasiswa = async (id_user) => {
     const data = await approveMahasiswaDb(id_user);
-    
+
     if (!data) {
-        return { error: "NOT_FOUND" };
+        return {
+            error: "Data mahasiswa tidak ditemukan.",
+            field: "id_user"
+        };
     }
-    
+
+    if (data.error === "EMAIL_NOT_VERIFIED") {
+        return { 
+            error: "Email mahasiswa belum diverifikasi.",
+            field: "email_verified_at"
+        };
+    }
+
     if (data.error === "ALREADY_VERIFIED") {
-        return data;
+        return {
+            error: "Mahasiswa ini sudah diverifikasi sebelumnya.",
+            field: "status_verifikasi"
+        };
     }
-    
+
     return data;
 };
 
 const rejectMahasiswa = async (id_user, catatan) => {
     if (!catatan || catatan.trim() === "") {
-        return { error: "CATATAN_WAJIB" };
+        return {
+            error: "Catatan penolakan wajib diisi.",
+            field: "catatan"
+        };
     }
 
     const result = await rejectMahasiswaDb(id_user, catatan);
-    
+
     if (!result) {
-        return { error: "NOT_FOUND" };
+        return {
+            error: "Data mahasiswa tidak ditemukan.",
+            field: "id_user"
+        };
     }
-    
+
     if (result.error === "ALREADY_PROCESSED") {
-        return result;
+        return {
+            error: "Status mahasiswa ini sudah diproses sebelumnya.",
+            field: "status_verifikasi"
+        };
     }
-    
+
     return result;
 };
 

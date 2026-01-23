@@ -43,7 +43,7 @@ const getDetailMahasiswa = async (req, res) => {
         }
 
         const result = await detailMahasiswa(id);
-        
+
         if (result.error) {
             return res.status(404).json({
                 success: false,
@@ -99,11 +99,22 @@ const approveMahasiswaController = async (req, res) => {
             });
         }
 
+        if (result.error === "EMAIL_NOT_VERIFIED") {
+            return res.status(400).json({
+                success: false,
+                message: "Email mahasiswa belum diverifikasi. Verifikasi admin hanya dapat dilakukan setelah email diverifikasi.",
+                data: {
+                    field: "email_verified_at"
+                }
+            });
+        }
+
         if (result.error === "ALREADY_VERIFIED") {
             return res.status(400).json({
                 success: false,
                 message: "Mahasiswa sudah diverifikasi sebelumnya",
                 data: {
+                    field: "status_verifikasi",
                     status_verifikasi: result.status_verifikasi,
                 },
             });

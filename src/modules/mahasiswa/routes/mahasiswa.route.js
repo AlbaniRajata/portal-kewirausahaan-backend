@@ -9,13 +9,20 @@ const {
   updatePasswordController,
 } = require("../controllers/profile.controller");
 
+const {
+  createTimController,
+  searchMahasiswaController,
+  acceptInviteController,
+  rejectInviteController,
+} = require("../controllers/tim.controller");
+
 router.use(roleMiddleware(["mahasiswa"]));
 
 const uploadOptional = (req, res, next) => {
   uploadFotoProfil.single("foto")(req, res, (err) => {
     if (err) {
-      return res.status(400).json({ 
-        message: err.message 
+      return res.status(400).json({
+        message: err.message
       });
     }
     next();
@@ -23,9 +30,12 @@ const uploadOptional = (req, res, next) => {
 };
 
 router.get("/profile", getProfileController);
-
 router.patch("/profile", uploadOptional, updateProfileController);
-
 router.put("/password", updatePasswordController);
+
+router.post("/tim", createTimController);
+router.get("/search", searchMahasiswaController);
+router.post("/tim/:id_tim/accept", acceptInviteController);
+router.post("/tim/:id_tim/reject", rejectInviteController);
 
 module.exports = router;
