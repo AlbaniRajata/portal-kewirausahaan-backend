@@ -4,6 +4,7 @@ const {
   updateBiodataDb,
   updatePasswordDb,
   getPasswordHashDb,
+  checkDuplicateBiodataDb,
 } = require("../db/profile.db");
 
 const getProfile = async (id_user) => {
@@ -38,25 +39,31 @@ const updateBiodata = async (id_user, data) => {
 
     const phoneRegex = /^08[0-9]{8,11}$/;
     if (!phoneRegex.test(data.no_hp.trim())) {
-      return { 
-        error: "Format nomor HP tidak valid. Harus diawali 08 dan terdiri dari 10-13 digit" 
+      return {
+        error: "Format nomor HP tidak valid. Harus diawali 08 dan terdiri dari 10-13 digit",
       };
     }
 
     data.no_hp = data.no_hp.trim();
   }
 
-  try {
-    const updated = await updateBiodataDb(id_user, data);
-    return updated;
-  } catch (err) {
-    if (err.code === "23505") {
-      if (err.constraint && err.constraint.includes("username")) {
-        return { error: "Username sudah digunakan oleh pengguna lain" };
-      }
+  const duplicate = await checkDuplicateBiodataDb(id_user, {
+    username: data.username,
+    no_hp: data.no_hp,
+  });
+
+  if (duplicate) {
+    if (duplicate.username === data.username) {
+      return { error: "Username sudah digunakan oleh pengguna lain" };
     }
-    throw err;
+
+    if (duplicate.no_hp === data.no_hp) {
+      return { error: "Nomor HP sudah digunakan oleh pengguna lain" };
+    }
   }
+
+  const updated = await updateBiodataDb(id_user, data);
+  return updated;
 };
 
 const updatePassword = async (id_user, { current_password, new_password }) => {

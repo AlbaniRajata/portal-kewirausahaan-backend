@@ -65,7 +65,34 @@ const uploadFotoProfil = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });
 
+const proposalDir = "uploads/proposal";
+if (!fs.existsSync(proposalDir)) {
+  fs.mkdirSync(proposalDir, { recursive: true });
+}
+
+const storageProposal = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, proposalDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `proposal-${Date.now()}${ext}`);
+  },
+});
+
+const uploadProposal = multer({
+  storage: storageProposal,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype !== "application/pdf") {
+      return cb(new Error("File harus berupa PDF"));
+    }
+    cb(null, true);
+  },
+});
+
 module.exports = {
   uploadKTM,
   uploadFotoProfil,
+  uploadProposal,
 };

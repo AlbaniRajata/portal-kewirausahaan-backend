@@ -98,9 +98,41 @@ const getPasswordHashDb = async (id_user) => {
   return rows[0]?.password_hash;
 };
 
+const checkDuplicateBiodataDb = async (id_user, { username, no_hp }) => {
+  const conditions = [];
+  const values = [];
+  let idx = 1;
+
+  if (username !== undefined) {
+    conditions.push(`username = $${idx++}`);
+    values.push(username);
+  }
+
+  if (no_hp !== undefined) {
+    conditions.push(`no_hp = $${idx++}`);
+    values.push(no_hp);
+  }
+
+  if (conditions.length === 0) return null;
+
+  values.push(id_user);
+
+  const q = `
+    SELECT username, no_hp
+    FROM m_user
+    WHERE (${conditions.join(" OR ")})
+    AND id_user != $${idx}
+    LIMIT 1
+  `;
+
+  const { rows } = await pool.query(q, values);
+  return rows[0];
+};
+
 module.exports = {
   getProfileDb,
   updateBiodataDb,
   updatePasswordDb,
   getPasswordHashDb,
+  checkDuplicateBiodataDb,
 };

@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const roleMiddleware = require("../../../middlewares/role.middleware");
-const { uploadFotoProfil } = require("../../../middlewares/upload.middleware");
+const { 
+  uploadFotoProfil, 
+  uploadProposal 
+} = require("../../../middlewares/upload.middleware");
 
 const {
   getProfileController,
@@ -15,6 +18,11 @@ const {
   acceptInviteController,
   rejectInviteController,
 } = require("../controllers/tim.controller");
+
+const {
+  createProposalController,
+  updateProposalController,
+} = require("../controllers/proposal.controller");
 
 router.use(roleMiddleware(["mahasiswa"]));
 
@@ -37,5 +45,8 @@ router.post("/tim", createTimController);
 router.get("/search", searchMahasiswaController);
 router.post("/tim/:id_tim/accept", acceptInviteController);
 router.post("/tim/:id_tim/reject", rejectInviteController);
+
+router.post("/proposal", uploadProposal.single("file_proposal"), createProposalController);
+router.patch("/proposal/:id_proposal", uploadProposal.single("file_proposal"), updateProposalController);
 
 module.exports = router;

@@ -4,6 +4,8 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const routes = require("./routes");
 
+require("./cron/proposalStatus.cron");
+
 const app = express();
 
 app.use(cors());
