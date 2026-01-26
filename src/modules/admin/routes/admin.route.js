@@ -15,6 +15,7 @@ const {
 const {
   getProposalListController,
   getProposalDetailAdminController,
+  getMonitoringDistribusiController,
 } = require("../controllers/proposal.controller");
 
 const {
@@ -35,7 +36,6 @@ const {
   manualDistribusiController,
 } = require("../controllers/distribusi.controller");
 
-
 const authMiddleware = require("../../../middlewares/auth.middleware");
 const roleMiddleware = require("../../../middlewares/role.middleware");
 
@@ -51,6 +51,7 @@ router.patch("/program/:id_program/timeline", setProgramTimelineController);
 
 router.get("/proposal", getProposalListController);
 router.get("/proposal/:id_proposal", getProposalDetailAdminController);
+router.get("/proposal/monitoring", getMonitoringDistribusiController);
 
 router.post("/reviewer", createReviewerController);
 router.get("/reviewer", getReviewersController);

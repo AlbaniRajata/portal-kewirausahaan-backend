@@ -1,6 +1,7 @@
 const {
   getProposalListDb,
   getProposalDetailAdminDb,
+  getMonitoringDistribusiDb,
 } = require("../db/proposal.db");
 
 const getProposalList = async (filter) => {
@@ -29,7 +30,17 @@ const getProposalDetailAdmin = async (id_proposal) => {
   };
 };
 
+const getMonitoringDistribusi = async (filter) => {
+  const data = await getMonitoringDistribusiDb(filter);
+
+  return {
+    error: false,
+    data,
+  };
+};
+
 module.exports = {
   getProposalList,
   getProposalDetailAdmin,
+  getMonitoringDistribusi,
 };

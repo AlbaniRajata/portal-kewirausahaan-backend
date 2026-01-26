@@ -90,7 +90,59 @@ const getProposalDetailAdminDb = async (id_proposal) => {
   return rows[0];
 };
 
+const getMonitoringDistribusiDb = async ({ id_program, tahap, status }) => {
+  const values = [];
+  let i = 1;
+  let where = "WHERE 1=1";
+
+  if (id_program) {
+    where += ` AND p.id_program = $${i++}`;
+    values.push(id_program);
+  }
+
+  if (tahap !== undefined) {
+    where += ` AND d.tahap = $${i++}`;
+    values.push(tahap);
+  }
+
+  if (status !== undefined) {
+    where += ` AND d.status = $${i++}`;
+    values.push(status);
+  }
+
+  const q = `
+    SELECT
+      d.id_distribusi,
+      d.status AS status_penugasan,
+      d.tahap,
+      d.assigned_at,
+      d.responded_at,
+      d.catatan_reviewer,
+
+      p.id_proposal,
+      p.judul,
+      p.modal_diajukan,
+
+      t.nama_tim,
+      pr.nama_program,
+
+      u.id_user AS id_reviewer,
+      u.nama_lengkap AS nama_reviewer
+    FROM t_distribusi_reviewer d
+    JOIN t_proposal p ON p.id_proposal = d.id_proposal
+    JOIN t_tim t ON t.id_tim = p.id_tim
+    JOIN m_program pr ON pr.id_program = p.id_program
+    JOIN m_user u ON u.id_user = d.id_reviewer
+    ${where}
+    ORDER BY d.assigned_at DESC
+  `;
+
+  const { rows } = await pool.query(q, values);
+  return rows;
+};
+
 module.exports = {
   getProposalListDb,
   getProposalDetailAdminDb,
+  getMonitoringDistribusiDb,
 };

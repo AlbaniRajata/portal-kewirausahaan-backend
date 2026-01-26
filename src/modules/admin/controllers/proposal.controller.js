@@ -1,6 +1,7 @@
 const {
   getProposalList,
   getProposalDetailAdmin,
+  getMonitoringDistribusi,
 } = require("../services/proposal.service");
 
 const getProposalListController = async (req, res) => {
@@ -49,7 +50,23 @@ const getProposalDetailAdminController = async (req, res) => {
   }
 };
 
+const getMonitoringDistribusiController = async (req, res) => {
+  const { id_program, tahap, status } = req.query;
+
+  const result = await getMonitoringDistribusi({
+    id_program,
+    tahap,
+    status,
+  });
+
+  return res.json({
+    message: "Monitoring distribusi reviewer",
+    data: result.data,
+  });
+};
+
 module.exports = {
   getProposalListController,
   getProposalDetailAdminController,
+  getMonitoringDistribusiController,
 };
