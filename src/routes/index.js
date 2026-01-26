@@ -6,12 +6,13 @@ router.use("/auth", authRoutes);
 
 const mahasiswaRoutes = require("../modules/mahasiswa/routes/mahasiswa.route");
 const adminRoutes = require("../modules/admin/routes/admin.route");
+const reviewerRoutes = require("../modules/reviewer/routes/reviewer.route");
 
 router.use("/mahasiswa", authMiddleware, mahasiswaRoutes);
 
 router.use("/admin", authMiddleware, adminRoutes);
 // router.use("/dosen", authMiddleware, dosenRoutes);
-// router.use("/reviewer", authMiddleware, reviewerRoutes);
+router.use("/reviewer", authMiddleware, reviewerRoutes);
 // router.use("/juri", authMiddleware, juriRoutes);
 
 module.exports = router;

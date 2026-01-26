@@ -40,7 +40,7 @@ const authMiddleware = require("../../../middlewares/auth.middleware");
 const roleMiddleware = require("../../../middlewares/role.middleware");
 
 router.use(authMiddleware);
-router.use(roleMiddleware(["admin inbis", "admin pmw", "super admin"]));
+router.use(roleMiddleware([2, 6])); // Admin and Super Admin
 
 router.get("/verifikasi/mahasiswa", getPendingMahasiswa);
 router.get("/verifikasi/mahasiswa/:id", getDetailMahasiswa);

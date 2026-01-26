@@ -24,7 +24,7 @@ const {
   updateProposalController,
 } = require("../controllers/proposal.controller");
 
-router.use(roleMiddleware(["mahasiswa"]));
+router.use(roleMiddleware([1])); // Mahasiswa
 
 const uploadOptional = (req, res, next) => {
   uploadFotoProfil.single("foto")(req, res, (err) => {
