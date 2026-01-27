@@ -36,6 +36,11 @@ const {
   manualDistribusiController,
 } = require("../controllers/distribusi.controller");
 
+const {
+  getRekapPenilaianController,
+  finalizePenilaianController,
+} = require("../controllers/penilaian.controller");
+
 const authMiddleware = require("../../../middlewares/auth.middleware");
 const roleMiddleware = require("../../../middlewares/role.middleware");
 
@@ -64,5 +69,8 @@ router.get("/juri/:id_user", getJuriDetailController);
 router.get("/proposal/distribusi/preview", previewDistribusiController);
 router.post("/proposal/distribusi/auto", autoDistribusiController);
 router.post("/proposal/distribusi/manual", manualDistribusiController);
+
+router.get("/penilaian/:id_proposal/:id_tahap", getRekapPenilaianController);
+router.post("/penilaian/:id_proposal/:id_tahap/finalize", finalizePenilaianController);
 
 module.exports = router;
