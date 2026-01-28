@@ -5,26 +5,25 @@ const {
 } = require("../services/penilaian.service");
 
 const getFormPenilaianController = async (req, res) => {
-  const id_user = req.user.id_user;
+  const { id_user } = req.user;
   const id_distribusi = Number(req.params.id_distribusi);
 
   const result = await getFormPenilaian(id_user, id_distribusi);
 
-  if (result.error) {
+  if (result.error)
     return res.status(400).json({
       message: result.message,
       data: result.data,
     });
-  }
 
   res.json({
-    message: "Form penilaian reviewer",
+    message: "Form penilaian juri",
     data: result.data,
   });
 };
 
 const simpanNilaiController = async (req, res) => {
-  const id_user = req.user.id_user;
+  const { id_user } = req.user;
   const id_distribusi = Number(req.params.id_distribusi);
 
   const result = await simpanNilai(
@@ -33,12 +32,11 @@ const simpanNilaiController = async (req, res) => {
     req.body.nilai
   );
 
-  if (result.error) {
+  if (result.error)
     return res.status(400).json({
       message: result.message,
       data: result.data,
     });
-  }
 
   res.json({
     message: result.message,
@@ -47,20 +45,19 @@ const simpanNilaiController = async (req, res) => {
 };
 
 const submitPenilaianController = async (req, res) => {
-  const id_user = req.user.id_user;
+  const { id_user } = req.user;
   const id_distribusi = Number(req.params.id_distribusi);
 
   const result = await submitPenilaian(id_user, id_distribusi);
 
-  if (result.error) {
+  if (result.error)
     return res.status(400).json({
       message: result.message,
       data: result.data,
     });
-  }
 
   res.json({
-    message: "Penilaian reviewer berhasil disubmit",
+    message: "Penilaian berhasil disubmit",
     data: result.data,
   });
 };

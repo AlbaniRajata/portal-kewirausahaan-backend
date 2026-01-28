@@ -16,21 +16,21 @@ const getFormPenilaian = async (id_user, id_distribusi) => {
     return {
       error: true,
       message: "Distribusi tidak ditemukan",
-      data: { id_distribusi },
+      data: null,
     };
 
-  if (dist.id_reviewer !== id_user)
+  if (dist.id_juri !== id_user)
     return {
       error: true,
       message: "Akses ditolak",
-      data: { reviewer: id_user },
+      data: null,
     };
 
-  if (dist.status_distribusi !== 1)
+  if (dist.status !== 1)
     return {
       error: true,
       message: "Penugasan belum diterima",
-      data: { status: dist.status_distribusi },
+      data: null,
     };
 
   const penilaian = await getOrCreatePenilaianDb(
@@ -48,7 +48,6 @@ const getFormPenilaian = async (id_user, id_distribusi) => {
         id_proposal: dist.id_proposal,
         judul: dist.judul,
       },
-      tahap: dist.id_tahap,
       penilaian,
       kriteria,
       nilai,
@@ -62,16 +61,16 @@ const simpanNilai = async (id_user, id_distribusi, payload) => {
     return {
       error: true,
       message: "Payload nilai kosong",
-      data: payload,
+      data: null,
     };
 
   const dist = await getDistribusiForPenilaianDb(id_distribusi);
 
-  if (!dist || dist.id_reviewer !== id_user)
+  if (!dist || dist.id_juri !== id_user)
     return {
       error: true,
       message: "Akses ditolak",
-      data: { id_distribusi },
+      data: null,
     };
 
   const penilaian = await getOrCreatePenilaianDb(
@@ -83,11 +82,10 @@ const simpanNilai = async (id_user, id_distribusi, payload) => {
     return {
       error: true,
       message: "Penilaian sudah disubmit",
-      data: penilaian,
+      data: null,
     };
 
   const kriteria = await getKriteriaByTahapDb(dist.id_tahap);
-
   const hasil = [];
 
   for (const item of payload) {
@@ -106,7 +104,7 @@ const simpanNilai = async (id_user, id_distribusi, payload) => {
       return {
         error: true,
         message: "Skor tidak valid",
-        data: { skor: item.skor },
+        data: item.skor,
       };
 
     const nilai = ref.bobot * item.skor;
@@ -124,22 +122,19 @@ const simpanNilai = async (id_user, id_distribusi, payload) => {
 
   return {
     error: false,
-    message: "Nilai reviewer berhasil disimpan",
-    data: {
-      id_penilaian: penilaian.id_penilaian,
-      hasil,
-    },
+    message: "Nilai berhasil disimpan",
+    data: hasil,
   };
 };
 
 const submitPenilaian = async (id_user, id_distribusi) => {
   const dist = await getDistribusiForPenilaianDb(id_distribusi);
 
-  if (!dist || dist.id_reviewer !== id_user)
+  if (!dist || dist.id_juri !== id_user)
     return {
       error: true,
       message: "Akses ditolak",
-      data: { id_distribusi },
+      data: null,
     };
 
   const penilaian = await getOrCreatePenilaianDb(
@@ -154,10 +149,7 @@ const submitPenilaian = async (id_user, id_distribusi) => {
     return {
       error: true,
       message: "Nilai belum lengkap",
-      data: {
-        total_kriteria: kriteria.length,
-        terisi: nilai.length,
-      },
+      data: null,
     };
 
   const submitted = await submitPenilaianDb(penilaian.id_penilaian);

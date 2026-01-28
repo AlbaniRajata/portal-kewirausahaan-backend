@@ -1,13 +1,19 @@
-const {
-  getRekapPenilaian,
-} = require("../services/penilaian.service");
+const { getRekapPenilaian } = require("../services/penilaian.service");
 
 const getRekapPenilaianController = async (req, res) => {
   const { id_proposal, id_tahap } = req.params;
 
-  const result = await getRekapPenilaian(Number(id_proposal), Number(id_tahap));
+  const result = await getRekapPenilaian(
+    Number(id_proposal),
+    Number(id_tahap)
+  );
 
-  if (result.error) return res.status(400).json(result);
+  if (result.error) {
+    return res.status(400).json({
+      message: result.message,
+      data: result.data,
+    });
+  }
 
   res.json({
     message: "Rekap penilaian lengkap",

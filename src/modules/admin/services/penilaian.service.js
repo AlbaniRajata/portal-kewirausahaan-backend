@@ -32,22 +32,25 @@ const getRekapPenilaian = async (id_proposal, id_tahap) => {
     judul: rows[0].judul,
   };
 
-  const reviewerMap = {};
+  const penilaiMap = {};
 
   for (const r of rows) {
-    if (!reviewerMap[r.id_reviewer]) {
-      reviewerMap[r.id_reviewer] = {
-        reviewer: {
-          id_reviewer: r.id_reviewer,
-          nama: r.nama_reviewer,
-          email: r.email_reviewer,
+    const key = `${r.tipe_penilai}-${r.id_penilai}`;
+
+    if (!penilaiMap[key]) {
+      penilaiMap[key] = {
+        tipe: r.tipe_penilai,
+        penilai: {
+          id_user: r.id_penilai,
+          nama: r.nama_penilai,
+          email: r.email_penilai,
         },
         detail: [],
         total_nilai: 0,
       };
     }
 
-    reviewerMap[r.id_reviewer].detail.push({
+    penilaiMap[key].detail.push({
       id_kriteria: r.id_kriteria,
       nama_kriteria: r.nama_kriteria,
       bobot: Number(r.bobot),
@@ -56,21 +59,22 @@ const getRekapPenilaian = async (id_proposal, id_tahap) => {
       catatan: r.catatan,
     });
 
-    reviewerMap[r.id_reviewer].total_nilai += Number(r.nilai);
+    penilaiMap[key].total_nilai += Number(r.nilai);
   }
 
-  const reviewers = Object.values(reviewerMap);
+  const penilai = Object.values(penilaiMap);
 
   const rata_rata =
-    reviewers.reduce((acc, x) => acc + x.total_nilai, 0) / reviewers.length;
+    penilai.reduce((acc, x) => acc + x.total_nilai, 0) / penilai.length;
 
   return {
-    message: "Rekap penilaian lengkap",
+    error: false,
     data: {
       proposal,
-      reviewers,
+      penilai,
       ringkasan: {
-        jumlah_reviewer: reviewers.length,
+        tahap: id_tahap,
+        jumlah_penilai: penilai.length,
         nilai_rata_rata: Number(rata_rata.toFixed(2)),
       },
     },
