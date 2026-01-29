@@ -1,6 +1,7 @@
 const {
   createProposal,
   updateProposal,
+  submitProposal,
 } = require("../services/proposal.service");
 
 const createProposalController = async (req, res) => {
@@ -10,8 +11,10 @@ const createProposalController = async (req, res) => {
 
     if (!req.file) {
       return res.status(400).json({
+        success: false,
         message: "File proposal wajib diunggah",
-        data: null,
+        data: {},
+        meta: {},
       });
     }
 
@@ -22,19 +25,25 @@ const createProposalController = async (req, res) => {
 
     if (result.error) {
       return res.status(400).json({
+        success: false,
         message: result.message,
-        data: result.data,
+        data: result.data || {},
+        meta: {},
       });
     }
 
     return res.json({
-      message: "Proposal berhasil didaftarkan",
+      success: true,
+      message: result.message,
       data: result.data,
+      meta: {},
     });
   } catch (err) {
     return res.status(500).json({
+      success: false,
       message: "Terjadi kesalahan pada sistem",
-      data: null,
+      data: { error: err.message },
+      meta: {},
     });
   }
 };
@@ -53,19 +62,57 @@ const updateProposalController = async (req, res) => {
 
     if (result.error) {
       return res.status(400).json({
+        success: false,
         message: result.message,
-        data: result.data,
+        data: result.data || {},
+        meta: {},
       });
     }
 
     return res.json({
-      message: "Proposal berhasil diperbarui",
+      success: true,
+      message: result.message,
       data: result.data,
+      meta: {},
     });
   } catch (err) {
     return res.status(500).json({
+      success: false,
       message: "Terjadi kesalahan pada sistem",
-      data: null,
+      data: { error: err.message },
+      meta: {},
+    });
+  }
+};
+
+const submitProposalController = async (req, res) => {
+  try {
+    const { id_user } = req.user;
+    const { id_proposal } = req.params;
+
+    const result = await submitProposal(id_user, id_proposal);
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: result.data || {},
+        meta: {},
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: result.message,
+      data: result.data,
+      meta: {},
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan pada sistem",
+      data: { error: err.message },
+      meta: {},
     });
   }
 };
@@ -73,4 +120,5 @@ const updateProposalController = async (req, res) => {
 module.exports = {
   createProposalController,
   updateProposalController,
+  submitProposalController,
 };

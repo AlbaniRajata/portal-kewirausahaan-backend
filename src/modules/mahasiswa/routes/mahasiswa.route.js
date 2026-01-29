@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const roleMiddleware = require("../../../middlewares/role.middleware");
-const { 
-  uploadFotoProfil, 
-  uploadProposal 
+const {
+  uploadFotoProfil,
+  uploadProposal,
 } = require("../../../middlewares/upload.middleware");
 
 const {
@@ -22,15 +22,19 @@ const {
 const {
   createProposalController,
   updateProposalController,
+  submitProposalController,
 } = require("../controllers/proposal.controller");
 
-router.use(roleMiddleware([1])); // Mahasiswa
+router.use(roleMiddleware([1]));
 
 const uploadOptional = (req, res, next) => {
   uploadFotoProfil.single("foto")(req, res, (err) => {
     if (err) {
       return res.status(400).json({
-        message: err.message
+        success: false,
+        message: err.message,
+        data: {},
+        meta: {},
       });
     }
     next();
@@ -47,6 +51,7 @@ router.post("/tim/:id_tim/accept", acceptInviteController);
 router.post("/tim/:id_tim/reject", rejectInviteController);
 
 router.post("/proposal", uploadProposal.single("file_proposal"), createProposalController);
-router.patch("/proposal/:id_proposal", uploadProposal.single("file_proposal"), updateProposalController);
+router.patch("/proposal/:id_proposal",uploadProposal.single("file_proposal"), updateProposalController);
+router.post("/proposal/:id_proposal/submit", submitProposalController);
 
 module.exports = router;

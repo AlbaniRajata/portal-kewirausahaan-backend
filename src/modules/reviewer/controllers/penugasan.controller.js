@@ -7,10 +7,22 @@ const {
 
 const getPenugasanController = async (req, res) => {
   const { id_user } = req.user;
-  const result = await getPenugasan(id_user);
+  const tahap = Number(req.query.tahap);
 
-  res.json({
-    message: "Daftar penugasan",
+  if (![1, 2].includes(tahap)) {
+    return res.status(400).json({
+      message: "Validasi gagal",
+      data: {
+        field: "tahap",
+        reason: "Tahap wajib diisi (1 atau 2)",
+      },
+    });
+  }
+
+  const result = await getPenugasan(id_user, tahap);
+
+  return res.json({
+    message: "Daftar penugasan reviewer",
     data: result.data,
   });
 };
@@ -22,7 +34,10 @@ const getDetailPenugasanController = async (req, res) => {
   if (!id_distribusi) {
     return res.status(400).json({
       message: "Validasi gagal",
-      data: { field: "id_distribusi", reason: "id_distribusi wajib diisi" },
+      data: {
+        field: "id_distribusi",
+        reason: "id_distribusi wajib diisi",
+      },
     });
   }
 
@@ -31,12 +46,12 @@ const getDetailPenugasanController = async (req, res) => {
   if (result.error) {
     return res.status(404).json({
       message: result.message,
-      data: result.data,
+      data: null,
     });
   }
 
-  res.json({
-    message: "Detail penugasan",
+  return res.json({
+    message: "Detail penugasan reviewer",
     data: result.data,
   });
 };
@@ -48,7 +63,10 @@ const acceptPenugasanController = async (req, res) => {
   if (!id_distribusi) {
     return res.status(400).json({
       message: "Validasi gagal",
-      data: { field: "id_distribusi", reason: "id_distribusi wajib diisi" },
+      data: {
+        field: "id_distribusi",
+        reason: "id_distribusi wajib diisi",
+      },
     });
   }
 
@@ -61,7 +79,7 @@ const acceptPenugasanController = async (req, res) => {
     });
   }
 
-  res.json({
+  return res.json({
     message: "Penugasan berhasil diterima",
     data: result.data,
   });
@@ -75,14 +93,20 @@ const rejectPenugasanController = async (req, res) => {
   if (!id_distribusi) {
     return res.status(400).json({
       message: "Validasi gagal",
-      data: { field: "id_distribusi", reason: "id_distribusi wajib diisi" },
+      data: {
+        field: "id_distribusi",
+        reason: "id_distribusi wajib diisi",
+      },
     });
   }
 
   if (!catatan || catatan.trim() === "") {
     return res.status(400).json({
       message: "Validasi gagal",
-      data: { field: "catatan", reason: "Catatan wajib diisi" },
+      data: {
+        field: "catatan",
+        reason: "Catatan wajib diisi saat menolak penugasan",
+      },
     });
   }
 
@@ -95,7 +119,7 @@ const rejectPenugasanController = async (req, res) => {
     });
   }
 
-  res.json({
+  return res.json({
     message: "Penugasan berhasil ditolak",
     data: result.data,
   });

@@ -4,6 +4,7 @@ const {
   checkProposalExistsDb,
   createProposalDb,
   updateProposalDb,
+  submitProposalDb,
   getProposalDetailDb,
   getProgramTimelineDb,
 } = require("../db/proposal.db");
@@ -15,7 +16,7 @@ const createProposal = async (id_user, data) => {
     return {
       error: true,
       message: "Anda bukan ketua tim pada program ini",
-      data: null,
+      data: { id_user, id_program: data.id_program },
     };
   }
 
@@ -25,10 +26,7 @@ const createProposal = async (id_user, data) => {
     return {
       error: true,
       message: "Jumlah anggota tim harus 3 sampai 5 orang",
-      data: {
-        tim,
-        total_anggota: anggota.total,
-      },
+      data: { tim, total_anggota: anggota.total },
     };
   }
 
@@ -39,19 +37,13 @@ const createProposal = async (id_user, data) => {
       data: {
         tim,
         anggota_pending: anggota.pending_members,
-        total_anggota: anggota.total,
-        total_disetujui: anggota.accepted,
       },
     };
   }
 
   const timeline = await getProgramTimelineDb(data.id_program);
 
-  if (
-    timeline &&
-    timeline.pendaftaran_mulai &&
-    timeline.pendaftaran_selesai
-  ) {
+  if (timeline?.pendaftaran_mulai && timeline?.pendaftaran_selesai) {
     const now = new Date();
     const mulai = new Date(timeline.pendaftaran_mulai);
     const selesai = new Date(timeline.pendaftaran_selesai);
@@ -60,11 +52,7 @@ const createProposal = async (id_user, data) => {
       return {
         error: true,
         message: "Pendaftaran proposal untuk program ini sudah ditutup",
-        data: {
-          tim,
-          timeline,
-          now,
-        },
+        data: { timeline, now },
       };
     }
   }
@@ -73,10 +61,8 @@ const createProposal = async (id_user, data) => {
   if (exists) {
     return {
       error: true,
-      message: "Tim ini sudah pernah mengajukan proposal",
-      data: {
-        tim,
-      },
+      message: "Tim ini sudah pernah membuat proposal",
+      data: { tim },
     };
   }
 
@@ -85,6 +71,7 @@ const createProposal = async (id_user, data) => {
 
   return {
     error: false,
+    message: "Draft proposal berhasil dibuat",
     data: detail,
   };
 };
@@ -96,7 +83,7 @@ const updateProposal = async (id_user, id_proposal, data) => {
     return {
       error: true,
       message: "Proposal tidak ditemukan",
-      data: null,
+      data: { id_proposal },
     };
   }
 
@@ -104,32 +91,65 @@ const updateProposal = async (id_user, id_proposal, data) => {
     return {
       error: true,
       message: "Anda tidak berhak mengubah proposal ini",
-      data: {
-        proposal,
-      },
+      data: { proposal },
     };
   }
 
   if (proposal.status !== 0) {
     return {
       error: true,
-      message: "Proposal sudah tidak dapat diubah karena pendaftaran telah ditutup",
-      data: {
-        proposal,
-      },
+      message: "Proposal sudah diajukan dan tidak bisa diedit",
+      data: { proposal },
     };
   }
 
-  await updateProposalDb(id_proposal, data);
-  const updated = await getProposalDetailDb(id_proposal);
+  const updated = await updateProposalDb(id_proposal, data);
 
   return {
     error: false,
+    message: "Draft proposal berhasil diperbarui",
     data: updated,
+  };
+};
+
+const submitProposal = async (id_user, id_proposal) => {
+  const proposal = await getProposalDetailDb(id_proposal);
+
+  if (!proposal) {
+    return {
+      error: true,
+      message: "Proposal tidak ditemukan",
+      data: { id_proposal },
+    };
+  }
+
+  if (proposal.ketua.id_user !== id_user) {
+    return {
+      error: true,
+      message: "Anda tidak berhak submit proposal ini",
+      data: { proposal },
+    };
+  }
+
+  if (proposal.status !== 0) {
+    return {
+      error: true,
+      message: "Proposal sudah diajukan sebelumnya",
+      data: { proposal },
+    };
+  }
+
+  const submitted = await submitProposalDb(id_proposal);
+
+  return {
+    error: false,
+    message: "Proposal berhasil diajukan",
+    data: submitted,
   };
 };
 
 module.exports = {
   createProposal,
   updateProposal,
+  submitProposal,
 };

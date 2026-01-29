@@ -5,33 +5,67 @@ const {
   getDetailNilaiDb,
   upsertNilaiDb,
   submitPenilaianDb,
+  markDistribusiSelesaiDb,
 } = require("../db/penilaian.db");
 
 const VALID_SKOR = [1, 2, 3, 5, 6, 7];
 
+const checkTimeline = (mulai, selesai) => {
+  const now = new Date();
+
+  if (!mulai || !selesai) return true;
+
+  const start = new Date(mulai);
+  const end = new Date(selesai);
+
+  return now >= start && now <= end;
+};
+
 const getFormPenilaian = async (id_user, id_distribusi) => {
   const dist = await getDistribusiForPenilaianDb(id_distribusi);
 
-  if (!dist)
+  if (!dist) {
     return {
       error: true,
       message: "Distribusi tidak ditemukan",
       data: { id_distribusi },
     };
+  }
 
-  if (dist.id_reviewer !== id_user)
+  if (dist.id_reviewer !== id_user) {
     return {
       error: true,
       message: "Akses ditolak",
-      data: { reviewer: id_user },
+      data: null,
     };
+  }
 
-  if (dist.status_distribusi !== 1)
+  if (dist.status_distribusi !== 1) {
     return {
       error: true,
       message: "Penugasan belum diterima",
       data: { status: dist.status_distribusi },
     };
+  }
+
+  if (!checkTimeline(dist.penilaian_mulai, dist.penilaian_selesai)) {
+    return {
+      error: true,
+      message: "Penilaian belum dibuka atau sudah ditutup",
+      data: {
+        mulai: dist.penilaian_mulai,
+        selesai: dist.penilaian_selesai,
+      },
+    };
+  }
+
+  if (dist.id_tahap === 2 && dist.status_proposal !== 4) {
+    return {
+      error: true,
+      message: "Proposal belum lolos desk evaluasi",
+      data: { status_proposal: dist.status_proposal },
+    };
+  }
 
   const penilaian = await getOrCreatePenilaianDb(
     dist.id_distribusi,
@@ -58,56 +92,75 @@ const getFormPenilaian = async (id_user, id_distribusi) => {
 };
 
 const simpanNilai = async (id_user, id_distribusi, payload) => {
-  if (!Array.isArray(payload) || payload.length === 0)
+  if (!Array.isArray(payload) || payload.length === 0) {
     return {
       error: true,
       message: "Payload nilai kosong",
-      data: payload,
+      data: null,
     };
+  }
 
   const dist = await getDistribusiForPenilaianDb(id_distribusi);
 
-  if (!dist || dist.id_reviewer !== id_user)
+  if (!dist || dist.id_reviewer !== id_user) {
     return {
       error: true,
       message: "Akses ditolak",
-      data: { id_distribusi },
+      data: null,
     };
+  }
+
+  if (dist.status_distribusi !== 1) {
+    return {
+      error: true,
+      message: "Penugasan belum diterima",
+      data: null,
+    };
+  }
+
+  if (!checkTimeline(dist.penilaian_mulai, dist.penilaian_selesai)) {
+    return {
+      error: true,
+      message: "Penilaian belum dibuka atau sudah ditutup",
+      data: null,
+    };
+  }
 
   const penilaian = await getOrCreatePenilaianDb(
     dist.id_distribusi,
     dist.id_tahap
   );
 
-  if (penilaian.status === 1)
+  if (penilaian.status === 1) {
     return {
       error: true,
       message: "Penilaian sudah disubmit",
       data: penilaian,
     };
+  }
 
   const kriteria = await getKriteriaByTahapDb(dist.id_tahap);
 
   const hasil = [];
 
   for (const item of payload) {
-    const ref = kriteria.find(
-      (k) => k.id_kriteria === item.id_kriteria
-    );
+    const ref = kriteria.find((k) => k.id_kriteria === item.id_kriteria);
 
-    if (!ref)
+    if (!ref) {
       return {
         error: true,
         message: "Kriteria tidak valid",
         data: item,
       };
+    }
 
-    if (!VALID_SKOR.includes(item.skor))
+    if (!VALID_SKOR.includes(item.skor)) {
       return {
         error: true,
         message: "Skor tidak valid",
         data: { skor: item.skor },
       };
+    }
 
     const nilai = ref.bobot * item.skor;
 
@@ -135,12 +188,29 @@ const simpanNilai = async (id_user, id_distribusi, payload) => {
 const submitPenilaian = async (id_user, id_distribusi) => {
   const dist = await getDistribusiForPenilaianDb(id_distribusi);
 
-  if (!dist || dist.id_reviewer !== id_user)
+  if (!dist || dist.id_reviewer !== id_user) {
     return {
       error: true,
       message: "Akses ditolak",
-      data: { id_distribusi },
+      data: null,
     };
+  }
+
+  if (dist.status_distribusi !== 1) {
+    return {
+      error: true,
+      message: "Penugasan belum diterima",
+      data: null,
+    };
+  }
+
+  if (!checkTimeline(dist.penilaian_mulai, dist.penilaian_selesai)) {
+    return {
+      error: true,
+      message: "Penilaian belum dibuka atau sudah ditutup",
+      data: null,
+    };
+  }
 
   const penilaian = await getOrCreatePenilaianDb(
     dist.id_distribusi,
@@ -150,7 +220,7 @@ const submitPenilaian = async (id_user, id_distribusi) => {
   const nilai = await getDetailNilaiDb(penilaian.id_penilaian);
   const kriteria = await getKriteriaByTahapDb(dist.id_tahap);
 
-  if (nilai.length !== kriteria.length)
+  if (nilai.length !== kriteria.length) {
     return {
       error: true,
       message: "Nilai belum lengkap",
@@ -159,8 +229,11 @@ const submitPenilaian = async (id_user, id_distribusi) => {
         terisi: nilai.length,
       },
     };
+  }
 
   const submitted = await submitPenilaianDb(penilaian.id_penilaian);
+
+  await markDistribusiSelesaiDb(id_distribusi);
 
   return {
     error: false,

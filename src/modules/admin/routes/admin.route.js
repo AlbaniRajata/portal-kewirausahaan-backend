@@ -38,6 +38,7 @@ const {
 
 const {
   getRekapPenilaianController,
+  finalisasiDeskEvaluasiController,
 } = require("../controllers/penilaian.controller");
 
 const authMiddleware = require("../../../middlewares/auth.middleware");
@@ -70,5 +71,6 @@ router.post("/proposal/distribusi/auto", autoDistribusiController);
 router.post("/proposal/distribusi/manual", manualDistribusiController);
 
 router.get("/penilaian/:id_proposal/:id_tahap", getRekapPenilaianController);
+router.post("/proposal/:id_proposal/finalisasi-desk", finalisasiDeskEvaluasiController);
 
 module.exports = router;

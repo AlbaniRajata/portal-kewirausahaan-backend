@@ -27,11 +27,7 @@ const simpanNilaiController = async (req, res) => {
   const id_user = req.user.id_user;
   const id_distribusi = Number(req.params.id_distribusi);
 
-  const result = await simpanNilai(
-    id_user,
-    id_distribusi,
-    req.body.nilai
-  );
+  const result = await simpanNilai(id_user, id_distribusi, req.body.nilai);
 
   if (result.error) {
     return res.status(400).json({

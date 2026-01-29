@@ -1,4 +1,7 @@
-const { getRekapPenilaian } = require("../services/penilaian.service");
+const {
+  getRekapPenilaian,
+  finalisasiDeskEvaluasi,
+} = require("../services/penilaian.service");
 
 const getRekapPenilaianController = async (req, res) => {
   const { id_proposal, id_tahap } = req.params;
@@ -9,10 +12,7 @@ const getRekapPenilaianController = async (req, res) => {
   );
 
   if (result.error) {
-    return res.status(400).json({
-      message: result.message,
-      data: result.data,
-    });
+    return res.status(400).json(result);
   }
 
   res.json({
@@ -21,6 +21,23 @@ const getRekapPenilaianController = async (req, res) => {
   });
 };
 
+const finalisasiDeskEvaluasiController = async (req, res) => {
+  const id_proposal = Number(req.params.id_proposal);
+  const keputusan = Number(req.body.keputusan);
+
+  const result = await finalisasiDeskEvaluasi(id_proposal, keputusan);
+
+  if (result.error) {
+    return res.status(400).json(result);
+  }
+
+  res.json({
+    message: result.message,
+    data: result.data,
+  });
+};
+
 module.exports = {
   getRekapPenilaianController,
+  finalisasiDeskEvaluasiController,
 };

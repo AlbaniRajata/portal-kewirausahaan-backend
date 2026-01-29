@@ -1,20 +1,34 @@
 const pool = require("../../../config/db");
+
 const {
   getReviewerAktifDb,
+  getJuriAktifDb,
   getProposalSiapDistribusiDb,
-  insertDistribusiDb,
-  checkDistribusiExistsDb,
+  insertDistribusiReviewerDb,
+  insertDistribusiJuriDb,
+  checkDistribusiReviewerExistsDb,
+  checkDistribusiJuriExistsDb,
+  updateStatusProposalDistribusiDb,
 } = require("../db/distribusi.db");
 
 const previewDistribusi = async (tahap) => {
   const proposals = await getProposalSiapDistribusiDb(tahap);
   const reviewers = await getReviewerAktifDb();
+  const juris = tahap === 2 ? await getJuriAktifDb() : [];
 
   if (!proposals.length || !reviewers.length) {
     return {
       error: true,
       message: "Proposal atau reviewer tidak tersedia",
       data: { proposals, reviewers },
+    };
+  }
+
+  if (tahap === 2 && !juris.length) {
+    return {
+      error: true,
+      message: "Juri tidak tersedia untuk tahap wawancara",
+      data: { juris },
     };
   }
 
@@ -26,7 +40,7 @@ const previewDistribusi = async (tahap) => {
 
   let cursor = 0;
 
-  const rekomendasi = reviewers.map((r, idx) => {
+  const rekomendasiReviewer = reviewers.map((r, idx) => {
     const jatah = base + (idx < sisa ? 1 : 0);
     const slice = proposals.slice(cursor, cursor + jatah);
     cursor += jatah;
@@ -40,13 +54,14 @@ const previewDistribusi = async (tahap) => {
 
   return {
     error: false,
+    message: "Preview distribusi berhasil",
     data: {
       tahap,
       total_proposal: totalProposal,
       total_reviewer: totalReviewer,
-      base_per_reviewer: base,
-      sisa,
-      rekomendasi,
+      total_juri: juris.length,
+      rekomendasi_reviewer: rekomendasiReviewer,
+      juri_tersedia: juris,
     },
   };
 };
@@ -56,20 +71,35 @@ const autoDistribusi = async (admin_id, tahap) => {
   if (preview.error) return preview;
 
   const client = await pool.connect();
+
   try {
     await client.query("BEGIN");
 
     let total = 0;
     const hasil = [];
 
-    for (const r of preview.data.rekomendasi) {
+    for (const r of preview.data.rekomendasi_reviewer) {
       for (const p of r.proposals) {
-        await insertDistribusiDb(client, [
+        await insertDistribusiReviewerDb(client, [
           p.id_proposal,
           r.id_reviewer,
           tahap,
           admin_id,
         ]);
+
+        if (tahap === 2) {
+          for (const j of preview.data.juri_tersedia) {
+            await insertDistribusiJuriDb(client, [
+              p.id_proposal,
+              j.id_user,
+              tahap,
+              admin_id,
+            ]);
+          }
+        }
+
+        await updateStatusProposalDistribusiDb(client, p.id_proposal, tahap);
+
         total++;
       }
 
@@ -85,6 +115,7 @@ const autoDistribusi = async (admin_id, tahap) => {
 
     return {
       error: false,
+      message: "Distribusi otomatis berhasil",
       data: {
         tahap,
         total_distribusi: total,
@@ -96,7 +127,7 @@ const autoDistribusi = async (admin_id, tahap) => {
     return {
       error: true,
       message: e.message,
-      data: null,
+      data: { tahap },
     };
   } finally {
     client.release();
@@ -104,7 +135,7 @@ const autoDistribusi = async (admin_id, tahap) => {
 };
 
 const manualDistribusi = async (admin_id, data) => {
-  const { id_proposal, tahap, reviewers } = data;
+  const { id_proposal, tahap, reviewers, juris } = data;
 
   if (!id_proposal || !tahap || !reviewers?.length) {
     return {
@@ -114,8 +145,16 @@ const manualDistribusi = async (admin_id, data) => {
     };
   }
 
+  if (tahap === 2 && (!juris || !juris.length)) {
+    return {
+      error: true,
+      message: "Tahap 2 wajib ada juri",
+      data,
+    };
+  }
+
   const proposals = await getProposalSiapDistribusiDb(tahap);
-  const proposal = proposals.find(p => p.id_proposal === id_proposal);
+  const proposal = proposals.find((p) => p.id_proposal === id_proposal);
 
   if (!proposal) {
     return {
@@ -126,13 +165,12 @@ const manualDistribusi = async (admin_id, data) => {
   }
 
   const client = await pool.connect();
+
   try {
     await client.query("BEGIN");
 
-    const inserted = [];
-
     for (const id_reviewer of reviewers) {
-      const exists = await checkDistribusiExistsDb(
+      const exists = await checkDistribusiReviewerExistsDb(
         id_proposal,
         id_reviewer,
         tahap
@@ -147,24 +185,52 @@ const manualDistribusi = async (admin_id, data) => {
         };
       }
 
-      await insertDistribusiDb(client, [
+      await insertDistribusiReviewerDb(client, [
         id_proposal,
         id_reviewer,
         tahap,
         admin_id,
       ]);
-
-      inserted.push(id_reviewer);
     }
+
+    if (tahap === 2) {
+      for (const id_juri of juris) {
+        const exists = await checkDistribusiJuriExistsDb(
+          id_proposal,
+          id_juri,
+          tahap
+        );
+
+        if (exists) {
+          await client.query("ROLLBACK");
+          return {
+            error: true,
+            message: "Juri sudah menerima proposal ini",
+            data: { id_proposal, id_juri, tahap },
+          };
+        }
+
+        await insertDistribusiJuriDb(client, [
+          id_proposal,
+          id_juri,
+          tahap,
+          admin_id,
+        ]);
+      }
+    }
+
+    await updateStatusProposalDistribusiDb(client, id_proposal, tahap);
 
     await client.query("COMMIT");
 
     return {
       error: false,
+      message: "Distribusi manual berhasil",
       data: {
         tahap,
         proposal,
-        reviewer_ditambahkan: inserted,
+        reviewer_ditambahkan: reviewers,
+        juri_ditambahkan: tahap === 2 ? juris : [],
       },
     };
   } catch (e) {

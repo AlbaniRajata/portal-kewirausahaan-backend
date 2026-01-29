@@ -12,7 +12,8 @@ const getDistribusiForPenilaianDb = async (id_distribusi) => {
       t.penilaian_selesai,
 
       p.id_proposal,
-      p.judul
+      p.judul,
+      p.status AS status_proposal
     FROM t_distribusi_reviewer d
     JOIN m_tahap_penilaian t ON t.id_tahap = d.tahap
     JOIN t_proposal p ON p.id_proposal = d.id_proposal
@@ -123,6 +124,19 @@ const submitPenilaianDb = async (id_penilaian) => {
   return rows[0];
 };
 
+const markDistribusiSelesaiDb = async (id_distribusi) => {
+  const q = `
+    UPDATE t_distribusi_reviewer
+    SET status = 3,
+        responded_at = now()
+    WHERE id_distribusi = $1
+    RETURNING *
+  `;
+
+  const { rows } = await pool.query(q, [id_distribusi]);
+  return rows[0];
+};
+
 module.exports = {
   getDistribusiForPenilaianDb,
   getKriteriaByTahapDb,
@@ -130,4 +144,5 @@ module.exports = {
   getDetailNilaiDb,
   upsertNilaiDb,
   submitPenilaianDb,
+  markDistribusiSelesaiDb,
 };

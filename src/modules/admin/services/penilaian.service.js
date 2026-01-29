@@ -1,22 +1,11 @@
-const { getRekapDb } = require("../db/penilaian.db");
+const {
+  getRekapDb,
+  countSubmittedReviewerDb,
+  countDistribusiReviewerDb,
+  updateStatusProposalDb,
+} = require("../db/penilaian.db");
 
 const getRekapPenilaian = async (id_proposal, id_tahap) => {
-  if (!id_proposal) {
-    return {
-      error: true,
-      message: "Validasi gagal",
-      data: { field: "id_proposal", reason: "id_proposal wajib diisi" },
-    };
-  }
-
-  if (!id_tahap) {
-    return {
-      error: true,
-      message: "Validasi gagal",
-      data: { field: "id_tahap", reason: "id_tahap wajib diisi" },
-    };
-  }
-
   const rows = await getRekapDb(id_proposal, id_tahap);
 
   if (rows.length === 0) {
@@ -45,6 +34,7 @@ const getRekapPenilaian = async (id_proposal, id_tahap) => {
           nama: r.nama_penilai,
           email: r.email_penilai,
         },
+        submitted_at: r.submitted_at,
         detail: [],
         total_nilai: 0,
       };
@@ -62,25 +52,57 @@ const getRekapPenilaian = async (id_proposal, id_tahap) => {
     penilaiMap[key].total_nilai += Number(r.nilai);
   }
 
-  const penilai = Object.values(penilaiMap);
-
-  const rata_rata =
-    penilai.reduce((acc, x) => acc + x.total_nilai, 0) / penilai.length;
-
   return {
     error: false,
     data: {
       proposal,
-      penilai,
-      ringkasan: {
-        tahap: id_tahap,
-        jumlah_penilai: penilai.length,
-        nilai_rata_rata: Number(rata_rata.toFixed(2)),
-      },
+      tahap: id_tahap,
+      penilai: Object.values(penilaiMap),
     },
+  };
+};
+
+const finalisasiDeskEvaluasi = async (id_proposal, keputusan) => {
+  if (![3, 4].includes(keputusan)) {
+    return {
+      error: true,
+      message: "Keputusan tidak valid",
+      data: { keputusan },
+    };
+  }
+
+  const totalDistribusi = await countDistribusiReviewerDb(id_proposal, 1);
+  const totalSubmit = await countSubmittedReviewerDb(id_proposal, 1);
+
+  if (totalDistribusi === 0) {
+    return {
+      error: true,
+      message: "Proposal belum punya reviewer",
+      data: { id_proposal },
+    };
+  }
+
+  if (totalSubmit !== totalDistribusi) {
+    return {
+      error: true,
+      message: "Reviewer belum selesai semua",
+      data: {
+        total_distribusi: totalDistribusi,
+        total_submit: totalSubmit,
+      },
+    };
+  }
+
+  const updated = await updateStatusProposalDb(id_proposal, keputusan);
+
+  return {
+    error: false,
+    message: "Finalisasi desk evaluasi berhasil",
+    data: updated,
   };
 };
 
 module.exports = {
   getRekapPenilaian,
+  finalisasiDeskEvaluasi,
 };

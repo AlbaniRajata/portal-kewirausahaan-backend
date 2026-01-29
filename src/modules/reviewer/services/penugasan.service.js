@@ -4,9 +4,12 @@ const {
   updateStatusDistribusiDb,
 } = require("../db/penugasan.db");
 
-const getPenugasan = async (id_user) => {
-  const data = await getPenugasanDb(id_user);
-  return { error: false, data };
+const getPenugasan = async (id_user, tahap) => {
+  const data = await getPenugasanDb(id_user, tahap);
+
+  return {
+    data,
+  };
 };
 
 const getDetailPenugasan = async (id_user, id_distribusi) => {
@@ -20,7 +23,9 @@ const getDetailPenugasan = async (id_user, id_distribusi) => {
     };
   }
 
-  return { error: false, data };
+  return {
+    data,
+  };
 };
 
 const acceptPenugasan = async (id_user, id_distribusi) => {
@@ -43,7 +48,10 @@ const acceptPenugasan = async (id_user, id_distribusi) => {
   }
 
   const updated = await updateStatusDistribusiDb(id_distribusi, 1, null);
-  return { error: false, data: updated };
+
+  return {
+    data: updated,
+  };
 };
 
 const rejectPenugasan = async (id_user, id_distribusi, catatan) => {
@@ -66,7 +74,10 @@ const rejectPenugasan = async (id_user, id_distribusi, catatan) => {
   }
 
   const updated = await updateStatusDistribusiDb(id_distribusi, 2, catatan);
-  return { error: false, data: updated };
+
+  return {
+    data: updated,
+  };
 };
 
 module.exports = {
