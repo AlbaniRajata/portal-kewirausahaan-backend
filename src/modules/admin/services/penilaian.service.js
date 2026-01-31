@@ -1,18 +1,18 @@
 const {
-  getRekapDb,
-  countSubmittedReviewerDb,
-  countDistribusiReviewerDb,
+  getRekapReviewerTahap1Db,
+  countDistribusiReviewerTahap1Db,
+  countSubmittedReviewerTahap1Db,
   updateStatusProposalDb,
 } = require("../db/penilaian.db");
 
-const getRekapPenilaian = async (id_proposal, id_tahap) => {
-  const rows = await getRekapDb(id_proposal, id_tahap);
+const getRekapDeskEvaluasi = async (id_proposal) => {
+  const rows = await getRekapReviewerTahap1Db(id_proposal);
 
   if (rows.length === 0) {
     return {
       error: true,
-      message: "Belum ada penilaian yang disubmit",
-      data: { id_proposal, id_tahap },
+      message: "Belum ada penilaian reviewer yang disubmit",
+      data: { id_proposal },
     };
   }
 
@@ -21,18 +21,14 @@ const getRekapPenilaian = async (id_proposal, id_tahap) => {
     judul: rows[0].judul,
   };
 
-  const penilaiMap = {};
+  const reviewerMap = {};
 
   for (const r of rows) {
-    const key = `${r.tipe_penilai}-${r.id_penilai}`;
-
-    if (!penilaiMap[key]) {
-      penilaiMap[key] = {
-        tipe: r.tipe_penilai,
-        penilai: {
-          id_user: r.id_penilai,
-          nama: r.nama_penilai,
-          email: r.email_penilai,
+    if (!reviewerMap[r.id_reviewer]) {
+      reviewerMap[r.id_reviewer] = {
+        reviewer: {
+          id_user: r.id_reviewer,
+          nama: r.nama_reviewer,
         },
         submitted_at: r.submitted_at,
         detail: [],
@@ -40,7 +36,7 @@ const getRekapPenilaian = async (id_proposal, id_tahap) => {
       };
     }
 
-    penilaiMap[key].detail.push({
+    reviewerMap[r.id_reviewer].detail.push({
       id_kriteria: r.id_kriteria,
       nama_kriteria: r.nama_kriteria,
       bobot: Number(r.bobot),
@@ -49,60 +45,81 @@ const getRekapPenilaian = async (id_proposal, id_tahap) => {
       catatan: r.catatan,
     });
 
-    penilaiMap[key].total_nilai += Number(r.nilai);
+    reviewerMap[r.id_reviewer].total_nilai += Number(r.nilai);
   }
 
   return {
     error: false,
     data: {
       proposal,
-      tahap: id_tahap,
-      penilai: Object.values(penilaiMap),
+      reviewer: Object.values(reviewerMap),
     },
   };
 };
 
-const finalisasiDeskEvaluasi = async (id_proposal, keputusan) => {
-  if (![3, 4].includes(keputusan)) {
+const finalisasiDeskBatch = async (payload) => {
+  const { lolos = [], tidak_lolos = [] } = payload;
+
+  if (!Array.isArray(lolos) || !Array.isArray(tidak_lolos)) {
     return {
       error: true,
-      message: "Keputusan tidak valid",
-      data: { keputusan },
+      message: "Payload batch tidak valid",
+      data: payload,
     };
   }
 
-  const totalDistribusi = await countDistribusiReviewerDb(id_proposal, 1);
-  const totalSubmit = await countSubmittedReviewerDb(id_proposal, 1);
+  const hasil = [];
 
-  if (totalDistribusi === 0) {
-    return {
-      error: true,
-      message: "Proposal belum punya reviewer",
-      data: { id_proposal },
-    };
+  for (const id_proposal of lolos) {
+    const totalDistribusi = await countDistribusiReviewerTahap1Db(id_proposal);
+    const totalSubmit = await countSubmittedReviewerTahap1Db(id_proposal);
+
+    if (totalDistribusi === 0) {
+      continue;
+    }
+
+    if (totalSubmit !== totalDistribusi) {
+      continue;
+    }
+
+    const updated = await updateStatusProposalDb(id_proposal, 4);
+
+    hasil.push({
+      id_proposal,
+      status: "LOLOS",
+      updated,
+    });
   }
 
-  if (totalSubmit !== totalDistribusi) {
-    return {
-      error: true,
-      message: "Reviewer belum selesai semua",
-      data: {
-        total_distribusi: totalDistribusi,
-        total_submit: totalSubmit,
-      },
-    };
-  }
+  for (const id_proposal of tidak_lolos) {
+    const totalDistribusi = await countDistribusiReviewerTahap1Db(id_proposal);
+    const totalSubmit = await countSubmittedReviewerTahap1Db(id_proposal);
 
-  const updated = await updateStatusProposalDb(id_proposal, keputusan);
+    if (totalDistribusi === 0) {
+      continue;
+    }
+
+    if (totalSubmit !== totalDistribusi) {
+      continue;
+    }
+
+    const updated = await updateStatusProposalDb(id_proposal, 3);
+
+    hasil.push({
+      id_proposal,
+      status: "TIDAK LOLOS",
+      updated,
+    });
+  }
 
   return {
     error: false,
-    message: "Finalisasi desk evaluasi berhasil",
-    data: updated,
+    message: "Finalisasi desk evaluasi batch berhasil",
+    data: hasil,
   };
 };
 
 module.exports = {
-  getRekapPenilaian,
-  finalisasiDeskEvaluasi,
+  getRekapDeskEvaluasi,
+  finalisasiDeskBatch,
 };

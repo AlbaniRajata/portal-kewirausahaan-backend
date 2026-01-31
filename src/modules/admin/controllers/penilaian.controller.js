@@ -1,43 +1,43 @@
 const {
-  getRekapPenilaian,
-  finalisasiDeskEvaluasi,
+  getRekapDeskEvaluasi,
+  finalisasiDeskBatch,
 } = require("../services/penilaian.service");
 
-const getRekapPenilaianController = async (req, res) => {
-  const { id_proposal, id_tahap } = req.params;
+const getRekapDeskEvaluasiController = async (req, res) => {
+  const id_proposal = Number(req.params.id_proposal);
 
-  const result = await getRekapPenilaian(
-    Number(id_proposal),
-    Number(id_tahap)
-  );
+  const result = await getRekapDeskEvaluasi(id_proposal);
 
   if (result.error) {
-    return res.status(400).json(result);
+    return res.status(400).json({
+      message: result.message,
+      data: result.data,
+    });
   }
 
-  res.json({
-    message: "Rekap penilaian lengkap",
+  return res.json({
+    message: "Rekap desk evaluasi tahap 1",
     data: result.data,
   });
 };
 
-const finalisasiDeskEvaluasiController = async (req, res) => {
-  const id_proposal = Number(req.params.id_proposal);
-  const keputusan = Number(req.body.keputusan);
-
-  const result = await finalisasiDeskEvaluasi(id_proposal, keputusan);
+const finalisasiDeskBatchController = async (req, res) => {
+  const result = await finalisasiDeskBatch(req.body);
 
   if (result.error) {
-    return res.status(400).json(result);
+    return res.status(400).json({
+      message: result.message,
+      data: result.data,
+    });
   }
 
-  res.json({
+  return res.json({
     message: result.message,
     data: result.data,
   });
 };
 
 module.exports = {
-  getRekapPenilaianController,
-  finalisasiDeskEvaluasiController,
+  getRekapDeskEvaluasiController,
+  finalisasiDeskBatchController,
 };

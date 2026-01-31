@@ -5,7 +5,7 @@ const {
   getDetailNilaiDb,
   upsertNilaiDb,
   submitPenilaianDb,
-  markDistribusiSelesaiDb,
+  markDistribusiSubmittedDb,
 } = require("../db/penilaian.db");
 
 const VALID_SKOR = [1, 2, 3, 5, 6, 7];
@@ -19,6 +19,19 @@ const checkTimeline = (mulai, selesai) => {
   const end = new Date(selesai);
 
   return now >= start && now <= end;
+};
+
+const ensureNoDuplicateKriteria = (payload) => {
+  const seen = new Set();
+
+  for (const item of payload) {
+    if (seen.has(item.id_kriteria)) {
+      return false;
+    }
+    seen.add(item.id_kriteria);
+  }
+
+  return true;
 };
 
 const getFormPenilaian = async (id_user, id_distribusi) => {
@@ -59,14 +72,6 @@ const getFormPenilaian = async (id_user, id_distribusi) => {
     };
   }
 
-  if (dist.id_tahap === 2 && dist.status_proposal !== 4) {
-    return {
-      error: true,
-      message: "Proposal belum lolos desk evaluasi",
-      data: { status_proposal: dist.status_proposal },
-    };
-  }
-
   const penilaian = await getOrCreatePenilaianDb(
     dist.id_distribusi,
     dist.id_tahap
@@ -96,6 +101,14 @@ const simpanNilai = async (id_user, id_distribusi, payload) => {
     return {
       error: true,
       message: "Payload nilai kosong",
+      data: null,
+    };
+  }
+
+  if (!ensureNoDuplicateKriteria(payload)) {
+    return {
+      error: true,
+      message: "Payload mengandung kriteria duplikat",
       data: null,
     };
   }
@@ -217,6 +230,14 @@ const submitPenilaian = async (id_user, id_distribusi) => {
     dist.id_tahap
   );
 
+  if (penilaian.status === 1) {
+    return {
+      error: true,
+      message: "Penilaian sudah pernah disubmit",
+      data: penilaian,
+    };
+  }
+
   const nilai = await getDetailNilaiDb(penilaian.id_penilaian);
   const kriteria = await getKriteriaByTahapDb(dist.id_tahap);
 
@@ -233,7 +254,15 @@ const submitPenilaian = async (id_user, id_distribusi) => {
 
   const submitted = await submitPenilaianDb(penilaian.id_penilaian);
 
-  await markDistribusiSelesaiDb(id_distribusi);
+  if (!submitted) {
+    return {
+      error: true,
+      message: "Submit gagal atau sudah disubmit",
+      data: null,
+    };
+  }
+
+  await markDistribusiSubmittedDb(id_distribusi);
 
   return {
     error: false,

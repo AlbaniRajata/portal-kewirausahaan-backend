@@ -37,8 +37,8 @@ const {
 } = require("../controllers/distribusi.controller");
 
 const {
-  getRekapPenilaianController,
-  finalisasiDeskEvaluasiController,
+  getRekapDeskEvaluasiController,
+  finalisasiDeskBatchController,
 } = require("../controllers/penilaian.controller");
 
 const roleMiddleware = require("../../../middlewares/role.middleware");
@@ -68,7 +68,7 @@ router.get("/distribusi/reviewer/tahap/:tahap/preview", previewDistribusiTahap1C
 router.post("/distribusi/reviewer/tahap/:tahap/auto", autoDistribusiTahap1Controller);
 router.post("/distribusi/reviewer/tahap/:tahap/manual", manualDistribusiTahap1Controller);
 
-router.get("/penilaian/:id_proposal/:id_tahap", getRekapPenilaianController);
-router.post("/proposal/:id_proposal/finalisasi-desk", finalisasiDeskEvaluasiController);
+router.get("/proposal/:id_proposal/rekap-desk", getRekapDeskEvaluasiController);
+router.post("/proposal/finalisasi-desk-batch", finalisasiDeskBatchController);
 
 module.exports = router;

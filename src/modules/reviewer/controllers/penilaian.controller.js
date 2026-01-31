@@ -17,7 +17,7 @@ const getFormPenilaianController = async (req, res) => {
     });
   }
 
-  res.json({
+  return res.json({
     message: "Form penilaian reviewer",
     data: result.data,
   });
@@ -27,7 +27,9 @@ const simpanNilaiController = async (req, res) => {
   const id_user = req.user.id_user;
   const id_distribusi = Number(req.params.id_distribusi);
 
-  const result = await simpanNilai(id_user, id_distribusi, req.body.nilai);
+  const payload = req.body.nilai;
+
+  const result = await simpanNilai(id_user, id_distribusi, payload);
 
   if (result.error) {
     return res.status(400).json({
@@ -36,7 +38,7 @@ const simpanNilaiController = async (req, res) => {
     });
   }
 
-  res.json({
+  return res.json({
     message: result.message,
     data: result.data,
   });
@@ -55,7 +57,7 @@ const submitPenilaianController = async (req, res) => {
     });
   }
 
-  res.json({
+  return res.json({
     message: "Penilaian reviewer berhasil disubmit",
     data: result.data,
   });
