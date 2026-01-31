@@ -4,7 +4,6 @@ const {
   getDetailPenugasanDb,
   acceptDistribusiDb,
   rejectDistribusiDb,
-  rollbackStatusProposalDb,
 } = require("../db/penugasan.db");
 
 const getPenugasan = async (id_user, tahap) => {
@@ -32,9 +31,9 @@ const getPenugasan = async (id_user, tahap) => {
 };
 
 const getDetailPenugasan = async (id_user, id_distribusi) => {
-  const data = await getDetailPenugasanDb(id_distribusi, id_user);
+  const detail = await getDetailPenugasanDb(id_distribusi, id_user);
 
-  if (!data) {
+  if (!detail) {
     return {
       error: true,
       message: "Penugasan tidak ditemukan",
@@ -45,7 +44,7 @@ const getDetailPenugasan = async (id_user, id_distribusi) => {
   return {
     error: false,
     message: "Detail penugasan reviewer",
-    data,
+    data: detail,
   };
 };
 
@@ -137,8 +136,6 @@ const rejectPenugasan = async (id_user, id_distribusi, catatan) => {
       data: null,
     };
   }
-
-  await rollbackStatusProposalDb(detail.id_proposal);
 
   return {
     error: false,

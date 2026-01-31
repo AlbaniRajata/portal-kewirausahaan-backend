@@ -34,12 +34,18 @@ const {
   previewDistribusiTahap1Controller,
   autoDistribusiTahap1Controller,
   manualDistribusiTahap1Controller,
-} = require("../controllers/distribusi.controller");
+} = require("../controllers/distribusiTahap1.controller");
 
 const {
   getRekapDeskEvaluasiController,
   finalisasiDeskBatchController,
 } = require("../controllers/penilaian.controller");
+
+const {
+  previewDistribusiTahap2Controller,
+  autoDistribusiTahap2Controller,
+  manualDistribusiTahap2Controller,
+} = require("../controllers/distribusiTahap2.controller");
 
 const roleMiddleware = require("../../../middlewares/role.middleware");
 
@@ -70,5 +76,9 @@ router.post("/distribusi/reviewer/tahap/:tahap/manual", manualDistribusiTahap1Co
 
 router.get("/proposal/:id_proposal/rekap-desk", getRekapDeskEvaluasiController);
 router.post("/proposal/finalisasi-desk-batch", finalisasiDeskBatchController);
+
+router.get("/panel/tahap/:tahap/preview", previewDistribusiTahap2Controller);
+router.post("/panel/tahap/:tahap/auto", autoDistribusiTahap2Controller);
+router.post("/panel/tahap/:tahap/manual", manualDistribusiTahap2Controller);
 
 module.exports = router;

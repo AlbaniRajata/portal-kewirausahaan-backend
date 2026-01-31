@@ -8,7 +8,7 @@ const {
   lockProposalForDistribusiDb,
   insertDistribusiDb,
   updateStatusProposalDistribusiDb,
-} = require("../db/distribusi.db");
+} = require("../db/distribusiTahap1.db");
 
 const previewDistribusiTahap1 = async () => {
   const tahap = 1;

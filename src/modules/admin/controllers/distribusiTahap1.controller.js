@@ -2,7 +2,7 @@ const {
   previewDistribusiTahap1,
   autoDistribusiTahap1,
   manualDistribusiTahap1,
-} = require("../services/distribusi.service");
+} = require("../services/distribusiTahap1.service");
 
 const previewDistribusiTahap1Controller = async (req, res) => {
   const result = await previewDistribusiTahap1();
