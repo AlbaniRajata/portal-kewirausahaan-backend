@@ -1,34 +1,43 @@
 const pool = require("../../../config/db");
 
 const {
+  getTahapAktifDb,
   getReviewerAktifDb,
-  getJuriAktifDb,
+  checkReviewerValidDb,
   getProposalSiapDistribusiDb,
-  insertDistribusiReviewerDb,
-  insertDistribusiJuriDb,
-  checkDistribusiReviewerExistsDb,
-  checkDistribusiJuriExistsDb,
+  lockProposalForDistribusiDb,
+  insertDistribusiDb,
   updateStatusProposalDistribusiDb,
 } = require("../db/distribusi.db");
 
-const previewDistribusi = async (tahap) => {
-  const proposals = await getProposalSiapDistribusiDb(tahap);
-  const reviewers = await getReviewerAktifDb();
-  const juris = tahap === 2 ? await getJuriAktifDb() : [];
+const previewDistribusiTahap1 = async () => {
+  const tahap = 1;
 
-  if (!proposals.length || !reviewers.length) {
+  const tahapAktif = await getTahapAktifDb(tahap);
+  if (!tahapAktif) {
     return {
       error: true,
-      message: "Proposal atau reviewer tidak tersedia",
-      data: { proposals, reviewers },
+      message: "Tahap 1 tidak aktif",
+      data: { tahap },
     };
   }
 
-  if (tahap === 2 && !juris.length) {
+  const proposals = await getProposalSiapDistribusiDb(tahap);
+  const reviewers = await getReviewerAktifDb();
+
+  if (!proposals.length) {
     return {
       error: true,
-      message: "Juri tidak tersedia untuk tahap wawancara",
-      data: { juris },
+      message: "Tidak ada proposal siap distribusi tahap 1",
+      data: { tahap },
+    };
+  }
+
+  if (!reviewers.length) {
+    return {
+      error: true,
+      message: "Reviewer aktif tidak tersedia",
+      data: { tahap },
     };
   }
 
@@ -40,7 +49,7 @@ const previewDistribusi = async (tahap) => {
 
   let cursor = 0;
 
-  const rekomendasiReviewer = reviewers.map((r, idx) => {
+  const rekomendasi = reviewers.map((r, idx) => {
     const jatah = base + (idx < sisa ? 1 : 0);
     const slice = proposals.slice(cursor, cursor + jatah);
     cursor += jatah;
@@ -54,20 +63,20 @@ const previewDistribusi = async (tahap) => {
 
   return {
     error: false,
-    message: "Preview distribusi berhasil",
+    message: "Preview distribusi tahap 1 berhasil",
     data: {
       tahap,
       total_proposal: totalProposal,
       total_reviewer: totalReviewer,
-      total_juri: juris.length,
-      rekomendasi_reviewer: rekomendasiReviewer,
-      juri_tersedia: juris,
+      rekomendasi,
     },
   };
 };
 
-const autoDistribusi = async (admin_id, tahap) => {
-  const preview = await previewDistribusi(tahap);
+const autoDistribusiTahap1 = async (admin_id) => {
+  const tahap = 1;
+
+  const preview = await previewDistribusiTahap1();
   if (preview.error) return preview;
 
   const client = await pool.connect();
@@ -78,36 +87,36 @@ const autoDistribusi = async (admin_id, tahap) => {
     let total = 0;
     const hasil = [];
 
-    for (const r of preview.data.rekomendasi_reviewer) {
+    for (const r of preview.data.rekomendasi) {
+      const assigned = [];
+
       for (const p of r.proposals) {
-        await insertDistribusiReviewerDb(client, [
+        const locked = await lockProposalForDistribusiDb(
+          client,
+          p.id_proposal,
+          tahap
+        );
+
+        if (!locked) continue;
+
+        const distribusi = await insertDistribusiDb(client, [
           p.id_proposal,
           r.id_reviewer,
           tahap,
           admin_id,
         ]);
 
-        if (tahap === 2) {
-          for (const j of preview.data.juri_tersedia) {
-            await insertDistribusiJuriDb(client, [
-              p.id_proposal,
-              j.id_user,
-              tahap,
-              admin_id,
-            ]);
-          }
-        }
+        await updateStatusProposalDistribusiDb(client, p.id_proposal);
 
-        await updateStatusProposalDistribusiDb(client, p.id_proposal, tahap);
-
+        assigned.push(distribusi);
         total++;
       }
 
       hasil.push({
         id_reviewer: r.id_reviewer,
         nama_reviewer: r.nama_reviewer,
-        total_proposal: r.proposals.length,
-        proposals: r.proposals,
+        total_proposal: assigned.length,
+        distribusi: assigned,
       });
     }
 
@@ -115,11 +124,11 @@ const autoDistribusi = async (admin_id, tahap) => {
 
     return {
       error: false,
-      message: "Distribusi otomatis berhasil",
+      message: "Distribusi otomatis tahap 1 berhasil",
       data: {
         tahap,
         total_distribusi: total,
-        distribusi: hasil,
+        hasil,
       },
     };
   } catch (e) {
@@ -134,33 +143,34 @@ const autoDistribusi = async (admin_id, tahap) => {
   }
 };
 
-const manualDistribusi = async (admin_id, data) => {
-  const { id_proposal, tahap, reviewers, juris } = data;
+const manualDistribusiTahap1 = async (admin_id, payload) => {
+  const tahap = 1;
 
-  if (!id_proposal || !tahap || !reviewers?.length) {
+  const { id_proposal, id_reviewer } = payload;
+
+  if (!id_proposal || !id_reviewer) {
     return {
       error: true,
-      message: "Data tidak lengkap",
-      data,
+      message: "id_proposal dan id_reviewer wajib diisi",
+      data: payload,
     };
   }
 
-  if (tahap === 2 && (!juris || !juris.length)) {
+  const tahapAktif = await getTahapAktifDb(tahap);
+  if (!tahapAktif) {
     return {
       error: true,
-      message: "Tahap 2 wajib ada juri",
-      data,
+      message: "Tahap 1 tidak aktif",
+      data: { tahap },
     };
   }
 
-  const proposals = await getProposalSiapDistribusiDb(tahap);
-  const proposal = proposals.find((p) => p.id_proposal === id_proposal);
-
-  if (!proposal) {
+  const reviewerValid = await checkReviewerValidDb(id_reviewer);
+  if (!reviewerValid) {
     return {
       error: true,
-      message: "Proposal tidak valid atau sudah terdistribusi",
-      data: { id_proposal, tahap },
+      message: "Reviewer tidak valid atau tidak aktif",
+      data: { id_reviewer },
     };
   }
 
@@ -169,76 +179,43 @@ const manualDistribusi = async (admin_id, data) => {
   try {
     await client.query("BEGIN");
 
-    for (const id_reviewer of reviewers) {
-      const exists = await checkDistribusiReviewerExistsDb(
-        id_proposal,
-        id_reviewer,
-        tahap
-      );
+    const locked = await lockProposalForDistribusiDb(
+      client,
+      id_proposal,
+      tahap
+    );
 
-      if (exists) {
-        await client.query("ROLLBACK");
-        return {
-          error: true,
-          message: "Reviewer sudah menerima proposal ini",
-          data: { id_proposal, id_reviewer, tahap },
-        };
-      }
-
-      await insertDistribusiReviewerDb(client, [
-        id_proposal,
-        id_reviewer,
-        tahap,
-        admin_id,
-      ]);
+    if (!locked) {
+      await client.query("ROLLBACK");
+      return {
+        error: true,
+        message: "Proposal tidak valid atau sudah terdistribusi",
+        data: { id_proposal, tahap },
+      };
     }
 
-    if (tahap === 2) {
-      for (const id_juri of juris) {
-        const exists = await checkDistribusiJuriExistsDb(
-          id_proposal,
-          id_juri,
-          tahap
-        );
+    const distribusi = await insertDistribusiDb(client, [
+      id_proposal,
+      id_reviewer,
+      tahap,
+      admin_id,
+    ]);
 
-        if (exists) {
-          await client.query("ROLLBACK");
-          return {
-            error: true,
-            message: "Juri sudah menerima proposal ini",
-            data: { id_proposal, id_juri, tahap },
-          };
-        }
-
-        await insertDistribusiJuriDb(client, [
-          id_proposal,
-          id_juri,
-          tahap,
-          admin_id,
-        ]);
-      }
-    }
-
-    await updateStatusProposalDistribusiDb(client, id_proposal, tahap);
+    await updateStatusProposalDistribusiDb(client, id_proposal);
 
     await client.query("COMMIT");
 
     return {
       error: false,
-      message: "Distribusi manual berhasil",
-      data: {
-        tahap,
-        proposal,
-        reviewer_ditambahkan: reviewers,
-        juri_ditambahkan: tahap === 2 ? juris : [],
-      },
+      message: "Distribusi manual tahap 1 berhasil",
+      data: distribusi,
     };
   } catch (e) {
     await client.query("ROLLBACK");
     return {
       error: true,
       message: e.message,
-      data,
+      data: payload,
     };
   } finally {
     client.release();
@@ -246,7 +223,7 @@ const manualDistribusi = async (admin_id, data) => {
 };
 
 module.exports = {
-  previewDistribusi,
-  autoDistribusi,
-  manualDistribusi,
+  previewDistribusiTahap1,
+  autoDistribusiTahap1,
+  manualDistribusiTahap1,
 };

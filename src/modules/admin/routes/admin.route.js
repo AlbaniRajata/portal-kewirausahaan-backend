@@ -31,9 +31,9 @@ const {
 } = require("../controllers/juri.controller");
 
 const {
-  previewDistribusiController,
-  autoDistribusiController,
-  manualDistribusiController,
+  previewDistribusiTahap1Controller,
+  autoDistribusiTahap1Controller,
+  manualDistribusiTahap1Controller,
 } = require("../controllers/distribusi.controller");
 
 const {
@@ -41,10 +41,8 @@ const {
   finalisasiDeskEvaluasiController,
 } = require("../controllers/penilaian.controller");
 
-const authMiddleware = require("../../../middlewares/auth.middleware");
 const roleMiddleware = require("../../../middlewares/role.middleware");
 
-router.use(authMiddleware);
 router.use(roleMiddleware([2, 6])); // Admin and Super Admin
 
 router.get("/verifikasi/mahasiswa", getPendingMahasiswa);
@@ -55,8 +53,8 @@ router.post("/verifikasi/mahasiswa/:id/reject", rejectMahasiswaController);
 router.patch("/program/:id_program/timeline", setProgramTimelineController);
 
 router.get("/proposal", getProposalListController);
-router.get("/proposal/:id_proposal", getProposalDetailAdminController);
 router.get("/proposal/monitoring", getMonitoringDistribusiController);
+router.get("/proposal/:id_proposal", getProposalDetailAdminController);
 
 router.post("/reviewer", createReviewerController);
 router.get("/reviewer", getReviewersController);
@@ -66,9 +64,9 @@ router.post("/juri", createJuriController);
 router.get("/juri", getJurisController);
 router.get("/juri/:id_user", getJuriDetailController);
 
-router.get("/proposal/distribusi/preview", previewDistribusiController);
-router.post("/proposal/distribusi/auto", autoDistribusiController);
-router.post("/proposal/distribusi/manual", manualDistribusiController);
+router.get("/distribusi/reviewer/tahap/:tahap/preview", previewDistribusiTahap1Controller);
+router.post("/distribusi/reviewer/tahap/:tahap/auto", autoDistribusiTahap1Controller);
+router.post("/distribusi/reviewer/tahap/:tahap/manual", manualDistribusiTahap1Controller);
 
 router.get("/penilaian/:id_proposal/:id_tahap", getRekapPenilaianController);
 router.post("/proposal/:id_proposal/finalisasi-desk", finalisasiDeskEvaluasiController);
