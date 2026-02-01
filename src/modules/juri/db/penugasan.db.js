@@ -1,25 +1,27 @@
 const pool = require("../../../config/db");
 
-const getTahapAktifDb = async (tahap) => {
+const getTahapAktifDb = async (id_program, urutan) => {
   const q = `
     SELECT id_tahap, status
     FROM m_tahap_penilaian
-    WHERE id_tahap = $1
+    WHERE id_program = $1
+      AND urutan = $2
       AND status = 1
   `;
-  const { rows } = await pool.query(q, [tahap]);
+  const { rows } = await pool.query(q, [id_program, urutan]);
   return rows[0] || null;
 };
 
-const getPenugasanDb = async (id_juri, tahap) => {
+const getPenugasanDb = async (id_juri, urutan) => {
   const q = `
     SELECT
       d.id_distribusi,
       d.status,
-      d.tahap,
+      d.tahap AS urutan_tahap,
       d.assigned_at,
       d.responded_at,
 
+      p.id_program,
       p.id_proposal,
       p.judul,
       p.file_proposal,
@@ -39,7 +41,7 @@ const getPenugasanDb = async (id_juri, tahap) => {
 
     ORDER BY d.assigned_at DESC
   `;
-  const { rows } = await pool.query(q, [id_juri, tahap]);
+  const { rows } = await pool.query(q, [id_juri, urutan]);
   return rows;
 };
 

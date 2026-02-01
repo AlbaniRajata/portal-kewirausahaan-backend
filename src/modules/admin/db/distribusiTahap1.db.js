@@ -1,14 +1,15 @@
 const pool = require("../../../config/db");
 
-const getTahapAktifDb = async (tahap) => {
+const getTahapAktifDb = async (id_program, urutan) => {
   const q = `
-    SELECT id_tahap, status
+    SELECT id_tahap, urutan, status
     FROM m_tahap_penilaian
-    WHERE id_tahap = $1
+    WHERE id_program = $1
+      AND urutan = $2
       AND status = 1
   `;
-  const { rows } = await pool.query(q, [tahap]);
-  return rows[0];
+  const { rows } = await pool.query(q, [id_program, urutan]);
+  return rows[0] || null;
 };
 
 const getReviewerAktifDb = async () => {
@@ -35,7 +36,7 @@ const checkReviewerValidDb = async (id_reviewer) => {
   return rows.length > 0;
 };
 
-const getProposalSiapDistribusiDb = async (tahap) => {
+const getProposalSiapDistribusiDb = async (id_program, tahap) => {
   const q = `
     SELECT
       p.id_proposal,
@@ -54,15 +55,17 @@ const getProposalSiapDistribusiDb = async (tahap) => {
     JOIN m_program pr ON pr.id_program = p.id_program
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
     WHERE p.status = 1
+      AND p.id_program = $1
       AND NOT EXISTS (
         SELECT 1
         FROM t_distribusi_reviewer d
         WHERE d.id_proposal = p.id_proposal
-          AND d.tahap = $1
+          AND d.tahap = $2
       )
     ORDER BY p.id_proposal
   `;
-  const { rows } = await pool.query(q, [tahap]);
+
+  const { rows } = await pool.query(q, [id_program, tahap]);
   return rows;
 };
 

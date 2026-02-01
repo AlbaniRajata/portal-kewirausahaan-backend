@@ -1,25 +1,27 @@
 const pool = require("../../../config/db");
 
-const getTahapAktifDb = async (tahap) => {
+const getTahapAktifDb = async (id_program, urutan) => {
   const q = `
     SELECT id_tahap, status
     FROM m_tahap_penilaian
-    WHERE id_tahap = $1
+    WHERE id_program = $1
+      AND urutan = $2
       AND status = 1
   `;
-  const { rows } = await pool.query(q, [tahap]);
+  const { rows } = await pool.query(q, [id_program, urutan]);
   return rows[0] || null;
 };
 
-const getPenugasanDb = async (id_reviewer, tahap) => {
+const getPenugasanDb = async (id_reviewer, urutan) => {
   const q = `
     SELECT
       d.id_distribusi,
       d.status,
-      d.tahap,
+      d.tahap AS urutan_tahap,
       d.assigned_at,
       d.responded_at,
 
+      p.id_program,
       p.id_proposal,
       p.judul,
       p.file_proposal,
@@ -40,7 +42,7 @@ const getPenugasanDb = async (id_reviewer, tahap) => {
     ORDER BY d.assigned_at DESC
   `;
 
-  const { rows } = await pool.query(q, [id_reviewer, tahap]);
+  const { rows } = await pool.query(q, [id_reviewer, urutan]);
   return rows;
 };
 
@@ -51,11 +53,12 @@ const getDetailPenugasanDb = async (id_distribusi, id_reviewer) => {
       d.id_proposal,
       d.id_reviewer,
       d.status,
-      d.tahap,
+      d.tahap AS urutan_tahap,
       d.assigned_at,
       d.responded_at,
       d.catatan_reviewer,
 
+      p.id_program,
       p.judul,
       p.file_proposal,
       p.modal_diajukan,
@@ -63,11 +66,11 @@ const getDetailPenugasanDb = async (id_distribusi, id_reviewer) => {
 
       k.nama_kategori,
       pr.nama_program,
-      t.nama_tim
+      tm.nama_tim
 
     FROM t_distribusi_reviewer d
     JOIN t_proposal p ON p.id_proposal = d.id_proposal
-    JOIN t_tim t ON t.id_tim = p.id_tim
+    JOIN t_tim tm ON tm.id_tim = p.id_tim
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
     JOIN m_program pr ON pr.id_program = p.id_program
 

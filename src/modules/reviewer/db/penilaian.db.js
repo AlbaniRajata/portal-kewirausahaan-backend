@@ -6,17 +6,24 @@ const getDistribusiForPenilaianDb = async (id_distribusi) => {
       d.id_distribusi,
       d.id_reviewer,
       d.status AS status_distribusi,
-      d.tahap AS id_tahap,
+      d.tahap AS urutan_tahap,
 
+      p.id_program,
+
+      t.id_tahap,
       t.penilaian_mulai,
       t.penilaian_selesai,
 
       p.id_proposal,
       p.judul,
       p.status AS status_proposal
+
     FROM t_distribusi_reviewer d
-    JOIN m_tahap_penilaian t ON t.id_tahap = d.tahap
     JOIN t_proposal p ON p.id_proposal = d.id_proposal
+    JOIN m_tahap_penilaian t
+      ON t.id_program = p.id_program
+     AND t.urutan = d.tahap
+     AND t.status = 1
     WHERE d.id_distribusi = $1
   `;
 
@@ -58,7 +65,7 @@ const getOrCreatePenilaianDb = async (id_distribusi, id_tahap) => {
   `;
 
   const { rows } = await pool.query(q, [id_distribusi]);
-  return rows[0];
+  return rows[0] || null;
 };
 
 const getDetailNilaiDb = async (id_penilaian) => {
@@ -108,7 +115,7 @@ const upsertNilaiDb = async (
     catatan,
   ]);
 
-  return rows[0];
+  return rows[0] || null;
 };
 
 const submitPenilaianDb = async (id_penilaian) => {

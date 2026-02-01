@@ -10,6 +10,9 @@ const {
 
 const {
   setProgramTimelineController,
+  getTahapProgramController,
+  createTahapProgramController,
+  updateJadwalTahapController
 } = require("../controllers/program.controller");
 
 const {
@@ -39,7 +42,14 @@ const {
 const {
   getRekapDeskEvaluasiController,
   finalisasiDeskBatchController,
+  getRekapWawancaraTahap2Controller,
+  finalisasiWawancaraBatchController,
 } = require("../controllers/penilaian.controller");
+
+const {
+  scheduleWawancaraController,
+  scheduleWawancaraBulkController,
+} = require("../controllers/wawancara.controller");
 
 const {
   previewDistribusiTahap2Controller,
@@ -58,6 +68,10 @@ router.post("/verifikasi/mahasiswa/:id/reject", rejectMahasiswaController);
 
 router.patch("/program/:id_program/timeline", setProgramTimelineController);
 
+router.get("/program/:id_program/tahap", getTahapProgramController);
+router.post("/program/:id_program/tahap", createTahapProgramController);
+router.patch("/tahap/:id_tahap", updateJadwalTahapController);
+
 router.get("/proposal", getProposalListController);
 router.get("/proposal/monitoring", getMonitoringDistribusiController);
 router.get("/proposal/:id_proposal", getProposalDetailAdminController);
@@ -70,15 +84,20 @@ router.post("/juri", createJuriController);
 router.get("/juri", getJurisController);
 router.get("/juri/:id_user", getJuriDetailController);
 
-router.get("/distribusi/reviewer/tahap/:tahap/preview", previewDistribusiTahap1Controller);
-router.post("/distribusi/reviewer/tahap/:tahap/auto", autoDistribusiTahap1Controller);
-router.post("/distribusi/reviewer/tahap/:tahap/manual", manualDistribusiTahap1Controller);
+router.get("/program/:id_program/distribusi/reviewer/tahap/:tahap/preview", previewDistribusiTahap1Controller);
+router.post("/program/:id_program/distribusi/reviewer/tahap/:tahap/auto", autoDistribusiTahap1Controller);
+router.post("/program/:id_program/distribusi/reviewer/tahap/:tahap/manual", manualDistribusiTahap1Controller);
 
-router.get("/proposal/:id_proposal/rekap-desk", getRekapDeskEvaluasiController);
-router.post("/proposal/finalisasi-desk-batch", finalisasiDeskBatchController);
+router.get("/program/:id_program/proposal/:id_proposal/rekap-desk", getRekapDeskEvaluasiController);
+router.post("/program/:id_program/proposal/finalisasi-desk-batch", finalisasiDeskBatchController);
+router.get("/program/:id_program/proposal/:id_proposal/rekap-wawancara", getRekapWawancaraTahap2Controller);
+router.post("/program/:id_program/proposal/finalisasi-wawancara", finalisasiWawancaraBatchController);
 
-router.get("/panel/tahap/:tahap/preview", previewDistribusiTahap2Controller);
-router.post("/panel/tahap/:tahap/auto", autoDistribusiTahap2Controller);
-router.post("/panel/tahap/:tahap/manual", manualDistribusiTahap2Controller);
+router.patch("/proposal/:id_proposal/wawancara", scheduleWawancaraController);
+router.patch("/proposal/wawancara/bulk", scheduleWawancaraBulkController);
+
+router.get("/program/:id_program/panel/tahap2/preview", previewDistribusiTahap2Controller);
+router.post("/program/:id_program/panel/tahap2/auto", autoDistribusiTahap2Controller);
+router.post("/program/:id_program/panel/tahap2/manual", manualDistribusiTahap2Controller);
 
 module.exports = router;

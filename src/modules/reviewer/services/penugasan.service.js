@@ -6,24 +6,38 @@ const {
   rejectDistribusiDb,
 } = require("../db/penugasan.db");
 
-const getPenugasan = async (id_user, tahap) => {
-  const tahapAktif = await getTahapAktifDb(tahap);
+const getPenugasan = async (id_user, urutan) => {
+  const data = await getPenugasanDb(id_user, urutan);
+
+  if (!data.length) {
+    return {
+      error: false,
+      message: "Daftar penugasan reviewer kosong",
+      data: {
+        tahap: urutan,
+        total: 0,
+        penugasan: [],
+      },
+    };
+  }
+
+  const id_program = data[0].id_program;
+
+  const tahapAktif = await getTahapAktifDb(id_program, urutan);
 
   if (!tahapAktif) {
     return {
       error: true,
       message: "Tahap penilaian tidak aktif",
-      data: { tahap },
+      data: { tahap: urutan, id_program },
     };
   }
-
-  const data = await getPenugasanDb(id_user, tahap);
 
   return {
     error: false,
     message: "Daftar penugasan reviewer",
     data: {
-      tahap,
+      tahap: urutan,
       total: data.length,
       penugasan: data,
     },
@@ -67,13 +81,16 @@ const acceptPenugasan = async (id_user, id_distribusi) => {
     };
   }
 
-  const tahapAktif = await getTahapAktifDb(detail.tahap);
+  const tahapAktif = await getTahapAktifDb(
+    detail.id_program,
+    detail.urutan_tahap
+  );
 
   if (!tahapAktif) {
     return {
       error: true,
       message: "Tahap sudah ditutup",
-      data: { tahap: detail.tahap },
+      data: { tahap: detail.urutan_tahap },
     };
   }
 
@@ -113,13 +130,16 @@ const rejectPenugasan = async (id_user, id_distribusi, catatan) => {
     };
   }
 
-  const tahapAktif = await getTahapAktifDb(detail.tahap);
+  const tahapAktif = await getTahapAktifDb(
+    detail.id_program,
+    detail.urutan_tahap
+  );
 
   if (!tahapAktif) {
     return {
       error: true,
       message: "Tahap sudah ditutup",
-      data: { tahap: detail.tahap },
+      data: { tahap: detail.urutan_tahap },
     };
   }
 

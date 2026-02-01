@@ -7,27 +7,31 @@ const {
   getJuriAktifDb,
   insertReviewerTahap2Db,
   insertJuriTahap2Db,
+  updateProposalStatusPanelDb,
 } = require("../db/distribusiTahap2.db");
 
-const previewDistribusiTahap2 = async () => {
-  const tahapAktif = await getTahap2AktifDb();
+const previewDistribusiTahap2 = async (id_program) => {
+  const tahapAktif = await getTahap2AktifDb(id_program);
+
   if (!tahapAktif) {
     return {
       error: true,
-      message: "Tahap 2 tidak aktif",
-      data: null,
+      message: "Tahap wawancara (Tahap 2) tidak aktif",
+      data: { id_program },
     };
   }
 
-  const proposals = await getProposalTahap2Db();
+  const id_tahap = tahapAktif.id_tahap;
+
+  const proposals = await getProposalTahap2Db(id_program);
   const reviewers = await getReviewerAktifDb();
   const juries = await getJuriAktifDb();
 
   if (!proposals.length) {
     return {
       error: true,
-      message: "Tidak ada proposal lolos desk evaluasi",
-      data: null,
+      message: "Tidak ada proposal siap masuk panel wawancara",
+      data: { id_program },
     };
   }
 
@@ -47,35 +51,34 @@ const previewDistribusiTahap2 = async () => {
     };
   }
 
-  const totalProposal = proposals.length;
-  const totalReviewer = reviewers.length;
-  const totalJuri = juries.length;
-
   return {
     error: false,
-    message: "Preview distribusi tahap 2 siap",
+    message: "Preview distribusi panel wawancara siap",
     data: {
-      proposals: proposals.map((p) => ({
-        id_proposal: p.id_proposal,
-        judul: p.judul,
-      })),
-      total_proposal: totalProposal,
-      total_reviewer: totalReviewer,
-      total_juri: totalJuri,
+      id_program,
+      id_tahap,
+      total_proposal: proposals.length,
+      total_reviewer: reviewers.length,
+      total_juri: juries.length,
 
-      distribusi_reviewer: totalProposal * totalReviewer,
-      distribusi_juri: totalProposal * totalJuri,
+      distribusi_reviewer: proposals.length * reviewers.length,
+      distribusi_juri: proposals.length * juries.length,
       distribusi_total:
-        totalProposal * totalReviewer + totalProposal * totalJuri,
+        proposals.length * reviewers.length +
+        proposals.length * juries.length,
+
+      proposals,
     },
   };
 };
 
-const autoDistribusiTahap2 = async (admin_id) => {
-  const preview = await previewDistribusiTahap2();
+const autoDistribusiTahap2 = async (admin_id, id_program) => {
+  const preview = await previewDistribusiTahap2(id_program);
   if (preview.error) return preview;
 
-  const proposals = await getProposalTahap2Db();
+  const { id_tahap } = preview.data;
+
+  const proposals = await getProposalTahap2Db(id_program);
   const reviewers = await getReviewerAktifDb();
   const juries = await getJuriAktifDb();
 
@@ -93,8 +96,10 @@ const autoDistribusiTahap2 = async (admin_id) => {
           client,
           p.id_proposal,
           r.id_user,
+          id_tahap,
           admin_id
         );
+
         if (dist) totalReviewer++;
       }
 
@@ -103,22 +108,29 @@ const autoDistribusiTahap2 = async (admin_id) => {
           client,
           p.id_proposal,
           j.id_user,
+          id_tahap,
           admin_id
         );
+
         if (dist) totalJuri++;
       }
+
+      await updateProposalStatusPanelDb(
+        client,
+        id_program,
+        p.id_proposal
+      );
     }
 
     await client.query("COMMIT");
 
     return {
       error: false,
-      message: "Distribusi tahap 2 berhasil",
+      message: "Distribusi panel wawancara tahap 2 berhasil",
       data: {
+        id_program,
+        id_tahap,
         total_proposal: proposals.length,
-        total_reviewer: reviewers.length,
-        total_juri: juries.length,
-
         distribusi_reviewer: totalReviewer,
         distribusi_juri: totalJuri,
         distribusi_total: totalReviewer + totalJuri,
@@ -126,6 +138,7 @@ const autoDistribusiTahap2 = async (admin_id) => {
     };
   } catch (e) {
     await client.query("ROLLBACK");
+
     return {
       error: true,
       message: e.message,
@@ -136,8 +149,8 @@ const autoDistribusiTahap2 = async (admin_id) => {
   }
 };
 
-const manualDistribusiTahap2 = async (admin_id, payload) => {
-  const { id_proposal, reviewers, juries } = payload;
+const manualDistribusiTahap2 = async (admin_id, id_program, payload) => {
+  const { id_proposal, reviewers = [], juries = [] } = payload;
 
   if (!id_proposal) {
     return {
@@ -147,6 +160,18 @@ const manualDistribusiTahap2 = async (admin_id, payload) => {
     };
   }
 
+  const tahapAktif = await getTahap2AktifDb(id_program);
+
+  if (!tahapAktif) {
+    return {
+      error: true,
+      message: "Tahap wawancara tidak aktif",
+      data: { id_program },
+    };
+  }
+
+  const id_tahap = tahapAktif.id_tahap;
+
   const client = await pool.connect();
 
   try {
@@ -155,35 +180,41 @@ const manualDistribusiTahap2 = async (admin_id, payload) => {
     const hasilReviewer = [];
     const hasilJuri = [];
 
-    if (Array.isArray(reviewers)) {
-      for (const id_reviewer of reviewers) {
-        const dist = await insertReviewerTahap2Db(
-          client,
-          id_proposal,
-          id_reviewer,
-          admin_id
-        );
-        if (dist) hasilReviewer.push(dist);
-      }
+    for (const id_reviewer of reviewers) {
+      const dist = await insertReviewerTahap2Db(
+        client,
+        id_proposal,
+        id_reviewer,
+        id_tahap,
+        admin_id
+      );
+
+      if (dist) hasilReviewer.push(dist);
     }
 
-    if (Array.isArray(juries)) {
-      for (const id_juri of juries) {
-        const dist = await insertJuriTahap2Db(
-          client,
-          id_proposal,
-          id_juri,
-          admin_id
-        );
-        if (dist) hasilJuri.push(dist);
-      }
+    for (const id_juri of juries) {
+      const dist = await insertJuriTahap2Db(
+        client,
+        id_proposal,
+        id_juri,
+        id_tahap,
+        admin_id
+      );
+
+      if (dist) hasilJuri.push(dist);
     }
+
+    await updateProposalStatusPanelDb(
+      client,
+      id_program,
+      id_proposal
+    );
 
     await client.query("COMMIT");
 
     return {
       error: false,
-      message: "Distribusi manual panel tahap 2 berhasil",
+      message: "Distribusi manual panel wawancara berhasil",
       data: {
         reviewer: hasilReviewer,
         juri: hasilJuri,
@@ -191,6 +222,7 @@ const manualDistribusiTahap2 = async (admin_id, payload) => {
     };
   } catch (e) {
     await client.query("ROLLBACK");
+
     return {
       error: true,
       message: e.message,

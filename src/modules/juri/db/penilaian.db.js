@@ -5,17 +5,28 @@ const getDistribusiForPenilaianDb = async (id_distribusi) => {
     SELECT
       d.id_distribusi,
       d.id_juri,
-      d.status,
-      d.tahap AS id_tahap,
+      d.status AS status_distribusi,
+      d.tahap AS urutan_tahap,
+
+      t.id_tahap,
       t.penilaian_mulai,
       t.penilaian_selesai,
+
+      p.id_program,
       p.id_proposal,
-      p.judul
+      p.judul,
+      p.status AS status_proposal
+
     FROM t_distribusi_juri d
-    JOIN m_tahap_penilaian t ON t.id_tahap = d.tahap
     JOIN t_proposal p ON p.id_proposal = d.id_proposal
+    JOIN m_tahap_penilaian t 
+      ON t.urutan = d.tahap
+     AND t.id_program = p.id_program
+     AND t.status = 1
+
     WHERE d.id_distribusi = $1
   `;
+
   const { rows } = await pool.query(q, [id_distribusi]);
   return rows[0] || null;
 };
@@ -28,9 +39,11 @@ const getKriteriaByTahapDb = async (id_tahap) => {
       deskripsi,
       bobot
     FROM m_kriteria_penilaian
-    WHERE id_tahap = $1 AND status = 1
+    WHERE id_tahap = $1
+      AND status = 1
     ORDER BY urutan ASC
   `;
+
   const { rows } = await pool.query(q, [id_tahap]);
   return rows;
 };
@@ -42,6 +55,7 @@ const getOrCreatePenilaianDb = async (id_distribusi, id_tahap) => {
     ON CONFLICT (id_distribusi)
     DO NOTHING
   `;
+
   await pool.query(insert, [id_distribusi, id_tahap]);
 
   const q = `
@@ -49,6 +63,7 @@ const getOrCreatePenilaianDb = async (id_distribusi, id_tahap) => {
     FROM t_penilaian_juri
     WHERE id_distribusi = $1
   `;
+
   const { rows } = await pool.query(q, [id_distribusi]);
   return rows[0];
 };
@@ -67,6 +82,7 @@ const getDetailNilaiDb = async (id_penilaian) => {
     WHERE d.id_penilaian = $1
     ORDER BY k.urutan ASC
   `;
+
   const { rows } = await pool.query(q, [id_penilaian]);
   return rows;
 };
@@ -90,6 +106,7 @@ const upsertNilaiDb = async (
       updated_at = now()
     RETURNING *
   `;
+
   const { rows } = await pool.query(q, [
     id_penilaian,
     id_kriteria,
@@ -97,6 +114,7 @@ const upsertNilaiDb = async (
     nilai,
     catatan,
   ]);
+
   return rows[0];
 };
 
@@ -106,10 +124,26 @@ const submitPenilaianDb = async (id_penilaian) => {
     SET status = 1,
         submitted_at = now()
     WHERE id_penilaian = $1
+      AND status = 0
     RETURNING *
   `;
+
   const { rows } = await pool.query(q, [id_penilaian]);
-  return rows[0];
+  return rows[0] || null;
+};
+
+const markDistribusiSubmittedDb = async (id_distribusi) => {
+  const q = `
+    UPDATE t_distribusi_juri
+    SET status = 3,
+        responded_at = now()
+    WHERE id_distribusi = $1
+      AND status = 1
+    RETURNING *
+  `;
+
+  const { rows } = await pool.query(q, [id_distribusi]);
+  return rows[0] || null;
 };
 
 module.exports = {
@@ -119,4 +153,5 @@ module.exports = {
   getDetailNilaiDb,
   upsertNilaiDb,
   submitPenilaianDb,
+  markDistribusiSubmittedDb,
 };

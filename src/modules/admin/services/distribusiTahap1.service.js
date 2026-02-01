@@ -10,10 +10,10 @@ const {
   updateStatusProposalDistribusiDb,
 } = require("../db/distribusiTahap1.db");
 
-const previewDistribusiTahap1 = async () => {
+const previewDistribusiTahap1 = async (id_program) => {
   const tahap = 1;
 
-  const tahapAktif = await getTahapAktifDb(tahap);
+  const tahapAktif = await getTahapAktifDb(id_program, tahap);
   if (!tahapAktif) {
     return {
       error: true,
@@ -22,7 +22,7 @@ const previewDistribusiTahap1 = async () => {
     };
   }
 
-  const proposals = await getProposalSiapDistribusiDb(tahap);
+  const proposals = await getProposalSiapDistribusiDb(id_program, tahap);
   const reviewers = await getReviewerAktifDb();
 
   if (!proposals.length) {
@@ -73,10 +73,10 @@ const previewDistribusiTahap1 = async () => {
   };
 };
 
-const autoDistribusiTahap1 = async (admin_id) => {
+const autoDistribusiTahap1 = async (admin_id, id_program) => {
   const tahap = 1;
 
-  const preview = await previewDistribusiTahap1();
+  const preview = await previewDistribusiTahap1(id_program);
   if (preview.error) return preview;
 
   const client = await pool.connect();
@@ -146,17 +146,17 @@ const autoDistribusiTahap1 = async (admin_id) => {
 const manualDistribusiTahap1 = async (admin_id, payload) => {
   const tahap = 1;
 
-  const { id_proposal, id_reviewer } = payload;
+  const { id_proposal, id_reviewer, id_program } = payload;
 
-  if (!id_proposal || !id_reviewer) {
+  if (!id_proposal || !id_reviewer || !id_program) {
     return {
       error: true,
-      message: "id_proposal dan id_reviewer wajib diisi",
+      message: "id_proposal, id_reviewer, dan id_program wajib diisi",
       data: payload,
     };
   }
 
-  const tahapAktif = await getTahapAktifDb(tahap);
+  const tahapAktif = await getTahapAktifDb(id_program, tahap);
   if (!tahapAktif) {
     return {
       error: true,

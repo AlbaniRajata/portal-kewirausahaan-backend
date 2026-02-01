@@ -10,16 +10,13 @@ const getFormPenilaianController = async (req, res) => {
 
   const result = await getFormPenilaian(id_user, id_distribusi);
 
-  if (result.error) {
-    return res.status(400).json({
-      message: result.message,
-      data: result.data,
-    });
-  }
-
-  return res.json({
-    message: "Form penilaian reviewer",
+  return res.status(result.error ? 400 : 200).json({
+    success: !result.error,
+    message: result.error
+      ? result.message
+      : "Form penilaian reviewer",
     data: result.data,
+    meta: {},
   });
 };
 
@@ -31,16 +28,11 @@ const simpanNilaiController = async (req, res) => {
 
   const result = await simpanNilai(id_user, id_distribusi, payload);
 
-  if (result.error) {
-    return res.status(400).json({
-      message: result.message,
-      data: result.data,
-    });
-  }
-
-  return res.json({
+  return res.status(result.error ? 400 : 200).json({
+    success: !result.error,
     message: result.message,
     data: result.data,
+    meta: {},
   });
 };
 
@@ -50,16 +42,13 @@ const submitPenilaianController = async (req, res) => {
 
   const result = await submitPenilaian(id_user, id_distribusi);
 
-  if (result.error) {
-    return res.status(400).json({
-      message: result.message,
-      data: result.data,
-    });
-  }
-
-  return res.json({
-    message: "Penilaian reviewer berhasil disubmit",
+  return res.status(result.error ? 400 : 200).json({
+    success: !result.error,
+    message: result.error
+      ? result.message
+      : "Penilaian reviewer berhasil disubmit",
     data: result.data,
+    meta: {},
   });
 };
 

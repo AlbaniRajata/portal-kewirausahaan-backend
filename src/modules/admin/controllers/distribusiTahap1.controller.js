@@ -5,7 +5,8 @@ const {
 } = require("../services/distribusiTahap1.service");
 
 const previewDistribusiTahap1Controller = async (req, res) => {
-  const result = await previewDistribusiTahap1();
+  const { id_program } = req.params;
+  const result = await previewDistribusiTahap1(Number(id_program));
 
   return res.status(result.error ? 400 : 200).json({
     success: !result.error,
@@ -16,7 +17,8 @@ const previewDistribusiTahap1Controller = async (req, res) => {
 };
 
 const autoDistribusiTahap1Controller = async (req, res) => {
-  const result = await autoDistribusiTahap1(req.user.id_user);
+  const { id_program } = req.params;
+  const result = await autoDistribusiTahap1(req.user.id_user, Number(id_program));
 
   return res.status(result.error ? 400 : 200).json({
     success: !result.error,
@@ -27,9 +29,11 @@ const autoDistribusiTahap1Controller = async (req, res) => {
 };
 
 const manualDistribusiTahap1Controller = async (req, res) => {
-  const result = await manualDistribusiTahap1(
-    req.user.id_user,
-    req.body
+  const { id_program } = req.params;
+  const result = await manualDistribusiTahap1(req.user.id_user, 
+    { ...req.body, 
+      id_program: Number(id_program) 
+    }
   );
 
   return res.status(result.error ? 400 : 200).json({

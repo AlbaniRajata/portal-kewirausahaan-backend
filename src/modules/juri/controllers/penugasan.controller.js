@@ -34,17 +34,6 @@ const getDetailPenugasanController = async (req, res) => {
   const { id_user } = req.user;
   const id_distribusi = Number(req.params.id_distribusi);
 
-  if (!id_distribusi) {
-    return res.status(400).json({
-      success: false,
-      message: "Validasi gagal",
-      data: {
-        field: "id_distribusi",
-        reason: "id_distribusi wajib diisi",
-      },
-    });
-  }
-
   const result = await getDetailPenugasan(id_user, id_distribusi);
 
   return res.status(result.error ? 404 : 200).json({
