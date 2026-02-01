@@ -25,6 +25,12 @@ const {
   submitProposalController,
 } = require("../controllers/proposal.controller");
 
+const {
+  listDosenPembimbingController,
+  ajukanPembimbingController,
+  getStatusPembimbingController,
+} = require("../controllers/pembimbing.controller");
+
 router.use(roleMiddleware([1]));
 
 const uploadOptional = (req, res, next) => {
@@ -53,5 +59,9 @@ router.post("/tim/:id_tim/reject", rejectInviteController);
 router.post("/proposal", uploadProposal.single("file_proposal"), createProposalController);
 router.patch("/proposal/:id_proposal",uploadProposal.single("file_proposal"), updateProposalController);
 router.post("/proposal/:id_proposal/submit", submitProposalController);
+
+router.get("/pembimbing/dosen", listDosenPembimbingController);
+router.post("/pembimbing/ajukan", ajukanPembimbingController);
+router.get("/pembimbing/status", getStatusPembimbingController);
 
 module.exports = router;

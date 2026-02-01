@@ -234,6 +234,39 @@ const getRekapJuriTahap2Db = async (id_program, id_proposal) => {
   return rows;
 };
 
+const insertPesertaProgramByTimDb = async (id_tim, id_program) => {
+  const q = `
+    INSERT INTO t_peserta_program (id_user, id_program, tahun, status_lolos)
+    SELECT
+      a.id_user,
+      $2,
+      EXTRACT(YEAR FROM now())::int,
+      1
+    FROM t_anggota_tim a
+    WHERE a.id_tim = $1
+      AND a.status = 1
+    ON CONFLICT (id_user, id_program)
+    DO NOTHING
+    RETURNING *
+  `;
+
+  const { rows } = await pool.query(q, [id_tim, id_program]);
+  return rows;
+};
+
+const getProposalTimDb = async (id_program, id_proposal) => {
+  const q = `
+    SELECT id_tim
+    FROM t_proposal
+    WHERE id_program = $1
+      AND id_proposal = $2
+  `;
+
+  const { rows } = await pool.query(q, [id_program, id_proposal]);
+  return rows[0] || null;
+};
+
+
 module.exports = {
   getRekapReviewerTahap1Db,
   countDistribusiReviewerTahap1Db,
@@ -246,4 +279,7 @@ module.exports = {
 
   getRekapReviewerTahap2Db,
   getRekapJuriTahap2Db,
+
+  insertPesertaProgramByTimDb,
+  getProposalTimDb,
 };
