@@ -31,6 +31,12 @@ const {
   getStatusPembimbingController,
 } = require("../controllers/pembimbing.controller");
 
+const {
+  listBimbinganController,
+  detailBimbinganController,
+  ajukanBimbinganController,
+} = require("../controllers/bimbingan.controller");
+
 router.use(roleMiddleware([1]));
 
 const uploadOptional = (req, res, next) => {
@@ -63,5 +69,9 @@ router.post("/proposal/:id_proposal/submit", submitProposalController);
 router.get("/pembimbing/dosen", listDosenPembimbingController);
 router.post("/pembimbing/ajukan", ajukanPembimbingController);
 router.get("/pembimbing/status", getStatusPembimbingController);
+
+router.get("/bimbingan", listBimbinganController);
+router.get("/bimbingan/:id_bimbingan", detailBimbinganController);
+router.post("/bimbingan/ajukan", ajukanBimbinganController);
 
 module.exports = router;
