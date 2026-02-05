@@ -17,4 +17,6 @@ router.use("/dosen", authMiddleware, dosenRoutes);
 router.use("/reviewer", authMiddleware, reviewerRoutes);
 router.use("/juri", authMiddleware, juriRoutes);
 
+router.use("/public", require("../modules/public/routes/prodi.route"));
+
 module.exports = router;
