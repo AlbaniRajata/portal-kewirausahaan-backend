@@ -3,10 +3,14 @@ const {
     getDetailMahasiswaDb,
     approveMahasiswaDb,
     rejectMahasiswaDb,
+    getPendingDosenDb,
+    getDetailDosenDb,
+    approveDosenDb,
+    rejectDosenDb,
 } = require("../db/verification.db");
 
-const listPendingMahasiswa = async () => {
-    return await getPendingMahasiswaDb();
+const listPendingMahasiswa = async (filters) => {
+    return await getPendingMahasiswaDb(filters);
 };
 
 const detailMahasiswa = async (id_user) => {
@@ -74,9 +78,75 @@ const rejectMahasiswa = async (id_user, catatan) => {
     return result;
 };
 
+const listPendingDosen = async (filters) => {
+    return await getPendingDosenDb(filters);
+};
+
+const detailDosen = async (id_user) => {
+    const data = await getDetailDosenDb(id_user);
+    if (!data) {
+        return {
+            error: "Data dosen tidak ditemukan.",
+            field: "id_user"
+        };
+    }
+    return data;
+};
+
+const approveDosen = async (id_user) => {
+    const data = await approveDosenDb(id_user);
+
+    if (!data) {
+        return {
+            error: "Data dosen tidak ditemukan.",
+            field: "id_user"
+        };
+    }
+
+    if (data.error === "EMAIL_NOT_VERIFIED") {
+        return { 
+            error: "Email dosen belum diverifikasi.",
+            field: "email_verified_at"
+        };
+    }
+
+    if (data.error === "ALREADY_VERIFIED") {
+        return {
+            error: "Dosen ini sudah diverifikasi sebelumnya.",
+            field: "status_verifikasi"
+        };
+    }
+
+    return data;
+};
+
+const rejectDosen = async (id_user) => {
+    const result = await rejectDosenDb(id_user);
+
+    if (!result) {
+        return {
+            error: "Data dosen tidak ditemukan.",
+            field: "id_user"
+        };
+    }
+
+    if (result.error === "ALREADY_PROCESSED") {
+        return {
+            error: "Status dosen ini sudah diproses sebelumnya.",
+            field: "status_verifikasi"
+        };
+    }
+
+    return result;
+};
+
 module.exports = {
     listPendingMahasiswa,
     detailMahasiswa,
     approveMahasiswa,
     rejectMahasiswa,
+    listPendingDosen,
+    detailDosen,
+    approveDosen,
+    rejectDosen,
 };

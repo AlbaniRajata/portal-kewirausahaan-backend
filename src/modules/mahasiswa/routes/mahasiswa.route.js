@@ -17,6 +17,8 @@ const {
   searchMahasiswaController,
   acceptInviteController,
   rejectInviteController,
+  getTimStatusController,
+  getTimDetailController,
 } = require("../controllers/tim.controller");
 
 const {
@@ -57,8 +59,10 @@ router.get("/profile", getProfileController);
 router.patch("/profile", uploadOptional, updateProfileController);
 router.put("/password", updatePasswordController);
 
+router.get("/tim/status", getTimStatusController);
+router.get("/tim/detail", getTimDetailController);
 router.post("/tim", createTimController);
-router.get("/search", searchMahasiswaController);
+router.get("/search-mahasiswa", searchMahasiswaController);
 router.post("/tim/:id_tim/accept", acceptInviteController);
 router.post("/tim/:id_tim/reject", rejectInviteController);
 

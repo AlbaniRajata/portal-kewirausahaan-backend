@@ -6,6 +6,10 @@ const {
     getDetailMahasiswa,
     approveMahasiswaController,
     rejectMahasiswaController,
+    getPendingDosen,
+    getDetailDosen,
+    approveDosenController,
+    rejectDosenController,
 } = require("../controllers/verification.controller");
 
 const {
@@ -65,6 +69,11 @@ router.get("/verifikasi/mahasiswa", getPendingMahasiswa);
 router.get("/verifikasi/mahasiswa/:id", getDetailMahasiswa);
 router.post("/verifikasi/mahasiswa/:id/approve", approveMahasiswaController);
 router.post("/verifikasi/mahasiswa/:id/reject", rejectMahasiswaController);
+
+router.get("/verifikasi/dosen", getPendingDosen);
+router.get("/verifikasi/dosen/:id", getDetailDosen);
+router.post("/verifikasi/dosen/:id/approve", approveDosenController);
+router.post("/verifikasi/dosen/:id/reject", rejectDosenController);
 
 router.patch("/program/:id_program/timeline", setProgramTimelineController);
 

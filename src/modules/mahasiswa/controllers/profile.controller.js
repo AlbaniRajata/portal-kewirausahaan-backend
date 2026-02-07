@@ -32,13 +32,14 @@ const getProfileController = async (req, res) => {
 const updateProfileController = async (req, res) => {
   try {
     const { id_user } = req.user;
-    const { nama_lengkap, username, no_hp } = req.body;
+    const { nama_lengkap, username, no_hp, alamat } = req.body;
 
     const dataToUpdate = {};
 
     if (nama_lengkap !== undefined) dataToUpdate.nama_lengkap = nama_lengkap;
     if (username !== undefined) dataToUpdate.username = username;
     if (no_hp !== undefined) dataToUpdate.no_hp = no_hp;
+    if (alamat !== undefined) dataToUpdate.alamat = alamat;
 
     if (req.file) {
       dataToUpdate.foto = req.file.filename;

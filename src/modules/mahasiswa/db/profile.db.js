@@ -9,6 +9,7 @@ const getProfileDb = async (id_user) => {
       u.email,
       u.no_hp,
       u.foto,
+      u.alamat,
       m.nim,
       m.id_prodi,
       m.tahun_masuk,
@@ -18,11 +19,14 @@ const getProfileDb = async (id_user) => {
       p.nama_prodi,
       p.jenjang,
       j.id_jurusan,
-      j.nama_jurusan
+      j.nama_jurusan,
+      prog.nama_program
     FROM m_user u
     JOIN m_mahasiswa m ON m.id_user = u.id_user
     JOIN m_prodi p ON p.id_prodi = m.id_prodi
     JOIN m_jurusan j ON j.id_jurusan = p.id_jurusan
+    LEFT JOIN t_peserta_program tp ON tp.id_user = u.id_user
+    LEFT JOIN m_program prog ON prog.id_program = tp.id_program
     WHERE u.id_user = $1
   `;
 
@@ -53,6 +57,11 @@ const updateBiodataDb = async (id_user, data) => {
     if (data.no_hp !== undefined) {
       userFields.push(`no_hp = $${userIndex++}`);
       userValues.push(data.no_hp);
+    }
+
+    if (data.alamat !== undefined) {
+      userFields.push(`alamat = $${userIndex++}`);
+      userValues.push(data.alamat);
     }
 
     if (data.foto !== undefined) {

@@ -18,6 +18,16 @@ const createTim = async (user, payload) => {
         };
     }
 
+    if (payload.id_program === 2) {
+        const pmwStatus = await timDb.cekLolosPMW(user.id_user);
+        if (!pmwStatus || pmwStatus.status_lolos !== 1) {
+            return {
+                error: "Untuk mendaftar program INBIS, Anda harus lolos program PMW terlebih dahulu.",
+                field: "id_program"
+            };
+        }
+    }
+
     if (!Array.isArray(payload.anggota)) {
         return {
             error: "Data anggota tim tidak valid.",
@@ -25,9 +35,9 @@ const createTim = async (user, payload) => {
         };
     }
 
-    if (payload.anggota.length < 3 || payload.anggota.length > 5) {
+    if (payload.anggota.length < 2 || payload.anggota.length > 4) {
         return {
-            error: "Jumlah anggota tim harus minimal 3 dan maksimal 5 orang.",
+            error: "Jumlah anggota tim harus minimal 2 dan maksimal 4 orang (total 3-5 termasuk ketua).",
             field: "anggota"
         };
     }
@@ -50,12 +60,23 @@ const createTim = async (user, payload) => {
             1
         );
 
+        const currentYear = new Date().getFullYear();
+        await timDb.insertPesertaProgram(client, user.id_user, payload.id_program, tim.id_tim, currentYear);
+
         for (const item of payload.anggota) {
             const target = await timDb.getMahasiswaByNim(item.nim);
             if (!target || target.status_verifikasi !== 1 || target.status_mahasiswa !== 1) {
                 await client.query("ROLLBACK");
                 return {
-                    error: "Salah satu anggota yang diajukan tidak memenuhi syarat sebagai anggota tim.",
+                    error: `Mahasiswa dengan NIM ${item.nim} tidak memenuhi syarat sebagai anggota tim.`,
+                    field: "anggota"
+                };
+            }
+
+            if (target.id_user === user.id_user) {
+                await client.query("ROLLBACK");
+                return {
+                    error: "Anda tidak dapat menambahkan diri sendiri sebagai anggota.",
                     field: "anggota"
                 };
             }
@@ -64,9 +85,20 @@ const createTim = async (user, payload) => {
             if (punyaTim) {
                 await client.query("ROLLBACK");
                 return {
-                    error: "Salah satu anggota yang diajukan sudah terdaftar dalam tim lain.",
+                    error: `Mahasiswa dengan NIM ${item.nim} sudah terdaftar dalam tim lain.`,
                     field: "anggota"
                 };
+            }
+
+            if (payload.id_program === 2) {
+                const pmwStatus = await timDb.cekLolosPMW(target.id_user);
+                if (!pmwStatus || pmwStatus.status_lolos !== 1) {
+                    await client.query("ROLLBACK");
+                    return {
+                        error: `Mahasiswa dengan NIM ${item.nim} belum lolos program PMW dan tidak dapat bergabung di program INBIS.`,
+                        field: "anggota"
+                    };
+                }
             }
 
             await timDb.insertAnggotaTim(
@@ -112,10 +144,43 @@ const acceptInvite = async (user, id_tim) => {
     };
   }
 
-  await timDb.acceptAnggotaTim(id_tim, user.id_user);
+  const id_program = await timDb.getIdProgramByIdTim(id_tim);
+  if (!id_program) {
+    return {
+      error: "Program tim tidak ditemukan.",
+      field: "tim"
+    };
+  }
 
-  const data = await timDb.getTimDetail(id_tim);
-  return { data };
+  if (id_program === 2) {
+    const pmwStatus = await timDb.cekLolosPMW(user.id_user);
+    if (!pmwStatus || pmwStatus.status_lolos !== 1) {
+      return {
+        error: "Anda belum lolos program PMW dan tidak dapat bergabung di program INBIS.",
+        field: "tim"
+      };
+    }
+  }
+
+  const client = await db.connect();
+  try {
+    await client.query("BEGIN");
+
+    await timDb.acceptAnggotaTim(id_tim, user.id_user);
+
+    const currentYear = new Date().getFullYear();
+    await timDb.insertPesertaProgram(client, user.id_user, id_program, id_tim, currentYear);
+
+    await client.query("COMMIT");
+
+    const data = await timDb.getTimDetail(id_tim);
+    return { data };
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 };
 
 const rejectInvite = async (user, id_tim, catatan) => {
@@ -157,9 +222,46 @@ const rejectInvite = async (user, id_tim, catatan) => {
   };
 };
 
+const getTimStatus = async (user) => {
+  const tim = await timDb.getTimByUserId(user.id_user);
+  
+  if (!tim) {
+    return {
+      hasTim: false,
+      isKetua: false,
+      isAnggota: false,
+      statusAnggota: null,
+      data: null
+    };
+  }
+
+  return {
+    hasTim: true,
+    isKetua: tim.peran === 1,
+    isAnggota: tim.peran === 2,
+    statusAnggota: tim.status_anggota,
+    data: tim
+  };
+};
+
+const getTimDetail = async (user) => {
+  const detail = await timDb.getTimDetailByUserId(user.id_user);
+  
+  if (!detail) {
+    return {
+      error: "Anda belum terdaftar dalam tim apapun.",
+      field: "tim"
+    };
+  }
+
+  return { data: detail };
+};
+
 module.exports = {
     createTim,
     searchMahasiswa,
     acceptInvite,
     rejectInvite,
+    getTimStatus,
+    getTimDetail,
 };

@@ -186,6 +186,125 @@ const rejectAnggotaTim = async (id_tim, id_user, catatan) => {
   return r.rowCount;
 };
 
+const getTimByUserId = async (id_user) => {
+  const q = `
+    select
+      t.id_tim,
+      t.nama_tim,
+      t.id_program,
+      t.status,
+      t.created_at,
+      a.peran,
+      a.status as status_anggota
+    from t_anggota_tim a
+    join t_tim t on t.id_tim = a.id_tim
+    where a.id_user = $1
+  `;
+  const r = await db.query(q, [id_user]);
+  return r.rows[0];
+};
+
+const getTimDetailByUserId = async (id_user) => {
+  const q = `
+    select
+      t.id_tim,
+      t.nama_tim,
+      t.id_program,
+      prog.nama_program,
+      t.status as status_tim,
+      t.created_at,
+      (
+        select json_build_object(
+          'id_user', u.id_user,
+          'nim', m.nim,
+          'nama_lengkap', u.nama_lengkap,
+          'username', u.username
+        )
+        from t_anggota_tim a
+        join m_mahasiswa m on m.id_user = a.id_user
+        join m_user u on u.id_user = m.id_user
+        where a.id_tim = t.id_tim
+          and a.peran = 1
+        limit 1
+      ) as ketua_tim,
+      (
+        select json_agg(
+          json_build_object(
+            'id_user', u2.id_user,
+            'nim', m2.nim,
+            'nama_lengkap', u2.nama_lengkap,
+            'username', u2.username,
+            'peran', a2.peran,
+            'status', a2.status
+          )
+        )
+        from t_anggota_tim a2
+        join m_mahasiswa m2 on m2.id_user = a2.id_user
+        join m_user u2 on u2.id_user = m2.id_user
+        where a2.id_tim = t.id_tim
+      ) as anggota
+    from t_anggota_tim ta
+    join t_tim t on t.id_tim = ta.id_tim
+    join m_program prog on prog.id_program = t.id_program
+    where ta.id_user = $1
+  `;
+  const r = await db.query(q, [id_user]);
+  return r.rows[0];
+};
+
+const insertPesertaProgram = async (client, id_user, id_program, id_tim, tahun) => {
+  const q = `
+    insert into t_peserta_program (id_user, id_program, id_tim, tahun, status_lolos)
+    values ($1, $2, $3, $4, 0)
+    on conflict (id_user, id_program) do nothing
+  `;
+  await client.query(q, [id_user, id_program, id_tim, tahun]);
+};
+
+const cekLolosPMW = async (id_user) => {
+  const q = `
+    select status_lolos
+    from t_peserta_program
+    where id_user = $1
+      and id_program = 1
+  `;
+  const r = await db.query(q, [id_user]);
+  return r.rows[0];
+};
+
+const cekSemuaAnggotaDisetujui = async (id_tim) => {
+  const q = `
+    select 
+      count(*) filter (where status = 1) as disetujui,
+      count(*) as total
+    from t_anggota_tim
+    where id_tim = $1
+  `;
+  const r = await db.query(q, [id_tim]);
+  const { disetujui, total } = r.rows[0];
+  return parseInt(disetujui) === parseInt(total);
+};
+
+const getIdProgramByIdTim = async (id_tim) => {
+  const q = `
+    select id_program
+    from t_tim
+    where id_tim = $1
+  `;
+  const r = await db.query(q, [id_tim]);
+  return r.rows[0]?.id_program;
+};
+
+const getAllAnggotaTim = async (id_tim) => {
+  const q = `
+    select id_user
+    from t_anggota_tim
+    where id_tim = $1
+      and status = 1
+  `;
+  const r = await db.query(q, [id_tim]);
+  return r.rows.map(row => row.id_user);
+};
 
 module.exports = {
     getMahasiswaByUserId,
@@ -200,4 +319,11 @@ module.exports = {
     getPendingInvite,
     acceptAnggotaTim,
     rejectAnggotaTim,
+    getTimByUserId,
+    getTimDetailByUserId,
+    insertPesertaProgram,
+    cekLolosPMW,
+    cekSemuaAnggotaDisetujui,
+    getIdProgramByIdTim,
+    getAllAnggotaTim,
 };
