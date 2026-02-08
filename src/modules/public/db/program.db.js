@@ -9,7 +9,7 @@ const getAllProgramDb = async () => {
             pendaftaran_mulai,
             pendaftaran_selesai
         FROM m_program
-        ORDER BY nama_program ASC
+        ORDER BY id_program ASC
     `;
 
     const { rows } = await pool.query(q);

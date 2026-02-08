@@ -20,11 +20,15 @@ const getAnggotaTimDetailDb = async (id_tim) => {
       u.id_user,
       u.nama_lengkap,
       u.username,
+      m.nim,
+      a.peran,
       a.status,
       a.catatan
     FROM t_anggota_tim a
     JOIN m_user u ON u.id_user = a.id_user
+    JOIN m_mahasiswa m ON m.id_user = u.id_user
     WHERE a.id_tim = $1
+    ORDER BY a.peran DESC, u.nama_lengkap
   `;
   const { rows } = await pool.query(q, [id_tim]);
 
@@ -32,6 +36,7 @@ const getAnggotaTimDetailDb = async (id_tim) => {
   const accepted = rows.filter((r) => r.status === 1);
 
   return {
+    members: rows,
     total: rows.length,
     accepted: accepted.length,
     pending: pending.length,
@@ -111,6 +116,8 @@ const getProposalDetailDb = async (id_proposal) => {
       p.file_proposal,
       p.status,
       p.tanggal_submit,
+      p.id_program,
+      prog.nama_program,
       k.id_kategori,
       k.nama_kategori,
       t.id_tim,
@@ -124,6 +131,7 @@ const getProposalDetailDb = async (id_proposal) => {
         SELECT json_agg(
           json_build_object(
             'id_user', um.id_user,
+            'nim', mm.nim,
             'nama_lengkap', um.nama_lengkap,
             'username', um.username,
             'peran', at.peran,
@@ -133,11 +141,13 @@ const getProposalDetailDb = async (id_proposal) => {
         )
         FROM t_anggota_tim at
         JOIN m_user um ON um.id_user = at.id_user
+        JOIN m_mahasiswa mm ON mm.id_user = um.id_user
         WHERE at.id_tim = t.id_tim
       ) AS anggota_tim
     FROM t_proposal p
     JOIN t_tim t ON t.id_tim = p.id_tim
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
+    JOIN m_program prog ON prog.id_program = p.id_program
     JOIN t_anggota_tim a ON a.id_tim = t.id_tim AND a.peran = 1
     JOIN m_user u ON u.id_user = a.id_user
     WHERE p.id_proposal = $1
@@ -156,6 +166,44 @@ const getProgramTimelineDb = async (id_program) => {
   return rows[0];
 };
 
+const getProposalByTimDb = async (id_tim) => {
+  const q = `
+    SELECT
+      p.id_proposal,
+      p.judul,
+      p.modal_diajukan,
+      p.file_proposal,
+      p.status,
+      p.tanggal_submit,
+      p.id_program,
+      k.id_kategori,
+      k.nama_kategori
+    FROM t_proposal p
+    JOIN m_kategori k ON k.id_kategori = p.id_kategori
+    WHERE p.id_tim = $1
+  `;
+  const { rows } = await pool.query(q, [id_tim]);
+  return rows[0];
+};
+
+const getTimByUserDb = async (id_user) => {
+  const q = `
+    SELECT
+      t.id_tim,
+      t.nama_tim,
+      t.id_program,
+      prog.nama_program,
+      a.peran
+    FROM t_anggota_tim a
+    JOIN t_tim t ON t.id_tim = a.id_tim
+    JOIN m_program prog ON prog.id_program = t.id_program
+    WHERE a.id_user = $1
+      AND a.status = 1
+  `;
+  const { rows } = await pool.query(q, [id_user]);
+  return rows[0];
+};
+
 module.exports = {
   getTimKetuaDb,
   getAnggotaTimDetailDb,
@@ -165,4 +213,6 @@ module.exports = {
   submitProposalDb,
   getProposalDetailDb,
   getProgramTimelineDb,
+  getProposalByTimDb,
+  getTimByUserDb,
 };

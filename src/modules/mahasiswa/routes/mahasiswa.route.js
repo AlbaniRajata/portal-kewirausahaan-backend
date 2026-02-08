@@ -25,6 +25,8 @@ const {
   createProposalController,
   updateProposalController,
   submitProposalController,
+  getProposalStatusController,
+  getProposalDetailController,
 } = require("../controllers/proposal.controller");
 
 const {
@@ -66,8 +68,10 @@ router.get("/search-mahasiswa", searchMahasiswaController);
 router.post("/tim/:id_tim/accept", acceptInviteController);
 router.post("/tim/:id_tim/reject", rejectInviteController);
 
+router.get("/proposal/status", getProposalStatusController);
+router.get("/proposal/:id_proposal", getProposalDetailController);
 router.post("/proposal", uploadProposal.single("file_proposal"), createProposalController);
-router.patch("/proposal/:id_proposal",uploadProposal.single("file_proposal"), updateProposalController);
+router.patch("/proposal/:id_proposal", uploadProposal.single("file_proposal"), updateProposalController);
 router.post("/proposal/:id_proposal/submit", submitProposalController);
 
 router.get("/pembimbing/dosen", listDosenPembimbingController);

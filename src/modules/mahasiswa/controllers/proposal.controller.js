@@ -1,8 +1,32 @@
 const {
+  getProposalStatus,
   createProposal,
   updateProposal,
   submitProposal,
+  getProposalDetail,
 } = require("../services/proposal.service");
+
+const getProposalStatusController = async (req, res) => {
+  try {
+    const { id_user } = req.user;
+
+    const result = await getProposalStatus(id_user);
+
+    return res.json({
+      success: true,
+      message: result.message,
+      data: result,
+      meta: {},
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan pada sistem",
+      data: { error: err.message },
+      meta: {},
+    });
+  }
+};
 
 const createProposalController = async (req, res) => {
   try {
@@ -117,8 +141,42 @@ const submitProposalController = async (req, res) => {
   }
 };
 
+const getProposalDetailController = async (req, res) => {
+  try {
+    const { id_user } = req.user;
+    const { id_proposal } = req.params;
+
+    const result = await getProposalDetail(id_user, id_proposal);
+
+    if (result.error) {
+      return res.status(404).json({
+        success: false,
+        message: result.message,
+        data: result.data || {},
+        meta: {},
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: result.message,
+      data: result.data,
+      meta: {},
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan pada sistem",
+      data: { error: err.message },
+      meta: {},
+    });
+  }
+};
+
 module.exports = {
+  getProposalStatusController,
   createProposalController,
   updateProposalController,
   submitProposalController,
+  getProposalDetailController,
 };

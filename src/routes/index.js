@@ -19,5 +19,6 @@ router.use("/juri", authMiddleware, juriRoutes);
 router.use("/public", require("../modules/public/routes/prodi.route"));
 router.use("/public", require("../modules/public/routes/jurusan.route"));
 router.use("/public", require("../modules/public/routes/program.route"));
+router.use("/public", require("../modules/public/routes/kategori.route"));
 
 module.exports = router;
