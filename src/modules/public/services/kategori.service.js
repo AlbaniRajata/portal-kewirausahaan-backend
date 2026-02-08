@@ -1,19 +1,12 @@
-const pool = require("../../../config/db");
+const {
+    getAllKategoriDb,
+} = require("../db/kategori.db");
 
-const getAllKategoriDb = async () => {
-    const q = `
-        SELECT
-            id_kategori,
-            nama_kategori,
-            keterangan
-        FROM m_kategori
-        ORDER BY nama_kategori ASC
-    `;
-
-    const { rows } = await pool.query(q);
-    return rows;
+const getAllKategori = async () => {
+    const kategoriList = await getAllKategoriDb();
+    return kategoriList;
 };
 
 module.exports = {
-    getAllKategoriDb,
+    getAllKategori,
 };

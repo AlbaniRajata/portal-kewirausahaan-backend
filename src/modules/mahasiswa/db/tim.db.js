@@ -211,6 +211,7 @@ const getTimDetailByUserId = async (id_user) => {
       t.nama_tim,
       t.id_program,
       prog.nama_program,
+      prog.keterangan,
       t.status as status_tim,
       t.created_at,
       (

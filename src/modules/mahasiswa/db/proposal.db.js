@@ -9,6 +9,7 @@ const getTimKetuaDb = async (id_user, id_program) => {
       AND a.peran = 1
       AND a.status = 1
       AND t.id_program = $2
+    ORDER BY a.peran DESC, u.nama_lengkap
   `;
   const { rows } = await pool.query(q, [id_user, id_program]);
   return rows[0];
@@ -20,20 +21,24 @@ const getAnggotaTimDetailDb = async (id_tim) => {
       u.id_user,
       u.nama_lengkap,
       u.username,
+      u.email,
       m.nim,
+      p.nama_prodi,
       a.peran,
       a.status,
       a.catatan
     FROM t_anggota_tim a
     JOIN m_user u ON u.id_user = a.id_user
     JOIN m_mahasiswa m ON m.id_user = u.id_user
+    JOIN m_prodi p ON p.id_prodi = m.id_prodi
     WHERE a.id_tim = $1
-    ORDER BY a.peran DESC, u.nama_lengkap
+    ORDER BY a.peran ASC, u.nama_lengkap ASC
   `;
+
   const { rows } = await pool.query(q, [id_tim]);
 
-  const pending = rows.filter((r) => r.status === 0);
-  const accepted = rows.filter((r) => r.status === 1);
+  const pending = rows.filter(r => r.status === 0);
+  const accepted = rows.filter(r => r.status === 1);
 
   return {
     members: rows,
@@ -113,11 +118,12 @@ const getProposalDetailDb = async (id_proposal) => {
       p.id_proposal,
       p.judul,
       p.modal_diajukan,
-      p.file_proposal,
+      p.file_proposal,ram
       p.status,
       p.tanggal_submit,
       p.id_program,
       prog.nama_program,
+      prog.keterangan,
       k.id_kategori,
       k.nama_kategori,
       t.id_tim,
@@ -193,6 +199,7 @@ const getTimByUserDb = async (id_user) => {
       t.nama_tim,
       t.id_program,
       prog.nama_program,
+      prog.keterangan,
       a.peran
     FROM t_anggota_tim a
     JOIN t_tim t ON t.id_tim = a.id_tim
