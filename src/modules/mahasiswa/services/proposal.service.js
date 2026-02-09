@@ -9,6 +9,7 @@ const {
   getProgramTimelineDb,
   getProposalByTimDb,
   getTimByUserDb,
+  getProposalByUserDb,
 } = require("../db/proposal.db");
 
 const getProposalStatus = async (id_user) => {
@@ -19,38 +20,14 @@ const getProposalStatus = async (id_user) => {
       error: false,
       hasTim: false,
       isKetua: false,
+      isAnggota: false,
       message: "Anda belum terdaftar dalam tim",
       data: null,
     };
   }
 
   const isKetua = tim.peran === 1;
-
-  if (!isKetua) {
-    return {
-      error: false,
-      hasTim: true,
-      isKetua: false,
-      message: "Anda bukan ketua tim",
-      data: { tim },
-    };
-  }
-
   const anggota = await getAnggotaTimDetailDb(tim.id_tim);
-
-  if (!anggota.all_accepted) {
-    return {
-      error: false,
-      hasTim: true,
-      isKetua: true,
-      canSubmit: false,
-      message: "Belum semua anggota menyetujui undangan",
-      data: {
-        tim,
-        anggota,
-      },
-    };
-  }
 
   const timeline = await getProgramTimelineDb(tim.id_program);
   let timelineOpen = true;
@@ -62,13 +39,20 @@ const getProposalStatus = async (id_user) => {
     timelineOpen = now >= mulai && now <= selesai;
   }
 
-  const proposal = await getProposalByTimDb(tim.id_tim);
+  let proposal = null;
+
+  if (isKetua) {
+    proposal = await getProposalByTimDb(tim.id_tim);
+  } else {
+    proposal = await getProposalByUserDb(id_user);
+  }
 
   return {
     error: false,
     hasTim: true,
-    isKetua: true,
-    canSubmit: anggota.all_accepted && timelineOpen,
+    isKetua: isKetua,
+    isAnggota: !isKetua,
+    canSubmit: isKetua && anggota.all_accepted && timelineOpen,
     timelineOpen,
     message: "Status proposal berhasil diambil",
     data: {

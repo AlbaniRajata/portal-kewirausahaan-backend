@@ -23,6 +23,7 @@ const getProposalListDb = async ({ id_program, status }) => {
       p.tanggal_submit,
       pr.id_program,
       pr.nama_program,
+      pr.keterangan,
       t.id_tim,
       t.nama_tim,
       json_build_object(
@@ -54,6 +55,7 @@ const getProposalDetailAdminDb = async (id_proposal) => {
       p.tanggal_submit,
       pr.id_program,
       pr.nama_program,
+      pr.keterangan,
       k.id_kategori,
       k.nama_kategori,
       t.id_tim,
@@ -61,20 +63,24 @@ const getProposalDetailAdminDb = async (id_proposal) => {
       json_build_object(
         'id_user', u.id_user,
         'nama_lengkap', u.nama_lengkap,
-        'username', u.username
+        'nim', mhs_ketua.nim
       ) AS ketua,
       (
         SELECT json_agg(
           json_build_object(
             'id_user', um.id_user,
             'nama_lengkap', um.nama_lengkap,
-            'username', um.username,
+            'nim', mhs.nim,
+            'email', um.email,
+            'nama_prodi', prod.nama_prodi,
             'peran', at.peran,
             'status', at.status
-          ) ORDER BY at.peran DESC, um.nama_lengkap
+          ) ORDER BY at.peran ASC
         )
         FROM t_anggota_tim at
         JOIN m_user um ON um.id_user = at.id_user
+        JOIN m_mahasiswa mhs ON mhs.id_user = um.id_user
+        LEFT JOIN m_prodi prod ON prod.id_prodi = mhs.id_prodi
         WHERE at.id_tim = t.id_tim
       ) AS anggota_tim
     FROM t_proposal p
@@ -83,6 +89,7 @@ const getProposalDetailAdminDb = async (id_proposal) => {
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
     JOIN t_anggota_tim a ON a.id_tim = t.id_tim AND a.peran = 1
     JOIN m_user u ON u.id_user = a.id_user
+    LEFT JOIN m_mahasiswa mhs_ketua ON mhs_ketua.id_user = u.id_user
     WHERE p.id_proposal = $1
   `;
 

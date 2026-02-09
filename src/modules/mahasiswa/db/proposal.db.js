@@ -211,6 +211,34 @@ const getTimByUserDb = async (id_user) => {
   return rows[0];
 };
 
+const getProposalByUserDb = async (id_user) => {
+  const q = `
+    SELECT
+      p.id_proposal,
+      p.judul,
+      p.modal_diajukan,
+      p.file_proposal,
+      p.status,
+      p.tanggal_submit,
+      p.id_program,
+      k.id_kategori,
+      k.nama_kategori,
+      t.id_tim,
+      t.nama_tim,
+      prog.nama_program,
+      prog.keterangan
+    FROM t_proposal p
+    JOIN m_kategori k ON k.id_kategori = p.id_kategori
+    JOIN t_tim t ON t.id_tim = p.id_tim
+    JOIN m_program prog ON prog.id_program = p.id_program
+    JOIN t_anggota_tim a ON a.id_tim = t.id_tim
+    WHERE a.id_user = $1
+      AND a.status = 1
+  `;
+  const { rows } = await pool.query(q, [id_user]);
+  return rows[0];
+};
+
 module.exports = {
   getTimKetuaDb,
   getAnggotaTimDetailDb,
@@ -222,4 +250,5 @@ module.exports = {
   getProgramTimelineDb,
   getProposalByTimDb,
   getTimByUserDb,
+  getProposalByUserDb,
 };
