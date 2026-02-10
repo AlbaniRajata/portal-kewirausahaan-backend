@@ -63,7 +63,7 @@ const getReviewerUsersDb = async () => {
       r.bidang_keahlian
     FROM m_user u
     JOIN m_reviewer r ON r.id_user = u.id_user
-    ORDER BY u.created_at DESC
+    ORDER BY u.nama_lengkap ASC
   `);
   return rows;
 };

@@ -14,6 +14,7 @@ const getProposalListController = async (req, res) => {
     });
 
     return res.json({
+      success: true,
       message: "Daftar proposal",
       data: result.data,
     });

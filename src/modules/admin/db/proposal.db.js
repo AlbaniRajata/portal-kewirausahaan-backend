@@ -20,6 +20,7 @@ const getProposalListDb = async ({ id_program, status }) => {
       p.id_proposal,
       p.judul,
       p.status,
+      p.modal_diajukan,
       p.tanggal_submit,
       pr.id_program,
       pr.nama_program,

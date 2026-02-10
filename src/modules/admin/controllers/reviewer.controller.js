@@ -28,6 +28,8 @@ const getReviewersController = async (req, res) => {
   const result = await getReviewers();
   return res.json({
     message: "Daftar reviewer internal",
+    success: true,
+    message: result.message,
     data: result.data,
   });
 };

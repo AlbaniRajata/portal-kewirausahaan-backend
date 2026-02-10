@@ -41,6 +41,10 @@ const {
   previewDistribusiTahap1Controller,
   autoDistribusiTahap1Controller,
   manualDistribusiTahap1Controller,
+  bulkDistribusiTahap1Controller,
+  getDistribusiHistoryController,
+  getDistribusiDetailController,
+  reassignReviewerController,
 } = require("../controllers/distribusiTahap1.controller");
 
 const {
@@ -96,6 +100,10 @@ router.get("/juri/:id_user", getJuriDetailController);
 router.get("/program/:id_program/distribusi/reviewer/tahap/:tahap/preview", previewDistribusiTahap1Controller);
 router.post("/program/:id_program/distribusi/reviewer/tahap/:tahap/auto", autoDistribusiTahap1Controller);
 router.post("/program/:id_program/distribusi/reviewer/tahap/:tahap/manual", manualDistribusiTahap1Controller);
+router.post("/program/:id_program/distribusi/reviewer/tahap/:tahap/bulk", bulkDistribusiTahap1Controller);
+router.get("/program/:id_program/distribusi/reviewer/tahap/:tahap/history", getDistribusiHistoryController);
+router.get("/program/:id_program/distribusi/reviewer/tahap/:tahap/:id_distribusi", getDistribusiDetailController);
+router.post("/program/:id_program/distribusi/reviewer/tahap/:tahap/:id_distribusi/reassign", reassignReviewerController);
 
 router.get("/program/:id_program/proposal/:id_proposal/rekap-desk", getRekapDeskEvaluasiController);
 router.post("/program/:id_program/proposal/finalisasi-desk-batch", finalisasiDeskBatchController);
