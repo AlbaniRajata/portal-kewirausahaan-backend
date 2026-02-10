@@ -38,7 +38,11 @@ const getReviewerAktifDb = async () => {
 
 const getJuriAktifDb = async () => {
   const q = `
-    SELECT j.id_user, u.nama_lengkap
+    SELECT 
+      j.id_user,
+      u.nama_lengkap,
+      u.email,
+      u.is_active
     FROM m_juri j
     JOIN m_user u ON u.id_user = j.id_user
     WHERE u.is_active = true
@@ -80,7 +84,7 @@ const insertJuriTahap2Db = async (client, id_proposal, id_juri, id_tahap, admin_
   return rows[0] || null;
 };
 
-const updateProposalStatusPanelDb = async (client, id_tahap, id_proposal) => {
+const updateProposalStatusPanelDb = async (client, id_program, id_proposal) => {
   const q = `
     UPDATE t_proposal
     SET status = 6
@@ -89,8 +93,73 @@ const updateProposalStatusPanelDb = async (client, id_tahap, id_proposal) => {
       AND status = 5
     RETURNING *
   `;
-  const { rows } = await client.query(q, [id_proposal, id_tahap]);
+  const { rows } = await client.query(q, [id_proposal, id_program]);
   return rows[0] || null;
+};
+
+const getDistribusiReviewerHistoryTahap2Db = async (id_program) => {
+  const q = `
+    SELECT 
+      d.id_distribusi,
+      d.id_proposal,
+      p.judul,
+      t.nama_tim,
+      d.id_reviewer,
+      u.nama_lengkap as nama_reviewer,
+      r.institusi,
+      d.tahap,
+      d.status,
+      d.assigned_at,
+      d.assigned_by,
+      admin.nama_lengkap as admin_name,
+      d.responded_at,
+      d.catatan_reviewer
+    FROM t_distribusi_reviewer d
+    JOIN t_proposal p ON p.id_proposal = d.id_proposal
+    JOIN t_tim t ON t.id_tim = p.id_tim
+    JOIN m_reviewer r ON r.id_user = d.id_reviewer
+    JOIN m_user u ON u.id_user = r.id_user
+    JOIN m_user admin ON admin.id_user = d.assigned_by
+    WHERE p.id_program = $1 
+      AND d.tahap = 2
+      AND d.status != 3
+    ORDER BY d.assigned_at DESC
+  `;
+  
+  const { rows } = await pool.query(q, [id_program]);
+  return rows;
+};
+
+const getDistribusiJuriHistoryTahap2Db = async (id_program) => {
+  const q = `
+    SELECT 
+      d.id_distribusi,
+      d.id_proposal,
+      p.judul,
+      t.nama_tim,
+      d.id_juri,
+      u.nama_lengkap as nama_juri,
+      d.tahap,
+      d.status,
+      d.assigned_at,
+      d.assigned_by,
+      admin.nama_lengkap as admin_name,
+      d.responded_at,
+      d.catatan_juri
+    FROM t_distribusi_juri d
+    JOIN t_proposal p ON p.id_proposal = d.id_proposal
+    JOIN t_tim t ON t.id_tim = p.id_tim
+    JOIN m_juri j ON j.id_user = d.id_juri
+    JOIN m_user u ON u.id_user = j.id_user
+    JOIN m_user admin ON admin.id_user = d.assigned_by
+    WHERE p.id_program = $1 
+      AND d.tahap = 2
+      AND d.status != 3
+    ORDER BY d.assigned_at DESC
+  `;
+  
+  const { rows } = await pool.query(q, [id_program]);
+  return rows;
 };
 
 module.exports = {
@@ -101,4 +170,6 @@ module.exports = {
   insertReviewerTahap2Db,
   insertJuriTahap2Db,
   updateProposalStatusPanelDb,
+  getDistribusiReviewerHistoryTahap2Db,
+  getDistribusiJuriHistoryTahap2Db,
 };

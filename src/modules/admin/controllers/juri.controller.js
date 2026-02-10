@@ -26,8 +26,9 @@ const createJuriController = async (req, res) => {
 
 const getJurisController = async (req, res) => {
   const result = await getJuris();
-  return res.json({
-    message: "Daftar juri eksternal",
+  return res.status(result.error ? 400 : 200).json({
+    success: !result.error,
+    message: result.error ? result.message : "Daftar juri eksternal",
     data: result.data,
   });
 };

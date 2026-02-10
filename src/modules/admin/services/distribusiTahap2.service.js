@@ -8,6 +8,9 @@ const {
   insertReviewerTahap2Db,
   insertJuriTahap2Db,
   updateProposalStatusPanelDb,
+  getDistribusiReviewerHistoryTahap2Db,
+  getDistribusiJuriHistoryTahap2Db,
+  getJuriListDb,
 } = require("../db/distribusiTahap2.db");
 
 const previewDistribusiTahap2 = async (id_program) => {
@@ -233,8 +236,64 @@ const manualDistribusiTahap2 = async (admin_id, id_program, payload) => {
   }
 };
 
+const getDistribusiReviewerHistoryTahap2 = async (id_program) => {
+  try {
+    const history = await getDistribusiReviewerHistoryTahap2Db(id_program);
+    
+    return {
+      error: false,
+      message: "History distribusi reviewer tahap 2 berhasil dimuat",
+      data: history,
+    };
+  } catch (e) {
+    return {
+      error: true,
+      message: e.message,
+      data: [],
+    };
+  }
+};
+
+const getDistribusiJuriHistoryTahap2 = async (id_program) => {
+  try {
+    const history = await getDistribusiJuriHistoryTahap2Db(id_program);
+    
+    return {
+      error: false,
+      message: "History distribusi juri tahap 2 berhasil dimuat",
+      data: history,
+    };
+  } catch (e) {
+    return {
+      error: true,
+      message: e.message,
+      data: [],
+    };
+  }
+};
+
+const getJuriList = async () => {
+  try {
+    const juries = await getJuriListDb();
+    
+    return {
+      error: false,
+      message: "Daftar juri berhasil dimuat",
+      data: juries,
+    };
+  } catch (e) {
+    return {
+      error: true,
+      message: e.message,
+      data: [],
+    };
+  }
+};
+
 module.exports = {
   previewDistribusiTahap2,
   autoDistribusiTahap2,
   manualDistribusiTahap2,
+  getDistribusiReviewerHistoryTahap2,
+  getDistribusiJuriHistoryTahap2,
 };

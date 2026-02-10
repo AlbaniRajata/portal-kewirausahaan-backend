@@ -26,10 +26,9 @@ const createReviewerController = async (req, res) => {
 
 const getReviewersController = async (req, res) => {
   const result = await getReviewers();
-  return res.json({
-    message: "Daftar reviewer internal",
-    success: true,
-    message: result.message,
+  return res.status(result.error ? 400 : 200).json({
+    success: !result.error,
+    message: result.error ? result.message : "Daftar reviewer internal",
     data: result.data,
   });
 };

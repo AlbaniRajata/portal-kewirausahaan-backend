@@ -2,11 +2,13 @@ const {
   getRoleByNameDb,
   checkDuplicateUserDb,
   createUserDb,
-  getReviewerUsersDb,
-  getReviewerDetailDb,
 } = require("../db/user.db");
 
-const { createReviewerDb } = require("../db/reviewer.db");
+const { 
+  createReviewerDb, 
+  getReviewersDb, 
+  getReviewerDetailDb 
+} = require("../db/reviewer.db");
 
 const createReviewer = async (data) => {
   const required = [
@@ -80,7 +82,7 @@ const createReviewer = async (data) => {
 };
 
 const getReviewers = async () => {
-  const data = await getReviewerUsersDb();
+  const data = await getReviewersDb();
   return { error: false, data };
 };
 

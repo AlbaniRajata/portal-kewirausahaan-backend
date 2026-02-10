@@ -4,8 +4,11 @@ const {
   createUserDb,
 } = require("../db/user.db");
 
-const { createJuriDb } = require("../db/juri.db");
-const pool = require("../../../config/db");
+const { 
+  createJuriDb, 
+  getJurisDb, 
+  getJuriDetailDb
+} = require("../db/juri.db");
 
 const createJuri = async (data) => {
   const required = [
@@ -79,42 +82,14 @@ const createJuri = async (data) => {
 };
 
 const getJuris = async () => {
-  const { rows } = await pool.query(`
-    SELECT
-      u.id_user,
-      u.nama_lengkap,
-      u.username,
-      u.email,
-      u.no_hp,
-      j.institusi,
-      j.bidang_keahlian
-    FROM m_user u
-    JOIN m_juri j ON j.id_user = u.id_user
-    ORDER BY u.created_at DESC
-  `);
-
-  return { error: false, data: rows };
+  const data = await getJurisDb();
+  return { error: false, data };
 };
 
 const getJuriDetail = async (id_user) => {
-  const { rows } = await pool.query(
-    `
-    SELECT
-      u.id_user,
-      u.nama_lengkap,
-      u.username,
-      u.email,
-      u.no_hp,
-      j.institusi,
-      j.bidang_keahlian
-    FROM m_user u
-    JOIN m_juri j ON j.id_user = u.id_user
-    WHERE u.id_user = $1
-    `,
-    [id_user]
-  );
+  const data = await getJuriDetailDb(id_user);
 
-  if (!rows[0]) {
+  if (!data) {
     return {
       error: true,
       message: "Juri tidak ditemukan",
@@ -122,7 +97,7 @@ const getJuriDetail = async (id_user) => {
     };
   }
 
-  return { error: false, data: rows[0] };
+  return { error: false, data };
 };
 
 module.exports = {

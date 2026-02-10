@@ -63,6 +63,8 @@ const {
   previewDistribusiTahap2Controller,
   autoDistribusiTahap2Controller,
   manualDistribusiTahap2Controller,
+  getDistribusiReviewerHistoryTahap2Controller,
+  getDistribusiJuriHistoryTahap2Controller,
 } = require("../controllers/distribusiTahap2.controller");
 
 const roleMiddleware = require("../../../middlewares/role.middleware");
@@ -116,5 +118,7 @@ router.patch("/proposal/wawancara/bulk", scheduleWawancaraBulkController);
 router.get("/program/:id_program/panel/tahap2/preview", previewDistribusiTahap2Controller);
 router.post("/program/:id_program/panel/tahap2/auto", autoDistribusiTahap2Controller);
 router.post("/program/:id_program/panel/tahap2/manual", manualDistribusiTahap2Controller);
+router.get("/program/:id_program/distribusi/reviewer/tahap/2/history", getDistribusiReviewerHistoryTahap2Controller);
+router.get("/program/:id_program/distribusi/juri/tahap/2/history", getDistribusiJuriHistoryTahap2Controller);
 
 module.exports = router;
