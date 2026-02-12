@@ -12,7 +12,15 @@ const getTahapAktifDb = async (id_program, urutan) => {
   return rows[0] || null;
 };
 
-const getPenugasanDb = async (id_reviewer, urutan) => {
+const getPenugasanDb = async (id_reviewer, urutan, status_filter = null) => {
+  const values = [id_reviewer, urutan];
+  let statusClause = "";
+
+  if (status_filter !== null && status_filter !== "") {
+    statusClause = "AND d.status = $3";
+    values.push(status_filter);
+  }
+
   const q = `
     SELECT
       d.id_distribusi,
@@ -20,6 +28,7 @@ const getPenugasanDb = async (id_reviewer, urutan) => {
       d.tahap AS urutan_tahap,
       d.assigned_at,
       d.responded_at,
+      d.catatan_reviewer,
 
       p.id_program,
       p.id_proposal,
@@ -29,20 +38,24 @@ const getPenugasanDb = async (id_reviewer, urutan) => {
       p.status AS status_proposal,
 
       k.nama_kategori,
-      pr.nama_program
+      pr.nama_program,
+      pr.keterangan,
+      t.nama_tim
 
     FROM t_distribusi_reviewer d
     JOIN t_proposal p ON p.id_proposal = d.id_proposal
+    JOIN t_tim t ON t.id_tim = p.id_tim
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
     JOIN m_program pr ON pr.id_program = p.id_program
 
     WHERE d.id_reviewer = $1
       AND d.tahap = $2
+      ${statusClause}
 
     ORDER BY d.assigned_at DESC
   `;
 
-  const { rows } = await pool.query(q, [id_reviewer, urutan]);
+  const { rows } = await pool.query(q, values);
   return rows;
 };
 
@@ -66,13 +79,19 @@ const getDetailPenugasanDb = async (id_distribusi, id_reviewer) => {
 
       k.nama_kategori,
       pr.nama_program,
-      tm.nama_tim
+      pr.keterangan,
+      tm.nama_tim,
+      
+      tp.nama_tahap,
+      tp.penilaian_mulai,
+      tp.penilaian_selesai
 
     FROM t_distribusi_reviewer d
     JOIN t_proposal p ON p.id_proposal = d.id_proposal
     JOIN t_tim tm ON tm.id_tim = p.id_tim
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
     JOIN m_program pr ON pr.id_program = p.id_program
+    LEFT JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = d.tahap
 
     WHERE d.id_distribusi = $1
       AND d.id_reviewer = $2

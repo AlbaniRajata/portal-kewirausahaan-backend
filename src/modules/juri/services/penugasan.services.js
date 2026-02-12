@@ -6,8 +6,8 @@ const {
   rejectDistribusiDb,
 } = require("../db/penugasan.db");
 
-const getPenugasan = async (id_user, urutan) => {
-  const data = await getPenugasanDb(id_user, urutan);
+const getPenugasan = async (id_user, urutan, status_filter) => {
+  const data = await getPenugasanDb(id_user, urutan, status_filter);
 
   if (!data.length) {
     return {
@@ -22,7 +22,6 @@ const getPenugasan = async (id_user, urutan) => {
   }
 
   const id_program = data[0].id_program;
-
   const tahapAktif = await getTahapAktifDb(id_program, urutan);
 
   if (!tahapAktif) {
@@ -81,20 +80,25 @@ const acceptPenugasan = async (id_user, id_distribusi) => {
     };
   }
 
-  const tahapAktif = await getTahapAktifDb(
-    detail.id_program,
-    detail.urutan_tahap
-  );
+  const tahapAktif = await getTahapAktifDb(detail.id_program, 2);
 
   if (!tahapAktif) {
     return {
       error: true,
       message: "Tahap sudah ditutup",
-      data: { tahap: detail.urutan_tahap },
+      data: { tahap: 2 },
     };
   }
 
   const updated = await acceptDistribusiDb(id_distribusi, id_user);
+
+  if (!updated) {
+    return {
+      error: true,
+      message: "Penugasan gagal diterima",
+      data: null,
+    };
+  }
 
   return {
     error: false,
@@ -122,24 +126,25 @@ const rejectPenugasan = async (id_user, id_distribusi, catatan) => {
     };
   }
 
-  const tahapAktif = await getTahapAktifDb(
-    detail.id_program,
-    detail.urutan_tahap
-  );
+  const tahapAktif = await getTahapAktifDb(detail.id_program, 2);
 
   if (!tahapAktif) {
     return {
       error: true,
       message: "Tahap sudah ditutup",
-      data: { tahap: detail.urutan_tahap },
+      data: { tahap: 2 },
     };
   }
 
-  const updated = await rejectDistribusiDb(
-    id_distribusi,
-    id_user,
-    catatan
-  );
+  const updated = await rejectDistribusiDb(id_distribusi, id_user, catatan);
+
+  if (!updated) {
+    return {
+      error: true,
+      message: "Penugasan gagal ditolak",
+      data: null,
+    };
+  }
 
   return {
     error: false,

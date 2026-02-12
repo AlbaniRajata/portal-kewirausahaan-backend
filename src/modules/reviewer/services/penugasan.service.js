@@ -6,8 +6,8 @@ const {
   rejectDistribusiDb,
 } = require("../db/penugasan.db");
 
-const getPenugasan = async (id_user, urutan) => {
-  const data = await getPenugasanDb(id_user, urutan);
+const getPenugasan = async (id_user, urutan, status_filter) => {
+  const data = await getPenugasanDb(id_user, urutan, status_filter);
 
   if (!data.length) {
     return {
