@@ -13,10 +13,12 @@ const {
 } = require("../controllers/verification.controller");
 
 const {
+  getProgramAdminController,
   setProgramTimelineController,
   getTahapProgramController,
   createTahapProgramController,
-  updateJadwalTahapController
+  updateJadwalTahapController,
+  deleteTahapController,
 } = require("../controllers/program.controller");
 
 const {
@@ -81,11 +83,12 @@ router.get("/verifikasi/dosen/:id", getDetailDosen);
 router.post("/verifikasi/dosen/:id/approve", approveDosenController);
 router.post("/verifikasi/dosen/:id/reject", rejectDosenController);
 
+router.get("/program/my", getProgramAdminController);
 router.patch("/program/:id_program/timeline", setProgramTimelineController);
-
 router.get("/program/:id_program/tahap", getTahapProgramController);
 router.post("/program/:id_program/tahap", createTahapProgramController);
 router.patch("/tahap/:id_tahap", updateJadwalTahapController);
+router.delete("/tahap/:id_tahap", deleteTahapController);
 
 router.get("/proposal", getProposalListController);
 router.get("/proposal/monitoring", getMonitoringDistribusiController);

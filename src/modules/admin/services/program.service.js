@@ -1,12 +1,44 @@
-const { 
-  getProgramByIdDb, 
+const {
+  getProgramByAdminDb,
+  getProgramByIdAndAdminDb,
   updateProgramTimelineDb,
   getTahapByProgramDb,
+  getTahapByIdDb,
+  checkUrutanExistsDb,
   insertTahapDb,
-  updateTahapDb
+  updateTahapDb,
+  deleteTahapDb,
 } = require("../db/program.db");
 
-const setProgramTimeline = async (id_program, data) => {
+const getProgramAdmin = async (id_user) => {
+  const program = await getProgramByAdminDb(id_user);
+
+  if (!program) {
+    return {
+      error: true,
+      message: "Program tidak ditemukan atau akses ditolak",
+      data: null,
+    };
+  }
+
+  return {
+    error: false,
+    message: "Data program admin",
+    data: program,
+  };
+};
+
+const setProgramTimeline = async (id_user, id_program, data) => {
+  const program = await getProgramByIdAndAdminDb(id_program, id_user);
+
+  if (!program) {
+    return {
+      error: true,
+      message: "Akses ditolak",
+      data: null,
+    };
+  }
+
   if (!data.pendaftaran_mulai || !data.pendaftaran_selesai) {
     return {
       error: true,
@@ -26,45 +58,64 @@ const setProgramTimeline = async (id_program, data) => {
     };
   }
 
-  const program = await getProgramByIdDb(id_program);
-  if (!program) {
-    return {
-      error: true,
-      message: "Program tidak ditemukan",
-      data: null,
-    };
-  }
-
-  await updateProgramTimelineDb(id_program, {
+  const updated = await updateProgramTimelineDb(id_program, {
     pendaftaran_mulai: mulai,
     pendaftaran_selesai: selesai,
   });
 
-  const updated = await getProgramByIdDb(id_program);
-
   return {
     error: false,
+    message: "Timeline pendaftaran berhasil diperbarui",
     data: updated,
   };
 };
 
-const getTahapProgram = async (id_program) => {
+const getTahapProgram = async (id_user, id_program) => {
+  const program = await getProgramByIdAndAdminDb(id_program, id_user);
+
+  if (!program) {
+    return {
+      error: true,
+      message: "Akses ditolak",
+      data: null,
+    };
+  }
+
   const tahap = await getTahapByProgramDb(id_program);
 
   return {
     error: false,
+    message: "Daftar tahap penilaian",
     data: tahap,
   };
 };
 
-const createTahapProgram = async (id_program, payload) => {
+const createTahapProgram = async (id_user, id_program, payload) => {
+  const program = await getProgramByIdAndAdminDb(id_program, id_user);
+
+  if (!program) {
+    return {
+      error: true,
+      message: "Akses ditolak",
+      data: null,
+    };
+  }
+
   const { nama_tahap, urutan, penilaian_mulai, penilaian_selesai } = payload;
 
   if (!nama_tahap || !urutan || !penilaian_mulai || !penilaian_selesai) {
     return {
       error: true,
       message: "Semua field wajib diisi",
-      data: payload,
+      data: null,
+    };
+  }
+
+  if (Number(urutan) < 1) {
+    return {
+      error: true,
+      message: "Urutan minimal 1",
+      data: null,
     };
   }
 
@@ -74,14 +125,24 @@ const createTahapProgram = async (id_program, payload) => {
   if (mulai >= selesai) {
     return {
       error: true,
-      message: "Tanggal mulai harus sebelum tanggal selesai",
-      data: payload,
+      message: "Tanggal selesai harus lebih besar dari tanggal mulai",
+      data: null,
+    };
+  }
+
+  const urutanExists = await checkUrutanExistsDb(id_program, urutan);
+
+  if (urutanExists) {
+    return {
+      error: true,
+      message: `Urutan ${urutan} sudah digunakan`,
+      data: null,
     };
   }
 
   const inserted = await insertTahapDb(id_program, {
     nama_tahap,
-    urutan,
+    urutan: Number(urutan),
     penilaian_mulai: mulai,
     penilaian_selesai: selesai,
   });
@@ -93,8 +154,36 @@ const createTahapProgram = async (id_program, payload) => {
   };
 };
 
-const updateJadwalTahap = async (id_tahap, payload) => {
+const updateJadwalTahap = async (id_user, id_tahap, payload) => {
+  const tahap = await getTahapByIdDb(id_tahap);
+
+  if (!tahap) {
+    return {
+      error: true,
+      message: "Tahap tidak ditemukan",
+      data: null,
+    };
+  }
+
+  const program = await getProgramByIdAndAdminDb(tahap.id_program, id_user);
+
+  if (!program) {
+    return {
+      error: true,
+      message: "Akses ditolak",
+      data: null,
+    };
+  }
+
   const { penilaian_mulai, penilaian_selesai } = payload;
+
+  if (!penilaian_mulai || !penilaian_selesai) {
+    return {
+      error: true,
+      message: "Tanggal mulai dan selesai wajib diisi",
+      data: null,
+    };
+  }
 
   const mulai = new Date(penilaian_mulai);
   const selesai = new Date(penilaian_selesai);
@@ -102,8 +191,8 @@ const updateJadwalTahap = async (id_tahap, payload) => {
   if (mulai >= selesai) {
     return {
       error: true,
-      message: "Tanggal tidak valid",
-      data: payload,
+      message: "Tanggal selesai harus lebih besar dari tanggal mulai",
+      data: null,
     };
   }
 
@@ -119,9 +208,41 @@ const updateJadwalTahap = async (id_tahap, payload) => {
   };
 };
 
+const deleteTahap = async (id_user, id_tahap) => {
+  const tahap = await getTahapByIdDb(id_tahap);
+
+  if (!tahap) {
+    return {
+      error: true,
+      message: "Tahap tidak ditemukan",
+      data: null,
+    };
+  }
+
+  const program = await getProgramByIdAndAdminDb(tahap.id_program, id_user);
+
+  if (!program) {
+    return {
+      error: true,
+      message: "Akses ditolak",
+      data: null,
+    };
+  }
+
+  const deleted = await deleteTahapDb(id_tahap);
+
+  return {
+    error: false,
+    message: "Tahap berhasil dihapus",
+    data: deleted,
+  };
+};
+
 module.exports = {
+  getProgramAdmin,
   setProgramTimeline,
   getTahapProgram,
   createTahapProgram,
   updateJadwalTahap,
+  deleteTahap,
 };
