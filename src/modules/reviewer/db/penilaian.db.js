@@ -132,16 +132,27 @@ const submitPenilaianDb = async (id_penilaian) => {
   return rows[0] || null;
 };
 
+const markDistribusiDraftDb = async (id_distribusi) => {
+  const q = `
+    UPDATE t_distribusi_reviewer
+    SET status = 3
+    WHERE id_distribusi = $1
+      AND status IN (1, 3)
+    RETURNING *
+  `;
+  const { rows } = await pool.query(q, [id_distribusi]);
+  return rows[0] || null;
+};
+
 const markDistribusiSubmittedDb = async (id_distribusi) => {
   const q = `
     UPDATE t_distribusi_reviewer
-    SET status = 3,
+    SET status = 4,
         responded_at = now()
     WHERE id_distribusi = $1
-      AND status = 1
+      AND status IN (1, 3)
     RETURNING *
   `;
-
   const { rows } = await pool.query(q, [id_distribusi]);
   return rows[0] || null;
 };
@@ -153,5 +164,6 @@ module.exports = {
   getDetailNilaiDb,
   upsertNilaiDb,
   submitPenilaianDb,
+  markDistribusiDraftDb,
   markDistribusiSubmittedDb,
 };

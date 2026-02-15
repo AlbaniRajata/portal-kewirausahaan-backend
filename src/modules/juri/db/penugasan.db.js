@@ -25,9 +25,10 @@ const getPenugasanDb = async (id_juri, urutan, status_filter = null) => {
     SELECT
       d.id_distribusi,
       d.status,
-      d.tahap AS urutan_tahap,
+      d.tahap AS id_tahap,
       d.assigned_at,
       d.responded_at,
+      d.catatan_juri,
 
       p.id_program,
       p.id_proposal,
@@ -39,16 +40,21 @@ const getPenugasanDb = async (id_juri, urutan, status_filter = null) => {
       k.nama_kategori,
       pr.nama_program,
       pr.keterangan,
-      t.nama_tim
+      t.nama_tim,
+
+      tp.urutan AS urutan_tahap,
+      tp.penilaian_mulai,
+      tp.penilaian_selesai
 
     FROM t_distribusi_juri d
     JOIN t_proposal p ON p.id_proposal = d.id_proposal
     JOIN t_tim t ON t.id_tim = p.id_tim
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
     JOIN m_program pr ON pr.id_program = p.id_program
+    LEFT JOIN m_tahap_penilaian tp ON tp.id_tahap = d.tahap
 
     WHERE d.id_juri = $1
-      AND d.tahap = $2
+      AND tp.urutan = $2
       ${statusClause}
 
     ORDER BY d.assigned_at DESC
@@ -64,7 +70,7 @@ const getDetailPenugasanDb = async (id_distribusi, id_juri) => {
       d.id_proposal,
       d.id_juri,
       d.status,
-      d.tahap,
+      d.tahap AS id_tahap,
       d.assigned_at,
       d.responded_at,
       d.catatan_juri,
@@ -81,6 +87,7 @@ const getDetailPenugasanDb = async (id_distribusi, id_juri) => {
       t.nama_tim,
 
       tp.nama_tahap,
+      tp.urutan AS urutan_tahap,
       tp.penilaian_mulai,
       tp.penilaian_selesai
 
@@ -89,7 +96,7 @@ const getDetailPenugasanDb = async (id_distribusi, id_juri) => {
     JOIN t_tim t ON t.id_tim = p.id_tim
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
     JOIN m_program pr ON pr.id_program = p.id_program
-    LEFT JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = 2
+    LEFT JOIN m_tahap_penilaian tp ON tp.id_tahap = d.tahap
 
     WHERE d.id_distribusi = $1
       AND d.id_juri = $2

@@ -16,7 +16,7 @@ const getProposalTahap2Db = async (id_program) => {
   const q = `
     SELECT id_proposal, judul
     FROM t_proposal
-    WHERE status = 5
+    WHERE status = 4
       AND id_program = $1
     ORDER BY id_proposal
   `;
@@ -87,10 +87,10 @@ const insertJuriTahap2Db = async (client, id_proposal, id_juri, id_tahap, admin_
 const updateProposalStatusPanelDb = async (client, id_program, id_proposal) => {
   const q = `
     UPDATE t_proposal
-    SET status = 6
+    SET status = 5
     WHERE id_proposal = $1
       AND id_program = $2
-      AND status = 5
+      AND status = 4
     RETURNING *
   `;
   const { rows } = await client.query(q, [id_proposal, id_program]);

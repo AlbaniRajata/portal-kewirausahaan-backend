@@ -10,7 +10,29 @@ const {
   getRekapJuriTahap2Db,
   insertPesertaProgramByTimDb,
   getProposalTimDb,
+  getListProposalRekapTahap1Db,
+  getListProposalRekapTahap2Db,
 } = require("../db/penilaian.db");
+
+const getListProposalRekapTahap1 = async (id_program) => {
+  const proposals = await getListProposalRekapTahap1Db(id_program);
+
+  return {
+    error: false,
+    message: "List proposal rekap tahap 1",
+    data: proposals,
+  };
+};
+
+const getListProposalRekapTahap2 = async (id_program) => {
+  const proposals = await getListProposalRekapTahap2Db(id_program);
+
+  return {
+    error: false,
+    message: "List proposal rekap tahap 2",
+    data: proposals,
+  };
+};
 
 const getRekapDeskEvaluasi = async (id_program, id_proposal) => {
   const rows = await getRekapReviewerTahap1Db(id_program, id_proposal);
@@ -296,6 +318,8 @@ const finalisasiWawancaraBatch = async (id_program, payload) => {
 };
 
 module.exports = {
+  getListProposalRekapTahap1,
+  getListProposalRekapTahap2,
   getRekapDeskEvaluasi,
   finalisasiDeskBatch,
   getRekapWawancaraTahap2,

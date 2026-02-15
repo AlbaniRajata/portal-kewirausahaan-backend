@@ -5,6 +5,7 @@ const {
   getDetailNilaiDb,
   upsertNilaiDb,
   submitPenilaianDb,
+  markDistribusiDraftDb,
   markDistribusiSubmittedDb,
 } = require("../db/penilaian.db");
 
@@ -34,10 +35,10 @@ const validateProposalStatus = (dist) => {
     };
   }
 
-  if (dist.urutan_tahap === 2 && dist.status_proposal !== 6) {
+  if (dist.urutan_tahap === 2 && dist.status_proposal !== 5) {
     return {
       error: true,
-      message: "Proposal belum masuk panel wawancara tahap 2",
+      message: "Proposal belum masuk panel wawancara",
       data: { status_proposal: dist.status_proposal },
     };
   }
@@ -127,7 +128,7 @@ const simpanNilai = async (id_user, id_distribusi, payload) => {
       data: null,
     };
 
-  if (dist.status_distribusi !== 1)
+  if (![1, 3].includes(dist.status_distribusi))
     return {
       error: true,
       message: "Nilai hanya bisa disimpan sebelum submit",
@@ -190,6 +191,8 @@ const simpanNilai = async (id_user, id_distribusi, payload) => {
     hasil.push(saved);
   }
 
+  await markDistribusiDraftDb(id_distribusi);
+
   return {
     error: false,
     message: "Nilai reviewer berhasil disimpan",
@@ -207,7 +210,7 @@ const submitPenilaian = async (id_user, id_distribusi) => {
       data: null,
     };
 
-  if (dist.status_distribusi !== 1)
+  if (![1, 3].includes(dist.status_distribusi))
     return {
       error: true,
       message: "Penilaian sudah disubmit atau penugasan belum diterima",
@@ -245,6 +248,7 @@ const submitPenilaian = async (id_user, id_distribusi) => {
 
   return {
     error: false,
+    message: "Penilaian berhasil disubmit",
     data: submitted,
   };
 };

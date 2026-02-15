@@ -7,19 +7,9 @@ const {
 
 const getPenugasanController = async (req, res) => {
   const { id_user } = req.user;
-  const tahap = Number(req.query.tahap);
   const status = req.query.status;
 
-  if (tahap !== 2) {
-    return res.status(400).json({
-      success: false,
-      message: "Validasi gagal",
-      data: {
-        field: "tahap",
-        reason: "Juri hanya memiliki penugasan tahap 2",
-      },
-    });
-  }
+  const tahap = 2;
 
   const result = await getPenugasan(id_user, tahap, status);
 

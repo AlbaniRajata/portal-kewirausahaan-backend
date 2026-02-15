@@ -27,6 +27,8 @@ const getProposalListDb = async ({ id_program, status }) => {
       pr.keterangan,
       t.id_tim,
       t.nama_tim,
+      k.id_kategori,
+      k.nama_kategori,
       json_build_object(
         'id_user', u.id_user,
         'nama_lengkap', u.nama_lengkap,
@@ -35,6 +37,7 @@ const getProposalListDb = async ({ id_program, status }) => {
     FROM t_proposal p
     JOIN m_program pr ON pr.id_program = p.id_program
     JOIN t_tim t ON t.id_tim = p.id_tim
+    JOIN m_kategori k ON k.id_kategori = p.id_kategori
     JOIN t_anggota_tim a ON a.id_tim = t.id_tim AND a.peran = 1
     JOIN m_user u ON u.id_user = a.id_user
     ${where}

@@ -26,13 +26,14 @@ const getRekapReviewerTahap1Db = async (id_program, id_proposal) => {
     JOIN t_proposal pr ON pr.id_proposal = dr.id_proposal
     JOIN t_penilaian_reviewer_detail d ON d.id_penilaian = p.id_penilaian
     JOIN m_kriteria_penilaian k ON k.id_kriteria = d.id_kriteria
+    JOIN m_tahap_penilaian t ON t.id_tahap = p.id_tahap
 
     WHERE pr.id_program = $1
       AND pr.id_proposal = $2
-      AND p.id_tahap = 1
+      AND t.urutan = 1
       AND p.status = 1
 
-    ORDER BY id_reviewer, k.urutan
+    ORDER BY u.id_user, k.urutan
   `;
 
   const { rows } = await pool.query(q, [id_program, id_proposal]);
@@ -44,11 +45,12 @@ const countDistribusiReviewerTahap1Db = async (id_program, id_proposal) => {
     SELECT COUNT(*)::int AS total
     FROM t_distribusi_reviewer dr
     JOIN t_proposal p ON p.id_proposal = dr.id_proposal
+    JOIN m_tahap_penilaian t ON t.id_tahap = dr.tahap
 
     WHERE p.id_program = $1
       AND dr.id_proposal = $2
-      AND dr.tahap = 1
-      AND dr.status IN (1,3)
+      AND t.urutan = 1
+      AND dr.status IN (1, 3, 4)
   `;
 
   const { rows } = await pool.query(q, [id_program, id_proposal]);
@@ -61,10 +63,11 @@ const countSubmittedReviewerTahap1Db = async (id_program, id_proposal) => {
     FROM t_penilaian_reviewer pr
     JOIN t_distribusi_reviewer dr ON dr.id_distribusi = pr.id_distribusi
     JOIN t_proposal p ON p.id_proposal = dr.id_proposal
+    JOIN m_tahap_penilaian t ON t.id_tahap = pr.id_tahap
 
     WHERE p.id_program = $1
       AND dr.id_proposal = $2
-      AND pr.id_tahap = 1
+      AND t.urutan = 1
       AND pr.status = 1
   `;
 
@@ -92,18 +95,22 @@ const countDistribusiPanelTahap2Db = async (id_program, id_proposal) => {
         SELECT COUNT(*)
         FROM t_distribusi_reviewer dr
         JOIN t_proposal p ON p.id_proposal = dr.id_proposal
+        JOIN m_tahap_penilaian t ON t.id_tahap = dr.tahap
         WHERE p.id_program = $1
           AND dr.id_proposal = $2
-          AND dr.tahap = 2
+          AND t.urutan = 2
+          AND dr.status IN (1, 3, 4)
       )
       +
       (
         SELECT COUNT(*)
         FROM t_distribusi_juri dj
         JOIN t_proposal p ON p.id_proposal = dj.id_proposal
+        JOIN m_tahap_penilaian t ON t.id_tahap = dj.tahap
         WHERE p.id_program = $1
           AND dj.id_proposal = $2
-          AND dj.tahap = 2
+          AND t.urutan = 2
+          AND dj.status IN (1, 3, 4)
       ) AS total
   `;
 
@@ -119,10 +126,10 @@ const countSubmittedPanelTahap2Db = async (id_program, id_proposal) => {
         FROM t_penilaian_reviewer pr
         JOIN t_distribusi_reviewer dr ON dr.id_distribusi = pr.id_distribusi
         JOIN t_proposal p ON p.id_proposal = dr.id_proposal
-
+        JOIN m_tahap_penilaian t ON t.id_tahap = pr.id_tahap
         WHERE p.id_program = $1
           AND dr.id_proposal = $2
-          AND pr.id_tahap = 2
+          AND t.urutan = 2
           AND pr.status = 1
       )
       +
@@ -131,10 +138,10 @@ const countSubmittedPanelTahap2Db = async (id_program, id_proposal) => {
         FROM t_penilaian_juri pj
         JOIN t_distribusi_juri dj ON dj.id_distribusi = pj.id_distribusi
         JOIN t_proposal p ON p.id_proposal = dj.id_proposal
-
+        JOIN m_tahap_penilaian t ON t.id_tahap = pj.id_tahap
         WHERE p.id_program = $1
           AND dj.id_proposal = $2
-          AND pj.id_tahap = 2
+          AND t.urutan = 2
           AND pj.status = 1
       ) AS total
   `;
@@ -182,13 +189,14 @@ const getRekapReviewerTahap2Db = async (id_program, id_proposal) => {
     JOIN t_proposal pr ON pr.id_proposal = dr.id_proposal
     JOIN t_penilaian_reviewer_detail d ON d.id_penilaian = p.id_penilaian
     JOIN m_kriteria_penilaian k ON k.id_kriteria = d.id_kriteria
+    JOIN m_tahap_penilaian t ON t.id_tahap = p.id_tahap
 
     WHERE pr.id_program = $1
       AND pr.id_proposal = $2
-      AND p.id_tahap = 2
+      AND t.urutan = 2
       AND p.status = 1
 
-    ORDER BY id_reviewer, k.urutan
+    ORDER BY u.id_user, k.urutan
   `;
 
   const { rows } = await pool.query(q, [id_program, id_proposal]);
@@ -221,13 +229,14 @@ const getRekapJuriTahap2Db = async (id_program, id_proposal) => {
     JOIN t_proposal pr ON pr.id_proposal = dj.id_proposal
     JOIN t_penilaian_juri_detail d ON d.id_penilaian = p.id_penilaian
     JOIN m_kriteria_penilaian k ON k.id_kriteria = d.id_kriteria
+    JOIN m_tahap_penilaian t ON t.id_tahap = p.id_tahap
 
     WHERE pr.id_program = $1
       AND pr.id_proposal = $2
-      AND p.id_tahap = 2
+      AND t.urutan = 2
       AND p.status = 1
 
-    ORDER BY id_juri, k.urutan
+    ORDER BY u.id_user, k.urutan
   `;
 
   const { rows } = await pool.query(q, [id_program, id_proposal]);
@@ -236,12 +245,13 @@ const getRekapJuriTahap2Db = async (id_program, id_proposal) => {
 
 const insertPesertaProgramByTimDb = async (id_tim, id_program) => {
   const q = `
-    INSERT INTO t_peserta_program (id_user, id_program, tahun, status_lolos)
+    INSERT INTO t_peserta_program (id_user, id_program, tahun, status_lolos, id_tim)
     SELECT
       a.id_user,
       $2,
       EXTRACT(YEAR FROM now())::int,
-      1
+      1,
+      $1
     FROM t_anggota_tim a
     WHERE a.id_tim = $1
       AND a.status = 1
@@ -266,6 +276,92 @@ const getProposalTimDb = async (id_program, id_proposal) => {
   return rows[0] || null;
 };
 
+const getListProposalRekapTahap1Db = async (id_program) => {
+  const q = `
+    SELECT DISTINCT
+      p.id_proposal,
+      p.judul,
+      p.status,
+      t.nama_tim,
+      k.nama_kategori,
+      
+      COUNT(DISTINCT dr.id_distribusi) FILTER (WHERE dr.status IN (1, 3, 4)) AS total_reviewer,
+      COUNT(DISTINCT pr.id_penilaian) FILTER (WHERE pr.status = 1) AS total_submit
+      
+    FROM t_proposal p
+    JOIN t_tim t ON t.id_tim = p.id_tim
+    JOIN m_kategori k ON k.id_kategori = p.id_kategori
+    LEFT JOIN t_distribusi_reviewer dr ON dr.id_proposal = p.id_proposal
+    LEFT JOIN m_tahap_penilaian tp ON tp.id_tahap = dr.tahap AND tp.urutan = 1
+    LEFT JOIN t_penilaian_reviewer pr ON pr.id_distribusi = dr.id_distribusi
+    
+    WHERE p.id_program = $1
+      AND p.status IN (2, 3, 4)
+      
+    GROUP BY p.id_proposal, p.judul, p.status, t.nama_tim, k.nama_kategori
+    ORDER BY p.id_proposal ASC
+  `;
+
+  const { rows } = await pool.query(q, [id_program]);
+  return rows;
+};
+
+const getListProposalRekapTahap2Db = async (id_program) => {
+  const q = `
+    SELECT
+      p.id_proposal,
+      p.judul,
+      p.status,
+      t.nama_tim,
+      k.nama_kategori,
+
+      (
+        SELECT COUNT(DISTINCT dr.id_distribusi)
+        FROM t_distribusi_reviewer dr
+        JOIN m_tahap_penilaian tp ON tp.id_tahap = dr.tahap AND tp.urutan = 2
+        WHERE dr.id_proposal = p.id_proposal
+          AND dr.status IN (1, 3, 4)
+      )
+      +
+      (
+        SELECT COUNT(DISTINCT dj.id_distribusi)
+        FROM t_distribusi_juri dj
+        JOIN m_tahap_penilaian tp ON tp.id_tahap = dj.tahap AND tp.urutan = 2
+        WHERE dj.id_proposal = p.id_proposal
+          AND dj.status IN (1, 3, 4)
+      ) AS total_panel,
+
+      (
+        SELECT COUNT(DISTINCT pr.id_penilaian)
+        FROM t_penilaian_reviewer pr
+        JOIN t_distribusi_reviewer dr ON dr.id_distribusi = pr.id_distribusi
+        JOIN m_tahap_penilaian tp ON tp.id_tahap = pr.id_tahap AND tp.urutan = 2
+        WHERE dr.id_proposal = p.id_proposal
+          AND pr.status = 1
+      )
+      +
+      (
+        SELECT COUNT(DISTINCT pj.id_penilaian)
+        FROM t_penilaian_juri pj
+        JOIN t_distribusi_juri dj ON dj.id_distribusi = pj.id_distribusi
+        JOIN m_tahap_penilaian tp ON tp.id_tahap = pj.id_tahap AND tp.urutan = 2
+        WHERE dj.id_proposal = p.id_proposal
+          AND pj.status = 1
+      ) AS total_submit
+
+    FROM t_proposal p
+    JOIN t_tim t ON t.id_tim = p.id_tim
+    JOIN m_kategori k ON k.id_kategori = p.id_kategori
+
+    WHERE p.id_program = $1
+      AND p.status IN (5, 6, 7, 8)
+
+    ORDER BY p.id_proposal ASC
+  `;
+
+  const { rows } = await pool.query(q, [id_program]);
+  return rows;
+};
 
 module.exports = {
   getRekapReviewerTahap1Db,
@@ -273,6 +369,8 @@ module.exports = {
   countSubmittedReviewerTahap1Db,
   updateStatusProposalTahap1Db,
 
+  getListProposalRekapTahap1Db,
+  getListProposalRekapTahap2Db,
   countDistribusiPanelTahap2Db,
   countSubmittedPanelTahap2Db,
   updateStatusProposalTahap2Db,

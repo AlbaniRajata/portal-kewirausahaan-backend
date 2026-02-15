@@ -50,6 +50,8 @@ const {
 } = require("../controllers/distribusiTahap1.controller");
 
 const {
+  getListProposalRekapTahap1Controller,
+  getListProposalRekapTahap2Controller,
   getRekapDeskEvaluasiController,
   finalisasiDeskBatchController,
   getRekapWawancaraTahap2Controller,
@@ -110,10 +112,13 @@ router.get("/program/:id_program/distribusi/reviewer/tahap/:tahap/history", getD
 router.get("/program/:id_program/distribusi/reviewer/tahap/:tahap/:id_distribusi", getDistribusiDetailController);
 router.post("/program/:id_program/distribusi/reviewer/tahap/:tahap/:id_distribusi/reassign", reassignReviewerController);
 
+router.get("/program/:id_program/rekap-tahap1/list", getListProposalRekapTahap1Controller);
+router.get("/program/:id_program/rekap-tahap2/list", getListProposalRekapTahap2Controller);
+
 router.get("/program/:id_program/proposal/:id_proposal/rekap-desk", getRekapDeskEvaluasiController);
 router.post("/program/:id_program/proposal/finalisasi-desk-batch", finalisasiDeskBatchController);
 router.get("/program/:id_program/proposal/:id_proposal/rekap-wawancara", getRekapWawancaraTahap2Controller);
-router.post("/program/:id_program/proposal/finalisasi-wawancara", finalisasiWawancaraBatchController);
+router.post("/program/:id_program/proposal/finalisasi-wawancara-batch", finalisasiWawancaraBatchController);
 
 router.patch("/proposal/:id_proposal/wawancara", scheduleWawancaraController);
 router.patch("/proposal/wawancara/bulk", scheduleWawancaraBulkController);

@@ -10,7 +10,6 @@ const {
   updateProposalStatusPanelDb,
   getDistribusiReviewerHistoryTahap2Db,
   getDistribusiJuriHistoryTahap2Db,
-  getJuriListDb,
 } = require("../db/distribusiTahap2.db");
 
 const previewDistribusiTahap2 = async (id_program) => {
@@ -19,7 +18,7 @@ const previewDistribusiTahap2 = async (id_program) => {
   if (!tahapAktif) {
     return {
       error: true,
-      message: "Tahap wawancara (Tahap 2) tidak aktif",
+      message: "Tahap 2 (Wawancara) belum dibuat/dijadwalkan atau sudah ditutup",
       data: { id_program },
     };
   }
@@ -33,7 +32,7 @@ const previewDistribusiTahap2 = async (id_program) => {
   if (!proposals.length) {
     return {
       error: true,
-      message: "Tidak ada proposal siap masuk panel wawancara",
+      message: "Tidak ada proposal siap masuk panel wawancara (status harus Lolos Desk Evaluasi)",
       data: { id_program },
     };
   }
@@ -168,7 +167,7 @@ const manualDistribusiTahap2 = async (admin_id, id_program, payload) => {
   if (!tahapAktif) {
     return {
       error: true,
-      message: "Tahap wawancara tidak aktif",
+      message: "Tahap 2 (Wawancara) belum dibuat/dijadwalkan atau sudah ditutup",
       data: { id_program },
     };
   }
@@ -262,24 +261,6 @@ const getDistribusiJuriHistoryTahap2 = async (id_program) => {
       error: false,
       message: "History distribusi juri tahap 2 berhasil dimuat",
       data: history,
-    };
-  } catch (e) {
-    return {
-      error: true,
-      message: e.message,
-      data: [],
-    };
-  }
-};
-
-const getJuriList = async () => {
-  try {
-    const juries = await getJuriListDb();
-    
-    return {
-      error: false,
-      message: "Daftar juri berhasil dimuat",
-      data: juries,
     };
   } catch (e) {
     return {
