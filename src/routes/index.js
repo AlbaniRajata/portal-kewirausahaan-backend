@@ -20,5 +20,6 @@ router.use("/public", require("../modules/public/routes/prodi.route"));
 router.use("/public", require("../modules/public/routes/jurusan.route"));
 router.use("/public", require("../modules/public/routes/program.route"));
 router.use("/public", require("../modules/public/routes/kategori.route"));
+router.use("/public", require("../modules/public/routes/profile.route"));
 
 module.exports = router;
