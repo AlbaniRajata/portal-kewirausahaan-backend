@@ -100,11 +100,7 @@ const autoDistribusiTahap1 = async (admin_id, id_program) => {
       const assigned = [];
 
       for (const p of r.proposals) {
-        const locked = await lockProposalForDistribusiDb(
-          client,
-          p.id_proposal,
-          tahap
-        );
+        const locked = await lockProposalForDistribusiDb(client, p.id_proposal, tahap);
 
         if (!locked) continue;
 
@@ -188,11 +184,7 @@ const manualDistribusiTahap1 = async (admin_id, payload) => {
   try {
     await client.query("BEGIN");
 
-    const locked = await lockProposalForDistribusiDb(
-      client,
-      id_proposal,
-      tahap
-    );
+    const locked = await lockProposalForDistribusiDb(client, id_proposal, tahap);
 
     if (!locked) {
       await client.query("ROLLBACK");
@@ -244,22 +236,22 @@ const bulkDistribusiTahap1 = async (admin_id, payload) => {
 
   const tahapAktif = await getTahapAktifDb(id_program, tahap);
   if (!tahapAktif) {
-    return { 
-      error: true, 
-      message: "Tahap 1 tidak aktif" 
+    return {
+      error: true,
+      message: "Tahap 1 tidak aktif",
     };
   }
 
   const reviewerData = await getReviewerByIdDb(id_reviewer);
   if (!reviewerData || !reviewerData.is_active) {
-    return { 
-      error: true, 
-      message: "Reviewer tidak valid atau tidak aktif" 
+    return {
+      error: true,
+      message: "Reviewer tidak valid atau tidak aktif",
     };
   }
 
   const client = await pool.connect();
-  
+
   try {
     await client.query("BEGIN");
 
@@ -268,26 +260,26 @@ const bulkDistribusiTahap1 = async (admin_id, payload) => {
 
     for (const id_proposal of id_proposal_list) {
       const locked = await lockProposalForDistribusiDb(client, id_proposal, tahap);
-      
+
       if (!locked) {
         const proposalInfo = await getProposalBasicDb(id_proposal);
-        failed.push({ 
-          id_proposal, 
+        failed.push({
+          id_proposal,
           judul: proposalInfo?.judul || "Unknown",
-          reason: "Sudah terdistribusi atau tidak valid" 
+          reason: "Sudah terdistribusi atau tidak valid",
         });
         continue;
       }
 
       const distribusi = await insertDistribusiDb(client, [
-        id_proposal, 
-        id_reviewer, 
-        tahap, 
-        admin_id
+        id_proposal,
+        id_reviewer,
+        tahap,
+        admin_id,
       ]);
 
       await updateStatusProposalDistribusiDb(client, id_proposal);
-      
+
       const proposalInfo = await getProposalBasicDb(id_proposal);
       assigned.push({
         id_distribusi: distribusi.id_distribusi,
@@ -315,9 +307,9 @@ const bulkDistribusiTahap1 = async (admin_id, payload) => {
     };
   } catch (e) {
     await client.query("ROLLBACK");
-    return { 
-      error: true, 
-      message: e.message 
+    return {
+      error: true,
+      message: e.message,
     };
   } finally {
     client.release();
@@ -327,7 +319,7 @@ const bulkDistribusiTahap1 = async (admin_id, payload) => {
 const getDistribusiHistory = async (id_program, tahap) => {
   try {
     const history = await getDistribusiHistoryDb(id_program, tahap);
-    
+
     return {
       error: false,
       message: "History distribusi berhasil dimuat",
@@ -345,7 +337,7 @@ const getDistribusiHistory = async (id_program, tahap) => {
 const getDistribusiDetail = async (id_distribusi, id_program, tahap) => {
   try {
     const distribusi = await getDistribusiDetailDb(id_distribusi);
-    
+
     if (!distribusi) {
       return {
         error: true,
@@ -376,42 +368,50 @@ const getDistribusiDetail = async (id_distribusi, id_program, tahap) => {
   }
 };
 
-const reassignReviewer = async (admin_id, id_distribusi, id_reviewer_baru) => {
+const reassignReviewer = async (admin_id, id_distribusi, id_reviewer_baru, id_program, tahap) => {
   const distribusi = await getDistribusiByIdDb(id_distribusi);
-  
+
   if (!distribusi) {
-    return { 
-      error: true, 
-      message: "Distribusi tidak ditemukan" 
+    return {
+      error: true,
+      message: "Distribusi tidak ditemukan",
     };
   }
-  
+
+  if (distribusi.id_program !== id_program || distribusi.tahap !== tahap) {
+    return {
+      error: true,
+      message: "Distribusi tidak sesuai dengan program/tahap yang diminta",
+    };
+  }
+
   if (distribusi.status !== 2) {
-    return { 
-      error: true, 
-      message: "Hanya distribusi yang ditolak yang dapat di-reassign" 
+    return {
+      error: true,
+      message: "Hanya distribusi yang ditolak yang dapat di-reassign",
     };
   }
 
   const reviewerData = await getReviewerByIdDb(id_reviewer_baru);
   if (!reviewerData || !reviewerData.is_active) {
-    return { 
-      error: true, 
-      message: "Reviewer baru tidak valid atau tidak aktif" 
+    return {
+      error: true,
+      message: "Reviewer baru tidak valid atau tidak aktif",
     };
   }
 
   const client = await pool.connect();
-  
+
   try {
     await client.query("BEGIN");
+
     await updateDistribusiStatusDb(client, id_distribusi, 3);
 
     const distribusiBaru = await insertDistribusiDb(client, [
       distribusi.id_proposal,
       id_reviewer_baru,
       distribusi.tahap,
-      admin_id
+      admin_id,
     ]);
 
     await updateProposalStatusDb(client, distribusi.id_proposal, 2);
@@ -432,9 +432,9 @@ const reassignReviewer = async (admin_id, id_distribusi, id_reviewer_baru) => {
     };
   } catch (e) {
     await client.query("ROLLBACK");
-    return { 
-      error: true, 
-      message: e.message 
+    return {
+      error: true,
+      message: e.message,
     };
   } finally {
     client.release();

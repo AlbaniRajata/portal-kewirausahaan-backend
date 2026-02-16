@@ -17,7 +17,7 @@ const getProposalLolosDb = async (id_tim) => {
     SELECT *
     FROM t_proposal
     WHERE id_tim = $1
-      AND status IN (8,9)
+      AND status IN (7, 8, 9)
     LIMIT 1
   `;
   const { rows } = await pool.query(q, [id_tim]);
@@ -51,12 +51,7 @@ const getPengajuanTimDb = async (id_tim) => {
   return rows[0] || null;
 };
 
-const upsertPengajuanDb = async (
-  id_tim,
-  id_program,
-  id_dosen,
-  diajukan_oleh
-) => {
+const upsertPengajuanDb = async (id_tim, id_program, id_dosen, diajukan_oleh) => {
   const q = `
     INSERT INTO t_pengajuan_pembimbing
       (id_tim, id_program, id_dosen, diajukan_oleh, status)
@@ -73,12 +68,7 @@ const upsertPengajuanDb = async (
 
     RETURNING *
   `;
-  const { rows } = await pool.query(q, [
-    id_tim,
-    id_program,
-    id_dosen,
-    diajukan_oleh,
-  ]);
+  const { rows } = await pool.query(q, [id_tim, id_program, id_dosen, diajukan_oleh]);
   return rows[0];
 };
 

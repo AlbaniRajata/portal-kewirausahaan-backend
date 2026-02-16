@@ -1,3 +1,5 @@
+const pool = require("../../../config/db");
+
 const {
   getRekapReviewerTahap1Db,
   countDistribusiReviewerTahap1Db,
@@ -100,28 +102,13 @@ const finalisasiDeskBatch = async (id_program, payload) => {
   const hasil = [];
 
   for (const id_proposal of lolos) {
-    const totalDistribusi = await countDistribusiReviewerTahap1Db(
-      id_program,
-      id_proposal,
-    );
-    const totalSubmit = await countSubmittedReviewerTahap1Db(
-      id_program,
-      id_proposal,
-    );
+    const totalDistribusi = await countDistribusiReviewerTahap1Db(id_program, id_proposal);
+    const totalSubmit = await countSubmittedReviewerTahap1Db(id_program, id_proposal);
 
-    if (totalDistribusi === 0) {
-      continue;
-    }
+    if (totalDistribusi === 0) continue;
+    if (totalSubmit !== totalDistribusi) continue;
 
-    if (totalSubmit !== totalDistribusi) {
-      continue;
-    }
-
-    const updated = await updateStatusProposalTahap1Db(
-      id_program,
-      id_proposal,
-      4,
-    );
+    const updated = await updateStatusProposalTahap1Db(id_program, id_proposal, 4);
 
     hasil.push({
       id_proposal,
@@ -131,28 +118,13 @@ const finalisasiDeskBatch = async (id_program, payload) => {
   }
 
   for (const id_proposal of tidak_lolos) {
-    const totalDistribusi = await countDistribusiReviewerTahap1Db(
-      id_program,
-      id_proposal,
-    );
-    const totalSubmit = await countSubmittedReviewerTahap1Db(
-      id_program,
-      id_proposal,
-    );
+    const totalDistribusi = await countDistribusiReviewerTahap1Db(id_program, id_proposal);
+    const totalSubmit = await countSubmittedReviewerTahap1Db(id_program, id_proposal);
 
-    if (totalDistribusi === 0) {
-      continue;
-    }
+    if (totalDistribusi === 0) continue;
+    if (totalSubmit !== totalDistribusi) continue;
 
-    if (totalSubmit !== totalDistribusi) {
-      continue;
-    }
-
-    const updated = await updateStatusProposalTahap1Db(
-      id_program,
-      id_proposal,
-      3,
-    );
+    const updated = await updateStatusProposalTahap1Db(id_program, id_proposal, 3);
 
     hasil.push({
       id_proposal,
@@ -217,11 +189,9 @@ const getRekapWawancaraTahap2 = async (id_program, id_proposal) => {
   };
 
   const reviewer = groupPenilaian(reviewerRows, "id_reviewer", "nama_reviewer");
-
   const juri = groupPenilaian(juriRows, "id_juri", "nama_juri");
 
   const totalReviewer = reviewer.reduce((sum, r) => sum + r.total_nilai, 0);
-
   const totalJuri = juri.reduce((sum, j) => sum + j.total_nilai, 0);
 
   return {
@@ -251,63 +221,74 @@ const finalisasiWawancaraBatch = async (id_program, payload) => {
   const hasil = [];
 
   for (const id_proposal of lolos) {
-    const totalDistribusi = await countDistribusiPanelTahap2Db(
-      id_program,
-      id_proposal,
-    );
-
-    const totalSubmit = await countSubmittedPanelTahap2Db(
-      id_program,
-      id_proposal,
-    );
+    const totalDistribusi = await countDistribusiPanelTahap2Db(id_program, id_proposal);
+    const totalSubmit = await countSubmittedPanelTahap2Db(id_program, id_proposal);
 
     if (totalDistribusi === 0) continue;
     if (totalSubmit !== totalDistribusi) continue;
 
-    const updated = await updateStatusProposalTahap2Db(
-      id_program,
-      id_proposal,
-      8,
-    );
-
     const proposalTim = await getProposalTimDb(id_program, id_proposal);
+    const client = await pool.connect();
 
-    if (proposalTim) {
-      await insertPesertaProgramByTimDb(proposalTim.id_tim, id_program);
+    try {
+      await client.query("BEGIN");
+
+      const updated = await updateStatusProposalTahap2Db(client, id_program, id_proposal, 7);
+
+      if (proposalTim) {
+        await insertPesertaProgramByTimDb(client, proposalTim.id_tim, id_program);
+      }
+
+      await client.query("COMMIT");
+
+      hasil.push({
+        id_proposal,
+        status: "LOLOS WAWANCARA",
+        updated,
+      });
+    } catch (e) {
+      await client.query("ROLLBACK");
+      hasil.push({
+        id_proposal,
+        status: "ERROR",
+        error: e.message,
+      });
+    } finally {
+      client.release();
     }
-
-    hasil.push({
-      id_proposal,
-      status: "LOLOS WAWANCARA",
-      updated,
-    });
   }
 
   for (const id_proposal of tidak_lolos) {
-    const totalDistribusi = await countDistribusiPanelTahap2Db(
-      id_program,
-      id_proposal,
-    );
-
-    const totalSubmit = await countSubmittedPanelTahap2Db(
-      id_program,
-      id_proposal,
-    );
+    const totalDistribusi = await countDistribusiPanelTahap2Db(id_program, id_proposal);
+    const totalSubmit = await countSubmittedPanelTahap2Db(id_program, id_proposal);
 
     if (totalDistribusi === 0) continue;
     if (totalSubmit !== totalDistribusi) continue;
 
-    const updated = await updateStatusProposalTahap2Db(
-      id_program,
-      id_proposal,
-      7,
-    );
+    const client = await pool.connect();
 
-    hasil.push({
-      id_proposal,
-      status: "TIDAK LOLOS WAWANCARA",
-      updated,
-    });
+    try {
+      await client.query("BEGIN");
+
+      const updated = await updateStatusProposalTahap2Db(client, id_program, id_proposal, 6);
+
+      await client.query("COMMIT");
+
+      hasil.push({
+        id_proposal,
+        status: "TIDAK LOLOS WAWANCARA",
+        updated,
+      });
+    } catch (e) {
+      await client.query("ROLLBACK");
+      hasil.push({
+        id_proposal,
+        status: "ERROR",
+        error: e.message,
+      });
+    } finally {
+      client.release();
+    }
   }
 
   return {

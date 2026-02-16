@@ -64,7 +64,7 @@ const approvePengajuan = async (id_dosen, id_pengajuan) => {
 
   const proposal = await getProposalByTimDb(detail.id_tim);
 
-  if (!proposal || proposal.status !== 9) {
+  if (!proposal || proposal.status !== 8) {
     return {
       error: true,
       message: "Proposal belum dalam status pengajuan pembimbing",
@@ -74,7 +74,7 @@ const approvePengajuan = async (id_dosen, id_pengajuan) => {
 
   const approved = await approvePengajuanDb(id_pengajuan);
 
-  await updateProposalStatusDb(proposal.id_proposal, 10);
+  await updateProposalStatusDb(proposal.id_proposal, 9);
 
   const tim = await getTimLengkapDb(detail.id_tim);
 
@@ -85,7 +85,7 @@ const approvePengajuan = async (id_dosen, id_pengajuan) => {
       pengajuan: approved,
       proposal: {
         ...proposal,
-        status: 10,
+        status: 9,
       },
       tim,
     },
@@ -121,7 +121,7 @@ const rejectPengajuan = async (id_dosen, id_pengajuan, catatan) => {
 
   const proposal = await getProposalByTimDb(detail.id_tim);
 
-  if (!proposal || proposal.status !== 9) {
+  if (!proposal || proposal.status !== 8) {
     return {
       error: true,
       message: "Proposal tidak dalam status pengajuan pembimbing",
@@ -131,7 +131,7 @@ const rejectPengajuan = async (id_dosen, id_pengajuan, catatan) => {
 
   const rejected = await rejectPengajuanDb(id_pengajuan, catatan);
 
-  await updateProposalStatusDb(proposal.id_proposal, 8);
+  await updateProposalStatusDb(proposal.id_proposal, 7);
 
   const tim = await getTimLengkapDb(detail.id_tim);
 
@@ -142,7 +142,7 @@ const rejectPengajuan = async (id_dosen, id_pengajuan, catatan) => {
       pengajuan: rejected,
       proposal: {
         ...proposal,
-        status: 8,
+        status: 7,
       },
       tim,
     },

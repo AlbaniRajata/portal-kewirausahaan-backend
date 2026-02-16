@@ -45,7 +45,7 @@ const countDistribusiReviewerTahap1Db = async (id_program, id_proposal) => {
     SELECT COUNT(*)::int AS total
     FROM t_distribusi_reviewer dr
     JOIN t_proposal p ON p.id_proposal = dr.id_proposal
-    JOIN m_tahap_penilaian t ON t.id_tahap = dr.tahap
+    JOIN m_tahap_penilaian t ON t.id_program = p.id_program AND t.urutan = dr.tahap
 
     WHERE p.id_program = $1
       AND dr.id_proposal = $2
@@ -63,7 +63,7 @@ const countSubmittedReviewerTahap1Db = async (id_program, id_proposal) => {
     FROM t_penilaian_reviewer pr
     JOIN t_distribusi_reviewer dr ON dr.id_distribusi = pr.id_distribusi
     JOIN t_proposal p ON p.id_proposal = dr.id_proposal
-    JOIN m_tahap_penilaian t ON t.id_tahap = pr.id_tahap
+    JOIN m_tahap_penilaian t ON t.id_program = p.id_program AND t.urutan = pr.id_tahap
 
     WHERE p.id_program = $1
       AND dr.id_proposal = $2
@@ -95,7 +95,7 @@ const countDistribusiPanelTahap2Db = async (id_program, id_proposal) => {
         SELECT COUNT(*)
         FROM t_distribusi_reviewer dr
         JOIN t_proposal p ON p.id_proposal = dr.id_proposal
-        JOIN m_tahap_penilaian t ON t.id_tahap = dr.tahap
+        JOIN m_tahap_penilaian t ON t.id_program = p.id_program AND t.urutan = dr.tahap
         WHERE p.id_program = $1
           AND dr.id_proposal = $2
           AND t.urutan = 2
@@ -106,7 +106,7 @@ const countDistribusiPanelTahap2Db = async (id_program, id_proposal) => {
         SELECT COUNT(*)
         FROM t_distribusi_juri dj
         JOIN t_proposal p ON p.id_proposal = dj.id_proposal
-        JOIN m_tahap_penilaian t ON t.id_tahap = dj.tahap
+        JOIN m_tahap_penilaian t ON t.id_program = p.id_program AND t.urutan = dj.tahap
         WHERE p.id_program = $1
           AND dj.id_proposal = $2
           AND t.urutan = 2
@@ -126,7 +126,7 @@ const countSubmittedPanelTahap2Db = async (id_program, id_proposal) => {
         FROM t_penilaian_reviewer pr
         JOIN t_distribusi_reviewer dr ON dr.id_distribusi = pr.id_distribusi
         JOIN t_proposal p ON p.id_proposal = dr.id_proposal
-        JOIN m_tahap_penilaian t ON t.id_tahap = pr.id_tahap
+        JOIN m_tahap_penilaian t ON t.id_program = p.id_program AND t.urutan = pr.id_tahap
         WHERE p.id_program = $1
           AND dr.id_proposal = $2
           AND t.urutan = 2
@@ -138,7 +138,7 @@ const countSubmittedPanelTahap2Db = async (id_program, id_proposal) => {
         FROM t_penilaian_juri pj
         JOIN t_distribusi_juri dj ON dj.id_distribusi = pj.id_distribusi
         JOIN t_proposal p ON p.id_proposal = dj.id_proposal
-        JOIN m_tahap_penilaian t ON t.id_tahap = pj.id_tahap
+        JOIN m_tahap_penilaian t ON t.id_program = p.id_program AND t.urutan = pj.id_tahap
         WHERE p.id_program = $1
           AND dj.id_proposal = $2
           AND t.urutan = 2
@@ -150,7 +150,7 @@ const countSubmittedPanelTahap2Db = async (id_program, id_proposal) => {
   return Number(rows[0].total);
 };
 
-const updateStatusProposalTahap2Db = async (id_program, id_proposal, status) => {
+const updateStatusProposalTahap2Db = async (client, id_program, id_proposal, status) => {
   const q = `
     UPDATE t_proposal
     SET status = $3
@@ -159,7 +159,7 @@ const updateStatusProposalTahap2Db = async (id_program, id_proposal, status) => 
     RETURNING *
   `;
 
-  const { rows } = await pool.query(q, [id_program, id_proposal, status]);
+  const { rows } = await client.query(q, [id_program, id_proposal, status]);
   return rows[0];
 };
 
@@ -243,7 +243,7 @@ const getRekapJuriTahap2Db = async (id_program, id_proposal) => {
   return rows;
 };
 
-const insertPesertaProgramByTimDb = async (id_tim, id_program) => {
+const insertPesertaProgramByTimDb = async (client, id_tim, id_program) => {
   const q = `
     INSERT INTO t_peserta_program (id_user, id_program, tahun, status_lolos, id_tim)
     SELECT
@@ -260,7 +260,7 @@ const insertPesertaProgramByTimDb = async (id_tim, id_program) => {
     RETURNING *
   `;
 
-  const { rows } = await pool.query(q, [id_tim, id_program]);
+  const { rows } = await client.query(q, [id_tim, id_program]);
   return rows;
 };
 
@@ -292,7 +292,7 @@ const getListProposalRekapTahap1Db = async (id_program) => {
     JOIN t_tim t ON t.id_tim = p.id_tim
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
     LEFT JOIN t_distribusi_reviewer dr ON dr.id_proposal = p.id_proposal
-    LEFT JOIN m_tahap_penilaian tp ON tp.id_tahap = dr.tahap AND tp.urutan = 1
+    LEFT JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = dr.tahap AND tp.urutan = 1
     LEFT JOIN t_penilaian_reviewer pr ON pr.id_distribusi = dr.id_distribusi
     
     WHERE p.id_program = $1
@@ -318,7 +318,7 @@ const getListProposalRekapTahap2Db = async (id_program) => {
       (
         SELECT COUNT(DISTINCT dr.id_distribusi)
         FROM t_distribusi_reviewer dr
-        JOIN m_tahap_penilaian tp ON tp.id_tahap = dr.tahap AND tp.urutan = 2
+        JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = dr.tahap AND tp.urutan = 2
         WHERE dr.id_proposal = p.id_proposal
           AND dr.status IN (1, 3, 4)
       )
@@ -326,7 +326,7 @@ const getListProposalRekapTahap2Db = async (id_program) => {
       (
         SELECT COUNT(DISTINCT dj.id_distribusi)
         FROM t_distribusi_juri dj
-        JOIN m_tahap_penilaian tp ON tp.id_tahap = dj.tahap AND tp.urutan = 2
+        JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = dj.tahap AND tp.urutan = 2
         WHERE dj.id_proposal = p.id_proposal
           AND dj.status IN (1, 3, 4)
       ) AS total_panel,
@@ -335,7 +335,7 @@ const getListProposalRekapTahap2Db = async (id_program) => {
         SELECT COUNT(DISTINCT pr.id_penilaian)
         FROM t_penilaian_reviewer pr
         JOIN t_distribusi_reviewer dr ON dr.id_distribusi = pr.id_distribusi
-        JOIN m_tahap_penilaian tp ON tp.id_tahap = pr.id_tahap AND tp.urutan = 2
+        JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = pr.id_tahap AND tp.urutan = 2
         WHERE dr.id_proposal = p.id_proposal
           AND pr.status = 1
       )
@@ -344,7 +344,7 @@ const getListProposalRekapTahap2Db = async (id_program) => {
         SELECT COUNT(DISTINCT pj.id_penilaian)
         FROM t_penilaian_juri pj
         JOIN t_distribusi_juri dj ON dj.id_distribusi = pj.id_distribusi
-        JOIN m_tahap_penilaian tp ON tp.id_tahap = pj.id_tahap AND tp.urutan = 2
+        JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = pj.id_tahap AND tp.urutan = 2
         WHERE dj.id_proposal = p.id_proposal
           AND pj.status = 1
       ) AS total_submit

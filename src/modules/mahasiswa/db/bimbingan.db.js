@@ -17,7 +17,7 @@ const getProposalLolosDb = async (id_tim) => {
     SELECT *
     FROM t_proposal
     WHERE id_tim = $1
-      AND status = 10
+      AND status = 9
     LIMIT 1
   `;
   const { rows } = await pool.query(q, [id_tim]);
@@ -117,7 +117,7 @@ const createBimbinganDb = async (payload) => {
     id_dosen,
     diajukan_oleh,
     tanggal_bimbingan,
-    metode,
+    Number(metode),
     topik,
     deskripsi,
   ]);

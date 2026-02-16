@@ -82,7 +82,7 @@ const ajukanBimbingan = async (id_user, payload) => {
   if (!proposal) {
     return {
       error: true,
-      message: "Proposal belum disetujui pembimbingnya (status harus 10)",
+      message: "Proposal belum disetujui pembimbingnya",
       data: null,
     };
   }

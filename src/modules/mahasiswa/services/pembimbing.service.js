@@ -9,7 +9,6 @@ const {
 
 const listDosenPembimbing = async () => {
   const dosen = await listDosenDb();
-
   return {
     error: false,
     message: "Daftar dosen pembimbing tersedia",
@@ -33,12 +32,14 @@ const getStatusPembimbing = async (id_user) => {
   if (!proposal) {
     return {
       error: true,
-      message: "Proposal belum lolos wawancara tahap 2",
+      message: "Proposal belum lolos wawancara",
       data: null,
     };
   }
 
   const pengajuan = await getPengajuanTimDb(peserta.id_tim);
+
+  const bisa_ajukan = !pengajuan || pengajuan.status === 2;
 
   return {
     error: false,
@@ -50,6 +51,7 @@ const getStatusPembimbing = async (id_user) => {
         status: proposal.status,
       },
       pengajuan,
+      bisa_ajukan,
     },
   };
 };
@@ -70,17 +72,17 @@ const ajukanPembimbing = async (id_user, payload) => {
   if (!peserta) {
     return {
       error: true,
-      message: "Anda belum peserta program",
+      message: "Anda belum terdaftar sebagai peserta program",
       data: null,
     };
   }
 
   const proposal = await getProposalLolosDb(peserta.id_tim);
 
-  if (!proposal || proposal.status !== 8) {
+  if (!proposal || proposal.status !== 7) {
     return {
       error: true,
-      message: "Pengajuan hanya bisa dilakukan saat status proposal = 8",
+      message: "Pengajuan hanya bisa dilakukan saat proposal lolos wawancara",
       data: null,
     };
   }
@@ -92,7 +94,7 @@ const ajukanPembimbing = async (id_user, payload) => {
     id_user
   );
 
-  await updateStatusProposalDb(proposal.id_proposal, 9);
+  await updateStatusProposalDb(proposal.id_proposal, 8);
 
   return {
     error: false,
