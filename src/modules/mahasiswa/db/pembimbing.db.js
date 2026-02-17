@@ -42,9 +42,15 @@ const listDosenDb = async () => {
 
 const getPengajuanTimDb = async (id_tim) => {
   const q = `
-    SELECT *
-    FROM t_pengajuan_pembimbing
-    WHERE id_tim = $1
+    SELECT
+      p.*,
+      u.nama_lengkap AS nama_dosen,
+      d.nip,
+      d.bidang_keahlian
+    FROM t_pengajuan_pembimbing p
+    JOIN m_dosen d ON d.id_user = p.id_dosen
+    JOIN m_user u ON u.id_user = d.id_user
+    WHERE p.id_tim = $1
     LIMIT 1
   `;
   const { rows } = await pool.query(q, [id_tim]);

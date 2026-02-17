@@ -2,6 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 const roleMiddleware = require("../../../middlewares/role.middleware");
+const {
+  uploadFotoProfil,
+} = require("../../../middlewares/upload.middleware");
+
+const {
+  getProfileController,
+  updateProfileController,
+  updatePasswordController,
+} = require("../controllers/profile.controller");
 
 const {
   getPengajuanMasukController,
@@ -18,6 +27,22 @@ const {
 } = require("../controllers/bimbingan.controller");
 
 router.use(roleMiddleware([3]));
+
+const uploadOptional = (req, res, next) => {
+  uploadFotoProfil.single("foto")(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message,
+      });
+    }
+    next();
+  });
+};
+
+router.get("/profile", getProfileController);
+router.patch("/profile", uploadOptional, updateProfileController);
+router.put("/password", updatePasswordController);
 
 router.get("/pembimbing/pengajuan", getPengajuanMasukController);
 router.get("/pembimbing/pengajuan/:id_pengajuan", getDetailPengajuanController);
