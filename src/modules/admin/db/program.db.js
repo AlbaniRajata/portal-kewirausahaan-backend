@@ -137,6 +137,98 @@ const deleteTahapDb = async (id_tahap) => {
   return rows[0] || null;
 };
 
+const getKriteriaByTahapDb = async (id_tahap) => {
+  const q = `
+    SELECT *
+    FROM m_kriteria_penilaian
+    WHERE id_tahap = $1
+    ORDER BY urutan ASC
+  `;
+  const { rows } = await pool.query(q, [id_tahap]);
+  return rows;
+};
+
+const getKriteriaByIdDb = async (id_kriteria) => {
+  const q = `
+    SELECT
+      k.*,
+      t.id_program
+    FROM m_kriteria_penilaian k
+    JOIN m_tahap_penilaian t ON t.id_tahap = k.id_tahap
+    WHERE k.id_kriteria = $1
+  `;
+  const { rows } = await pool.query(q, [id_kriteria]);
+  return rows[0] || null;
+};
+
+const checkUrutanKriteriaExistsDb = async (id_tahap, urutan, exclude_id_kriteria = null) => {
+  let q = `
+    SELECT id_kriteria
+    FROM m_kriteria_penilaian
+    WHERE id_tahap = $1
+      AND urutan = $2
+  `;
+  const values = [id_tahap, urutan];
+
+  if (exclude_id_kriteria) {
+    q += ` AND id_kriteria != $3`;
+    values.push(exclude_id_kriteria);
+  }
+
+  const { rows } = await pool.query(q, values);
+  return rows.length > 0;
+};
+
+const insertKriteriaDb = async (id_tahap, data) => {
+  const q = `
+    INSERT INTO m_kriteria_penilaian
+      (id_tahap, nama_kriteria, deskripsi, bobot, urutan, status)
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING *
+  `;
+  const { rows } = await pool.query(q, [
+    id_tahap,
+    data.nama_kriteria,
+    data.deskripsi || null,
+    data.bobot,
+    data.urutan,
+    data.status !== undefined ? data.status : 1,
+  ]);
+  return rows[0];
+};
+
+const updateKriteriaDb = async (id_kriteria, data) => {
+  const q = `
+    UPDATE m_kriteria_penilaian
+    SET nama_kriteria = $2,
+        deskripsi = $3,
+        bobot = $4,
+        urutan = $5,
+        status = $6
+    WHERE id_kriteria = $1
+    RETURNING *
+  `;
+  const { rows } = await pool.query(q, [
+    id_kriteria,
+    data.nama_kriteria,
+    data.deskripsi || null,
+    data.bobot,
+    data.urutan,
+    data.status,
+  ]);
+  return rows[0] || null;
+};
+
+const deleteKriteriaDb = async (id_kriteria) => {
+  const q = `
+    DELETE FROM m_kriteria_penilaian
+    WHERE id_kriteria = $1
+    RETURNING *
+  `;
+  const { rows } = await pool.query(q, [id_kriteria]);
+  return rows[0] || null;
+};
+
 module.exports = {
   getProgramByAdminDb,
   getProgramByIdAndAdminDb,
@@ -147,4 +239,10 @@ module.exports = {
   insertTahapDb,
   updateTahapDb,
   deleteTahapDb,
+  getKriteriaByTahapDb,
+  getKriteriaByIdDb,
+  checkUrutanKriteriaExistsDb,
+  insertKriteriaDb,
+  updateKriteriaDb,
+  deleteKriteriaDb,
 };

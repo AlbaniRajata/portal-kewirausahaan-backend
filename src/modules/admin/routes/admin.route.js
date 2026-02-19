@@ -19,6 +19,10 @@ const {
   createTahapProgramController,
   updateJadwalTahapController,
   deleteTahapController,
+  getKriteriaPenilaianController,
+  createKriteriaPenilaianController,
+  updateKriteriaPenilaianController,
+  deleteKriteriaPenilaianController,
 } = require("../controllers/program.controller");
 
 const {
@@ -71,6 +75,37 @@ const {
   getDistribusiJuriHistoryTahap2Controller,
 } = require("../controllers/distribusiTahap2.controller");
 
+const {
+  getDashboardPengajuanPembimbingController,
+  getDashboardBimbinganController,
+} = require("../controllers/bimbingan.controller");
+
+const {
+  getKampusController,
+  getKampusByIdController,
+  createKampusController,
+  updateKampusController,
+  deleteKampusController,
+  getJurusanController,
+  getJurusanByIdController,
+  createJurusanController,
+  updateJurusanController,
+  deleteJurusanController,
+  getProdiController,
+  getProdiByIdController,
+  createProdiController,
+  updateProdiController,
+  deleteProdiController,
+} = require("../controllers/akademik.controller");
+
+const {
+  getKategoriController,
+  getKategoriByIdController,
+  createKategoriController,
+  updateKategoriController,
+  deleteKategoriController,
+} = require("../controllers/kategori.controller");
+
 const roleMiddleware = require("../../../middlewares/role.middleware");
 
 router.use(roleMiddleware([2, 6])); // Admin and Super Admin
@@ -91,6 +126,10 @@ router.get("/program/:id_program/tahap", getTahapProgramController);
 router.post("/program/:id_program/tahap", createTahapProgramController);
 router.patch("/tahap/:id_tahap", updateJadwalTahapController);
 router.delete("/tahap/:id_tahap", deleteTahapController);
+router.get("/tahap/:id_tahap/kriteria", getKriteriaPenilaianController);
+router.post("/tahap/:id_tahap/kriteria", createKriteriaPenilaianController);
+router.patch("/kriteria/:id_kriteria", updateKriteriaPenilaianController);
+router.delete("/kriteria/:id_kriteria", deleteKriteriaPenilaianController);
 
 router.get("/proposal", getProposalListController);
 router.get("/proposal/monitoring", getMonitoringDistribusiController);
@@ -128,5 +167,32 @@ router.post("/program/:id_program/panel/tahap2/auto", autoDistribusiTahap2Contro
 router.post("/program/:id_program/panel/tahap2/manual", manualDistribusiTahap2Controller);
 router.get("/program/:id_program/distribusi/reviewer/tahap/2/history", getDistribusiReviewerHistoryTahap2Controller);
 router.get("/program/:id_program/distribusi/juri/tahap/2/history", getDistribusiJuriHistoryTahap2Controller);
+
+router.get("/bimbingan/pengajuan", getDashboardPengajuanPembimbingController);
+router.get("/bimbingan/jadwal", getDashboardBimbinganController);
+
+router.get("/kampus", getKampusController);
+router.get("/kampus/:id_kampus", getKampusByIdController);
+router.post("/kampus", createKampusController);
+router.patch("/kampus/:id_kampus", updateKampusController);
+router.delete("/kampus/:id_kampus", deleteKampusController);
+
+router.get("/jurusan", getJurusanController);
+router.get("/jurusan/:id_jurusan", getJurusanByIdController);
+router.post("/jurusan", createJurusanController);
+router.patch("/jurusan/:id_jurusan", updateJurusanController);
+router.delete("/jurusan/:id_jurusan", deleteJurusanController);
+
+router.get("/prodi", getProdiController);
+router.get("/prodi/:id_prodi", getProdiByIdController);
+router.post("/prodi", createProdiController);
+router.patch("/prodi/:id_prodi", updateProdiController);
+router.delete("/prodi/:id_prodi", deleteProdiController);
+
+router.get("/kategori", getKategoriController);
+router.get("/kategori/:id_kategori", getKategoriByIdController);
+router.post("/kategori", createKategoriController);
+router.patch("/kategori/:id_kategori", updateKategoriController);
+router.delete("/kategori/:id_kategori", deleteKategoriController);
 
 module.exports = router;

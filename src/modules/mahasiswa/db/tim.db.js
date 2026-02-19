@@ -219,11 +219,21 @@ const getTimDetailByUserId = async (id_user) => {
           'id_user', u.id_user,
           'nim', m.nim,
           'nama_lengkap', u.nama_lengkap,
-          'username', u.username
+          'username', u.username,
+          'id_prodi', p.id_prodi,
+          'nama_prodi', p.nama_prodi,
+          'jenjang', p.jenjang,
+          'id_jurusan', j.id_jurusan,
+          'nama_jurusan', j.nama_jurusan,
+          'id_kampus', k.id_kampus,
+          'nama_kampus', k.nama_kampus
         )
         from t_anggota_tim a
         join m_mahasiswa m on m.id_user = a.id_user
         join m_user u on u.id_user = m.id_user
+        join m_prodi p on p.id_prodi = m.id_prodi
+        join m_jurusan j on j.id_jurusan = p.id_jurusan
+        join m_kampus k on k.id_kampus = p.id_kampus
         where a.id_tim = t.id_tim
           and a.peran = 1
         limit 1
@@ -236,12 +246,22 @@ const getTimDetailByUserId = async (id_user) => {
             'nama_lengkap', u2.nama_lengkap,
             'username', u2.username,
             'peran', a2.peran,
-            'status', a2.status
+            'status', a2.status,
+            'id_prodi', p2.id_prodi,
+            'nama_prodi', p2.nama_prodi,
+            'jenjang', p2.jenjang,
+            'id_jurusan', j2.id_jurusan,
+            'nama_jurusan', j2.nama_jurusan,
+            'id_kampus', k2.id_kampus,
+            'nama_kampus', k2.nama_kampus
           )
         )
         from t_anggota_tim a2
         join m_mahasiswa m2 on m2.id_user = a2.id_user
         join m_user u2 on u2.id_user = m2.id_user
+        join m_prodi p2 on p2.id_prodi = m2.id_prodi
+        join m_jurusan j2 on j2.id_jurusan = p2.id_jurusan
+        join m_kampus k2 on k2.id_kampus = p2.id_kampus
         where a2.id_tim = t.id_tim
       ) as anggota
     from t_anggota_tim ta
@@ -252,6 +272,7 @@ const getTimDetailByUserId = async (id_user) => {
   const r = await db.query(q, [id_user]);
   return r.rows[0];
 };
+
 
 const insertPesertaProgram = async (client, id_user, id_program, id_tim, tahun) => {
   const q = `

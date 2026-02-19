@@ -5,6 +5,10 @@ const {
   createTahapProgram,
   updateJadwalTahap,
   deleteTahap,
+  getKriteriaPenilaian,
+  createKriteriaPenilaian,
+  updateKriteriaPenilaian,
+  deleteKriteriaPenilaian,
 } = require("../services/program.service");
 
 const getProgramAdminController = async (req, res) => {
@@ -94,6 +98,58 @@ const deleteTahapController = async (req, res) => {
   });
 };
 
+const getKriteriaPenilaianController = async (req, res) => {
+  const { id_user } = req.user;
+  const { id_tahap } = req.params;
+
+  const result = await getKriteriaPenilaian(id_user, id_tahap);
+
+  return res.status(result.error ? 403 : 200).json({
+    success: !result.error,
+    message: result.message,
+    data: result.data,
+  });
+};
+
+const createKriteriaPenilaianController = async (req, res) => {
+  const { id_user } = req.user;
+  const { id_tahap } = req.params;
+
+  const result = await createKriteriaPenilaian(id_user, id_tahap, req.body);
+
+  return res.status(result.error ? 400 : 200).json({
+    success: !result.error,
+    message: result.message,
+    data: result.data,
+  });
+};
+
+const updateKriteriaPenilaianController = async (req, res) => {
+  const { id_user } = req.user;
+  const { id_kriteria } = req.params;
+
+  const result = await updateKriteriaPenilaian(id_user, id_kriteria, req.body);
+
+  return res.status(result.error ? 400 : 200).json({
+    success: !result.error,
+    message: result.message,
+    data: result.data,
+  });
+};
+
+const deleteKriteriaPenilaianController = async (req, res) => {
+  const { id_user } = req.user;
+  const { id_kriteria } = req.params;
+
+  const result = await deleteKriteriaPenilaian(id_user, id_kriteria);
+
+  return res.status(result.error ? 400 : 200).json({
+    success: !result.error,
+    message: result.message,
+    data: result.data,
+  });
+};
+
 module.exports = {
   getProgramAdminController,
   setProgramTimelineController,
@@ -101,4 +157,8 @@ module.exports = {
   createTahapProgramController,
   updateJadwalTahapController,
   deleteTahapController,
+  getKriteriaPenilaianController,
+  createKriteriaPenilaianController,
+  updateKriteriaPenilaianController,
+  deleteKriteriaPenilaianController,
 };
