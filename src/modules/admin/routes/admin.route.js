@@ -123,6 +123,14 @@ const {
   resetPasswordController,
 } = require("../controllers/pengguna.controller");
 
+const {
+  getTimListController,
+  getTimDetailController,
+  getPesertaListController,
+  getPesertaDetailController,
+} = require("../controllers/timpeserta.controller");
+
+
 const roleMiddleware = require("../../../middlewares/role.middleware");
 
 router.use(roleMiddleware([2, 6])); // Admin and Super Admin
@@ -230,5 +238,13 @@ router.patch("/pengguna/juri/:id_user", updateJuriController);
 
 router.patch("/pengguna/:id_user/toggle-active", toggleUserActiveController);
 router.patch("/pengguna/:id_user/reset-password", resetPasswordController);
+
+router.get("/tim-peserta/tim", getTimListController);
+router.get("/tim-peserta/tim/:id_tim", getTimDetailController);
+
+router.get("/tim-peserta/peserta", getPesertaListController);
+router.get("/tim-peserta/peserta/:id_user/:id_program", getPesertaDetailController);
+
+module.exports = router;
 
 module.exports = router;
