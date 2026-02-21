@@ -106,6 +106,23 @@ const {
   deleteKategoriController,
 } = require("../controllers/kategori.controller");
 
+const {
+  getMahasiswaListController,
+  getDosenListController,
+  getReviewerListPenggunaController,
+  getJuriListPenggunaController,
+  createMahasiswaController,
+  createDosenController,
+  createReviewerPenggunaController,
+  createJuriPenggunaController,
+  updateMahasiswaController,
+  updateDosenController,
+  updateReviewerController,
+  updateJuriController,
+  toggleUserActiveController,
+  resetPasswordController,
+} = require("../controllers/pengguna.controller");
+
 const roleMiddleware = require("../../../middlewares/role.middleware");
 
 router.use(roleMiddleware([2, 6])); // Admin and Super Admin
@@ -194,5 +211,24 @@ router.get("/kategori/:id_kategori", getKategoriByIdController);
 router.post("/kategori", createKategoriController);
 router.patch("/kategori/:id_kategori", updateKategoriController);
 router.delete("/kategori/:id_kategori", deleteKategoriController);
+
+router.get("/pengguna/mahasiswa", getMahasiswaListController);
+router.post("/pengguna/mahasiswa", createMahasiswaController);
+router.patch("/pengguna/mahasiswa/:id_user", updateMahasiswaController);
+
+router.get("/pengguna/dosen", getDosenListController);
+router.post("/pengguna/dosen", createDosenController);
+router.patch("/pengguna/dosen/:id_user", updateDosenController);
+
+router.get("/pengguna/reviewer", getReviewerListPenggunaController);
+router.post("/pengguna/reviewer", createReviewerPenggunaController);
+router.patch("/pengguna/reviewer/:id_user", updateReviewerController);
+
+router.get("/pengguna/juri", getJuriListPenggunaController);
+router.post("/pengguna/juri", createJuriPenggunaController);
+router.patch("/pengguna/juri/:id_user", updateJuriController);
+
+router.patch("/pengguna/:id_user/toggle-active", toggleUserActiveController);
+router.patch("/pengguna/:id_user/reset-password", resetPasswordController);
 
 module.exports = router;

@@ -1,5 +1,7 @@
 const pool = require("../../../config/db");
 
+// id_role: mahasiswa = 1, dosen = 3 (BENAR)
+
 const getPendingMahasiswaDb = async (filters = {}) => {
     const conditions = ["u.id_role = 1"];
     const params = [];
@@ -51,6 +53,7 @@ const getPendingMahasiswaDb = async (filters = {}) => {
             u.email_verified_at,
             u.is_active,
             m.status_verifikasi,
+            m.catatan,
             u.created_at
         FROM m_user u
         JOIN m_mahasiswa m ON m.id_user = u.id_user
@@ -101,61 +104,29 @@ const getDetailMahasiswaDb = async (id_user) => {
 
 const approveMahasiswaDb = async (id_user) => {
     const client = await pool.connect();
-
     try {
         await client.query("BEGIN");
 
-        const checkQuery = `
-            SELECT u.email_verified_at, m.status_verifikasi
-            FROM m_user u
-            JOIN m_mahasiswa m ON m.id_user = u.id_user
-            WHERE u.id_user = $1
-        `;
-        const checkResult = await client.query(checkQuery, [id_user]);
+        const checkResult = await client.query(
+            `SELECT u.email_verified_at, m.status_verifikasi
+             FROM m_user u JOIN m_mahasiswa m ON m.id_user = u.id_user
+             WHERE u.id_user = $1`,
+            [id_user]
+        );
 
-        if (checkResult.rows.length === 0) {
-            await client.query("ROLLBACK");
-            return null;
-        }
-
-        if (!checkResult.rows[0].email_verified_at) {
-            await client.query("ROLLBACK");
-            return {
-                error: "EMAIL_NOT_VERIFIED"
-            };
-        }
-
+        if (checkResult.rows.length === 0) { await client.query("ROLLBACK"); return null; }
+        if (!checkResult.rows[0].email_verified_at) { await client.query("ROLLBACK"); return { error: "EMAIL_NOT_VERIFIED" }; }
         if (checkResult.rows[0].status_verifikasi !== 0) {
             await client.query("ROLLBACK");
-            return {
-                error: "ALREADY_VERIFIED",
-                status_verifikasi: checkResult.rows[0].status_verifikasi,
-            };
+            return { error: "ALREADY_VERIFIED", status_verifikasi: checkResult.rows[0].status_verifikasi };
         }
 
-        await client.query(
-            `UPDATE m_user SET is_active = TRUE WHERE id_user = $1`,
-            [id_user]
-        );
-
-        await client.query(
-            `UPDATE m_mahasiswa SET status_verifikasi = 1, catatan = NULL WHERE id_user = $1`,
-            [id_user]
-        );
+        await client.query(`UPDATE m_user SET is_active = TRUE WHERE id_user = $1`, [id_user]);
+        await client.query(`UPDATE m_mahasiswa SET status_verifikasi = 1, catatan = NULL WHERE id_user = $1`, [id_user]);
 
         const { rows } = await client.query(
-            `
-            SELECT
-                u.id_user,
-                u.username,
-                u.email,
-                u.is_active,
-                m.nim,
-                m.status_verifikasi
-            FROM m_user u
-            JOIN m_mahasiswa m ON m.id_user = u.id_user
-            WHERE u.id_user = $1
-            `,
+            `SELECT u.id_user, u.username, u.email, u.is_active, m.nim, m.status_verifikasi
+             FROM m_user u JOIN m_mahasiswa m ON m.id_user = u.id_user WHERE u.id_user = $1`,
             [id_user]
         );
 
@@ -171,56 +142,32 @@ const approveMahasiswaDb = async (id_user) => {
 
 const rejectMahasiswaDb = async (id_user, catatan) => {
     const client = await pool.connect();
-
     try {
         await client.query("BEGIN");
 
-        const checkQuery = `
-            SELECT m.status_verifikasi
-            FROM m_mahasiswa m
-            WHERE m.id_user = $1
-        `;
-        const checkResult = await client.query(checkQuery, [id_user]);
+        const checkResult = await client.query(
+            `SELECT m.status_verifikasi FROM m_mahasiswa m WHERE m.id_user = $1`,
+            [id_user]
+        );
 
-        if (checkResult.rows.length === 0) {
-            await client.query("ROLLBACK");
-            return null;
-        }
-
+        if (checkResult.rows.length === 0) { await client.query("ROLLBACK"); return null; }
         if (checkResult.rows[0].status_verifikasi !== 0) {
             await client.query("ROLLBACK");
-            return { 
-                error: "ALREADY_PROCESSED",
-                status_verifikasi: checkResult.rows[0].status_verifikasi,
-            };
+            return { error: "ALREADY_PROCESSED", status_verifikasi: checkResult.rows[0].status_verifikasi };
         }
 
         await client.query(
-            `
-            UPDATE m_mahasiswa
-            SET status_verifikasi = 2,
-                catatan = $2
-            WHERE id_user = $1
-            `,
+            `UPDATE m_mahasiswa SET status_verifikasi = 2, catatan = $2 WHERE id_user = $1`,
             [id_user, catatan]
         );
 
         const { rows } = await client.query(
-            `
-            SELECT 
-                u.id_user,
-                u.username,
-                u.email,
-                m.nim,
-                p.nama_prodi,
-                m.tahun_masuk,
-                m.status_verifikasi,
-                m.catatan
-            FROM m_user u
-            JOIN m_mahasiswa m ON m.id_user = u.id_user
-            LEFT JOIN m_prodi p ON p.id_prodi = m.id_prodi
-            WHERE u.id_user = $1
-            `,
+            `SELECT u.id_user, u.username, u.email, m.nim, p.nama_prodi,
+                    m.tahun_masuk, m.status_verifikasi, m.catatan
+             FROM m_user u
+             JOIN m_mahasiswa m ON m.id_user = u.id_user
+             LEFT JOIN m_prodi p ON p.id_prodi = m.id_prodi
+             WHERE u.id_user = $1`,
             [id_user]
         );
 
@@ -233,6 +180,8 @@ const rejectMahasiswaDb = async (id_user, catatan) => {
         client.release();
     }
 };
+
+// ─────────────────────────────────────────────────────────────
 
 const getPendingDosenDb = async (filters = {}) => {
     const conditions = ["u.id_role = 3"];
@@ -284,6 +233,7 @@ const getPendingDosenDb = async (filters = {}) => {
             u.email_verified_at,
             u.is_active,
             d.status_verifikasi,
+            d.catatan,
             u.created_at
         FROM m_user u
         JOIN m_dosen d ON d.id_user = u.id_user
@@ -314,6 +264,7 @@ const getDetailDosenDb = async (id_user) => {
             k.nama_kampus,
             d.bidang_keahlian,
             d.status_verifikasi,
+            d.catatan,
             u.email_verified_at,
             u.is_active,
             u.created_at
@@ -331,61 +282,29 @@ const getDetailDosenDb = async (id_user) => {
 
 const approveDosenDb = async (id_user) => {
     const client = await pool.connect();
-
     try {
         await client.query("BEGIN");
 
-        const checkQuery = `
-            SELECT u.email_verified_at, d.status_verifikasi
-            FROM m_user u
-            JOIN m_dosen d ON d.id_user = u.id_user
-            WHERE u.id_user = $1
-        `;
-        const checkResult = await client.query(checkQuery, [id_user]);
+        const checkResult = await client.query(
+            `SELECT u.email_verified_at, d.status_verifikasi
+             FROM m_user u JOIN m_dosen d ON d.id_user = u.id_user
+             WHERE u.id_user = $1`,
+            [id_user]
+        );
 
-        if (checkResult.rows.length === 0) {
-            await client.query("ROLLBACK");
-            return null;
-        }
-
-        if (!checkResult.rows[0].email_verified_at) {
-            await client.query("ROLLBACK");
-            return {
-                error: "EMAIL_NOT_VERIFIED"
-            };
-        }
-
+        if (checkResult.rows.length === 0) { await client.query("ROLLBACK"); return null; }
+        if (!checkResult.rows[0].email_verified_at) { await client.query("ROLLBACK"); return { error: "EMAIL_NOT_VERIFIED" }; }
         if (checkResult.rows[0].status_verifikasi !== 0) {
             await client.query("ROLLBACK");
-            return {
-                error: "ALREADY_VERIFIED",
-                status_verifikasi: checkResult.rows[0].status_verifikasi,
-            };
+            return { error: "ALREADY_VERIFIED", status_verifikasi: checkResult.rows[0].status_verifikasi };
         }
 
-        await client.query(
-            `UPDATE m_user SET is_active = TRUE WHERE id_user = $1`,
-            [id_user]
-        );
-
-        await client.query(
-            `UPDATE m_dosen SET status_verifikasi = 1 WHERE id_user = $1`,
-            [id_user]
-        );
+        await client.query(`UPDATE m_user SET is_active = TRUE WHERE id_user = $1`, [id_user]);
+        await client.query(`UPDATE m_dosen SET status_verifikasi = 1 WHERE id_user = $1`, [id_user]);
 
         const { rows } = await client.query(
-            `
-            SELECT
-                u.id_user,
-                u.username,
-                u.email,
-                u.is_active,
-                d.nip,
-                d.status_verifikasi
-            FROM m_user u
-            JOIN m_dosen d ON d.id_user = u.id_user
-            WHERE u.id_user = $1
-            `,
+            `SELECT u.id_user, u.username, u.email, u.is_active, d.nip, d.status_verifikasi
+             FROM m_user u JOIN m_dosen d ON d.id_user = u.id_user WHERE u.id_user = $1`,
             [id_user]
         );
 
@@ -399,51 +318,34 @@ const approveDosenDb = async (id_user) => {
     }
 };
 
-const rejectDosenDb = async (id_user) => {
+const rejectDosenDb = async (id_user, catatan) => {
     const client = await pool.connect();
-
     try {
         await client.query("BEGIN");
 
-        const checkQuery = `
-            SELECT d.status_verifikasi
-            FROM m_dosen d
-            WHERE d.id_user = $1
-        `;
-        const checkResult = await client.query(checkQuery, [id_user]);
-
-        if (checkResult.rows.length === 0) {
-            await client.query("ROLLBACK");
-            return null;
-        }
-
-        if (checkResult.rows[0].status_verifikasi !== 0) {
-            await client.query("ROLLBACK");
-            return { 
-                error: "ALREADY_PROCESSED",
-                status_verifikasi: checkResult.rows[0].status_verifikasi,
-            };
-        }
-
-        await client.query(
-            `UPDATE m_dosen SET status_verifikasi = 2 WHERE id_user = $1`,
+        const checkResult = await client.query(
+            `SELECT d.status_verifikasi FROM m_dosen d WHERE d.id_user = $1`,
             [id_user]
         );
 
+        if (checkResult.rows.length === 0) { await client.query("ROLLBACK"); return null; }
+        if (checkResult.rows[0].status_verifikasi !== 0) {
+            await client.query("ROLLBACK");
+            return { error: "ALREADY_PROCESSED", status_verifikasi: checkResult.rows[0].status_verifikasi };
+        }
+
+        await client.query(
+            `UPDATE m_dosen SET status_verifikasi = 2, catatan = $2 WHERE id_user = $1`,
+            [id_user, catatan || null]
+        );
+
         const { rows } = await client.query(
-            `
-            SELECT 
-                u.id_user,
-                u.username,
-                u.email,
-                d.nip,
-                p.nama_prodi,
-                d.status_verifikasi
-            FROM m_user u
-            JOIN m_dosen d ON d.id_user = u.id_user
-            LEFT JOIN m_prodi p ON p.id_prodi = d.id_prodi
-            WHERE u.id_user = $1
-            `,
+            `SELECT u.id_user, u.username, u.email, d.nip, p.nama_prodi,
+                    d.status_verifikasi, d.catatan
+             FROM m_user u
+             JOIN m_dosen d ON d.id_user = u.id_user
+             LEFT JOIN m_prodi p ON p.id_prodi = d.id_prodi
+             WHERE u.id_user = $1`,
             [id_user]
         );
 
