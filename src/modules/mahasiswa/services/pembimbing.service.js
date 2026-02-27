@@ -52,6 +52,7 @@ const getStatusPembimbing = async (id_user) => {
       },
       pengajuan,
       bisa_ajukan,
+      is_ketua: peserta.peran === 1,
     },
   };
 };

@@ -12,6 +12,7 @@ const listBimbinganController = async (req, res) => {
   return res.status(result.error ? 400 : 200).json({
     success: !result.error,
     message: result.message,
+    is_ketua: result.is_ketua,
     data: result.data,
   });
 };

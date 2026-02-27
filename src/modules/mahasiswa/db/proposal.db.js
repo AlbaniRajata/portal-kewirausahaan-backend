@@ -9,7 +9,6 @@ const getTimKetuaDb = async (id_user, id_program) => {
       AND a.peran = 1
       AND a.status = 1
       AND t.id_program = $2
-    ORDER BY a.peran DESC, u.nama_lengkap
   `;
   const { rows } = await pool.query(q, [id_user, id_program]);
   return rows[0];
@@ -118,7 +117,7 @@ const getProposalDetailDb = async (id_proposal) => {
       p.id_proposal,
       p.judul,
       p.modal_diajukan,
-      p.file_proposal,ram
+      p.file_proposal,
       p.status,
       p.tanggal_submit,
       p.id_program,

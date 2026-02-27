@@ -2,10 +2,13 @@ const pool = require("../../../config/db");
 
 const getPesertaAktifDb = async (id_user) => {
   const q = `
-    SELECT *
-    FROM t_peserta_program
-    WHERE id_user = $1
-      AND status_lolos = 1
+    SELECT 
+      pp.*,
+      a.peran
+    FROM t_peserta_program pp
+    JOIN t_anggota_tim a ON a.id_tim = pp.id_tim AND a.id_user = pp.id_user
+    WHERE pp.id_user = $1
+      AND pp.status_lolos = 1
     LIMIT 1
   `;
   const { rows } = await pool.query(q, [id_user]);

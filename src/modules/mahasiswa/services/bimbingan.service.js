@@ -24,6 +24,7 @@ const listBimbingan = async (id_user) => {
   return {
     error: false,
     message: "Daftar bimbingan berhasil diambil",
+    is_ketua: peserta.peran === 1,
     data: bimbingan,
   };
 };

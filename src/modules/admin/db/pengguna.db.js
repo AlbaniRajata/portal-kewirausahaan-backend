@@ -156,7 +156,6 @@ const checkNipExistsDb = async (nip, exclude_id = null) => {
   return rows.length > 0;
 };
 
-// is_active=false, email_verified_at=NULL — biarkan user verifikasi sendiri
 const insertMahasiswaDb = async (userData, mahasiswaData, client) => {
   const bcrypt = require("bcrypt");
   const password_hash = await bcrypt.hash(userData.password, 10);

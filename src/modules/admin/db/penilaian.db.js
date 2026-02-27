@@ -256,7 +256,9 @@ const insertPesertaProgramByTimDb = async (client, id_tim, id_program) => {
     WHERE a.id_tim = $1
       AND a.status = 1
     ON CONFLICT (id_user, id_program)
-    DO NOTHING
+    DO UPDATE SET
+      status_lolos = 1,
+      id_tim = EXCLUDED.id_tim
     RETURNING *
   `;
 
