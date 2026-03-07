@@ -2,92 +2,81 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const ktmDir = "uploads/ktm";
-if (!fs.existsSync(ktmDir)) {
-  fs.mkdirSync(ktmDir, { recursive: true });
-}
+const ensureDir = (dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+};
 
-const storageKTM = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, ktmDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `ktm-${Date.now()}${ext}`);
-  },
-});
-
-const uploadKTM = multer({
-  storage: storageKTM,
-  fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|pdf/;
-    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mime = allowed.test(file.mimetype);
-    
-    if (ext && mime) {
+const createFileFilter = (allowedMimes, errorMsg) => {
+  return (req, file, cb) => {
+    if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error("Hanya file JPG, PNG, atau PDF yang diperbolehkan"));
+      cb(new Error(errorMsg));
     }
+  };
+};
+
+const createFilename = (prefix) => {
+  return (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, `${prefix}-${uniqueSuffix}${ext}`);
+  };
+};
+
+const ktmDir = "uploads/ktm";
+ensureDir(ktmDir);
+
+const uploadKTM = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, ktmDir),
+    filename: createFilename("ktm"),
+  }),
+  fileFilter: createFileFilter(
+    ["image/jpeg", "image/jpg", "image/png", "application/pdf"],
+    "Hanya file JPG, PNG, atau PDF yang diperbolehkan"
+  ),
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+    files: 1,
   },
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });
 
 const profilDir = "uploads/profil";
-if (!fs.existsSync(profilDir)) {
-  fs.mkdirSync(profilDir, { recursive: true });
-}
-
-const storageProfil = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, profilDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, `profil-${uniqueSuffix}${ext}`);
-  },
-});
+ensureDir(profilDir);
 
 const uploadFotoProfil = multer({
-  storage: storageProfil,
-  fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png/;
-    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mime = allowed.test(file.mimetype);
-    
-    if (ext && mime) {
-      cb(null, true);
-    } else {
-      cb(new Error("Hanya file JPG atau PNG yang diperbolehkan untuk foto profil"));
-    }
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, profilDir),
+    filename: createFilename("profil"),
+  }),
+  fileFilter: createFileFilter(
+    ["image/jpeg", "image/jpg", "image/png"],
+    "Hanya file JPG atau PNG yang diperbolehkan untuk foto profil"
+  ),
+  limits: {
+    fileSize: 3 * 1024 * 1024,
+    files: 1,
   },
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });
 
 const proposalDir = "uploads/proposal";
-if (!fs.existsSync(proposalDir)) {
-  fs.mkdirSync(proposalDir, { recursive: true });
-}
-
-const storageProposal = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, proposalDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `proposal-${Date.now()}${ext}`);
-  },
-});
+ensureDir(proposalDir);
 
 const uploadProposal = multer({
-  storage: storageProposal,
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype !== "application/pdf") {
-      return cb(new Error("File harus berupa PDF"));
-    }
-    cb(null, true);
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, proposalDir),
+    filename: createFilename("proposal"),
+  }),
+  fileFilter: createFileFilter(
+    ["application/pdf"],
+    "File proposal harus berupa PDF"
+  ),
+  limits: {
+    fileSize: 10 * 1024 * 1024,
+    files: 1,
   },
 });
 

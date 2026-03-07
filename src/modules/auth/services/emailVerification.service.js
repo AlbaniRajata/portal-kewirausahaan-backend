@@ -4,9 +4,12 @@ const {
   getValidTokenDb,
   markTokenUsedDb,
   verifyEmailUserDb,
+  deleteOldTokensDb,
 } = require("../db/emailVerification.db");
 
 const createVerificationToken = async (id_user) => {
+  await deleteOldTokensDb(id_user);
+
   const token = crypto.randomBytes(32).toString("hex");
   const expired_at = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 jam
 

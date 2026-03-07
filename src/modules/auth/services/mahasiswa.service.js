@@ -1,15 +1,23 @@
 const pool = require("../../../config/db");
 const { createBaseUser } = require("../../auth/services/auth.service");
-const {
-  createMahasiswaDb,
-} = require("../db/mahasiswa.db");
+const { createMahasiswaDb } = require("../db/mahasiswa.db");
+const { createVerificationToken } = require("../../auth/services/emailVerification.service");
+const ROLE = require("../../../constants/role");
 
 const registerMahasiswa = async (data) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
 
-    const user = await createBaseUser(data, client);
+    const user = await createBaseUser(
+      {
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        id_role: ROLE.MAHASISWA,
+      },
+      client
+    );
 
     await createMahasiswaDb(
       {
@@ -23,10 +31,13 @@ const registerMahasiswa = async (data) => {
     );
 
     await client.query("COMMIT");
-    return user;
-  } catch (e) {
+
+    const token = await createVerificationToken(user.id_user);
+
+    return { user, token };
+  } catch (err) {
     await client.query("ROLLBACK");
-    throw e;
+    throw err;
   } finally {
     client.release();
   }

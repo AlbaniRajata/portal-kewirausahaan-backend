@@ -1,6 +1,8 @@
 const { login } = require("../services/auth.service");
 
-const loginHandler = async (req, res) => {
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+const loginHandler = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -17,7 +19,23 @@ const loginHandler = async (req, res) => {
       });
     }
 
-    const result = await login({ email, password });
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Format email tidak valid",
+        data: { field: "email" },
+      });
+    }
+
+    if (password.length > 255) {
+      return res.status(400).json({
+        success: false,
+        message: "Input tidak valid",
+        data: null,
+      });
+    }
+
+    const result = await login({ email: email.toLowerCase().trim(), password });
 
     if (result.error) {
       return res.status(401).json({
@@ -27,22 +45,13 @@ const loginHandler = async (req, res) => {
       });
     }
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: "Login berhasil",
       data: result,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan pada sistem",
-      data: {
-        error:
-          process.env.NODE_ENV === "development"
-            ? err.message
-            : undefined,
-      },
-    });
+    next(err);
   }
 };
 

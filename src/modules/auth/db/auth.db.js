@@ -1,20 +1,12 @@
 const pool = require("../../../config/db");
 
-const createUserDb = async (
-  { username, email, password_hash, id_role },
-  client
-) => {
+const createUserDb = async ({ username, email, password_hash, id_role }, client) => {
   const q = `
     INSERT INTO m_user (id_role, username, email, password_hash, is_active)
-    VALUES ($1,$2,$3,$4,FALSE)
+    VALUES ($1, $2, $3, $4, FALSE)
     RETURNING id_user, username, email, id_role, is_active
   `;
-  const { rows } = await client.query(q, [
-    id_role,
-    username,
-    email,
-    password_hash,
-  ]);
+  const { rows } = await client.query(q, [id_role, username, email, password_hash]);
   return rows[0];
 };
 

@@ -1,12 +1,10 @@
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const {
-  createUserDb,
-  getUserForLoginDb,
-} = require("../db/auth.db");
+const { hashPassword, comparePassword } = require("../../../helpers/password.helper");
+
+const { createUserDb, getUserForLoginDb } = require("../db/auth.db");
 
 const createBaseUser = async (data, client) => {
-  const password_hash = await bcrypt.hash(data.password, 10);
+  const password_hash = await hashPassword(data.password);
   return createUserDb(
     {
       username: data.username,
@@ -23,14 +21,22 @@ const login = async ({ email, password }) => {
 
   if (!user) {
     return {
-      error: "Email tidak terdaftar dalam sistem.",
-      field: "email",
+      error: "Email atau password salah.",
+      field: "credentials",
+    };
+  }
+
+  const match = await comparePassword(password, user.password_hash);
+  if (!match) {
+    return {
+      error: "Email atau password salah.",
+      field: "credentials",
     };
   }
 
   if (!user.email_verified_at) {
     return {
-      error: "Email Anda belum diverifikasi.",
+      error: "Email Anda belum diverifikasi. Silakan cek inbox email Anda.",
       field: "email_verified",
     };
   }
@@ -56,19 +62,11 @@ const login = async ({ email, password }) => {
     };
   }
 
-  const match = await bcrypt.compare(password, user.password_hash);
-
-  if (!match) {
-    return {
-      error: "Password salah.",
-      field: "password",
-    };
-  }
-
   const token = jwt.sign(
     {
       id_user: user.id_user,
       id_role: user.id_role,
+      role: user.nama_role,
     },
     process.env.JWT_SECRET,
     { expiresIn: "1d" }

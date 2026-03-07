@@ -1,7 +1,15 @@
 const { registerMahasiswa } = require("../services/mahasiswa.service");
-const { createVerificationToken } = require("../../auth/services/emailVerification.service");
+const fs = require("fs");
 
-const registerMahasiswaHandler = async (req, res) => {
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+const isValidYear = (year) => {
+  const y = Number(year);
+  const current = new Date().getFullYear();
+  return Number.isInteger(y) && y >= 2000 && y <= current;
+};
+
+const registerMahasiswaHandler = async (req, res, next) => {
   try {
     const { username, email, password, nim, id_prodi, tahun_masuk } = req.body;
 
@@ -15,8 +23,8 @@ const registerMahasiswaHandler = async (req, res) => {
     ];
 
     const missingFields = requiredFields
-      .filter(f => !req.body[f.key])
-      .map(f => f.label);
+      .filter((f) => !req.body[f.key])
+      .map((f) => f.label);
 
     if (missingFields.length > 0) {
       return res.status(400).json({
@@ -26,7 +34,7 @@ const registerMahasiswaHandler = async (req, res) => {
       });
     }
 
-    if (!email.includes("@")) {
+    if (!isValidEmail(email)) {
       return res.status(400).json({
         success: false,
         message: "Format email tidak valid",
@@ -34,11 +42,35 @@ const registerMahasiswaHandler = async (req, res) => {
       });
     }
 
-    if (password.length < 8) {
+    if (password.length < 8 || password.length > 255) {
       return res.status(400).json({
         success: false,
-        message: "Password minimal 8 karakter",
+        message: "Password harus antara 8 hingga 255 karakter",
         data: { field: "password" },
+      });
+    }
+
+    if (!/^\d{8,20}$/.test(nim)) {
+      return res.status(400).json({
+        success: false,
+        message: "Format NIM tidak valid",
+        data: { field: "nim" },
+      });
+    }
+
+    if (!isValidYear(tahun_masuk)) {
+      return res.status(400).json({
+        success: false,
+        message: "Tahun masuk tidak valid",
+        data: { field: "tahun_masuk" },
+      });
+    }
+
+    if (!Number.isInteger(Number(id_prodi)) || Number(id_prodi) <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Program studi tidak valid",
+        data: { field: "id_prodi" },
       });
     }
 
@@ -50,21 +82,21 @@ const registerMahasiswaHandler = async (req, res) => {
       });
     }
 
-    const user = await registerMahasiswa({
-      username,
-      email,
+    const { user, token } = await registerMahasiswa({
+      username: username.trim(),
+      email: email.toLowerCase().trim(),
       password,
-      id_role: 1,
-      nim,
+      nim: nim.trim(),
       id_prodi: Number(id_prodi),
       tahun_masuk: Number(tahun_masuk),
       foto_ktm: req.file.filename,
     });
 
-    const token = await createVerificationToken(user.id_user);
-    const verificationLink = `${process.env.BASE_URL || "http://localhost:4000"}/api/auth/verify-email?token=${token}`;
+    const verificationLink = `${process.env.BASE_URL}/api/auth/verify-email?token=${token}`;
 
-    console.log("Verification Link:", verificationLink);
+    if (process.env.NODE_ENV === "development") {
+      console.log("[DEV] Verification Link:", verificationLink);
+    }
 
     return res.status(201).json({
       success: true,
@@ -76,27 +108,29 @@ const registerMahasiswaHandler = async (req, res) => {
           email: user.email,
           id_role: user.id_role,
         },
-        verification_link:
-          process.env.NODE_ENV === "development" ? verificationLink : undefined,
+        ...(process.env.NODE_ENV === "development" && { verification_link: verificationLink }),
       },
     });
   } catch (err) {
-    console.error("ERROR REGISTRASI MAHASISWA:", err);
+    if (req.file) {
+      fs.unlink(req.file.path, () => {});
+    }
 
     if (err.code === "23505") {
-      let field = "data";
-      let message = "Data sudah terdaftar";
+      const constraint = err.constraint || "";
+      const conflictMap = {
+        email: { field: "email", message: "Email sudah terdaftar" },
+        username: { field: "username", message: "Username sudah digunakan" },
+        nim: { field: "nim", message: "NIM sudah terdaftar" },
+      };
 
-      if (err.constraint?.includes("email")) {
-        field = "email";
-        message = "Email sudah terdaftar";
-      } else if (err.constraint?.includes("username")) {
-        field = "username";
-        message = "Username sudah digunakan";
-      } else if (err.constraint?.includes("nim")) {
-        field = "nim";
-        message = "NIM sudah terdaftar";
-      }
+      const match = Object.entries(conflictMap).find(([key]) =>
+        constraint.includes(key)
+      );
+
+      const { field, message } = match
+        ? match[1]
+        : { field: "data", message: "Data sudah terdaftar" };
 
       return res.status(409).json({
         success: false,
@@ -105,13 +139,7 @@ const registerMahasiswaHandler = async (req, res) => {
       });
     }
 
-    return res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan pada sistem",
-      data: {
-        error: process.env.NODE_ENV === "development" ? err.message : undefined,
-      },
-    });
+    next(err);
   }
 };
 
