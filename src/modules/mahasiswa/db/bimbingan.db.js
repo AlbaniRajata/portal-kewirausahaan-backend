@@ -2,8 +2,12 @@ const pool = require("../../../config/db");
 
 const getPesertaAktifDb = async (id_user) => {
   const q = `
-    SELECT 
-      pp.*,
+    SELECT
+      pp.id_user,
+      pp.id_program,
+      pp.id_tim,
+      pp.tahun,
+      pp.status_lolos,
       a.peran
     FROM t_peserta_program pp
     JOIN t_anggota_tim a ON a.id_tim = pp.id_tim AND a.id_user = pp.id_user
@@ -17,7 +21,7 @@ const getPesertaAktifDb = async (id_user) => {
 
 const getProposalLolosDb = async (id_tim) => {
   const q = `
-    SELECT *
+    SELECT id_proposal, judul, status
     FROM t_proposal
     WHERE id_tim = $1
       AND status = 9
@@ -29,9 +33,11 @@ const getProposalLolosDb = async (id_tim) => {
 
 const getPembimbingTimDb = async (id_tim) => {
   const q = `
-    SELECT 
-      pp.*,
-      u.nama_lengkap as nama_dosen,
+    SELECT
+      pp.id_pengajuan,
+      pp.id_dosen,
+      pp.status,
+      u.nama_lengkap AS nama_dosen,
       d.nip,
       d.bidang_keahlian
     FROM t_pengajuan_pembimbing pp
@@ -47,10 +53,8 @@ const getPembimbingTimDb = async (id_tim) => {
 
 const getBimbinganPendingDb = async (id_tim) => {
   const q = `
-    SELECT *
-    FROM t_bimbingan
-    WHERE id_tim = $1
-      AND status = 0
+    SELECT id_bimbingan FROM t_bimbingan
+    WHERE id_tim = $1 AND status = 0
     LIMIT 1
   `;
   const { rows } = await pool.query(q, [id_tim]);
@@ -59,10 +63,18 @@ const getBimbinganPendingDb = async (id_tim) => {
 
 const listBimbinganTimDb = async (id_tim) => {
   const q = `
-    SELECT 
-      b.*,
-      u.nama_lengkap as nama_dosen,
-      mhs.nama_lengkap as nama_pengaju
+    SELECT
+      b.id_bimbingan,
+      b.tanggal_bimbingan,
+      b.metode,
+      b.topik,
+      b.deskripsi,
+      b.status,
+      b.catatan_dosen,
+      b.created_at,
+      b.responded_at,
+      u.nama_lengkap AS nama_dosen,
+      mhs.nama_lengkap AS nama_pengaju
     FROM t_bimbingan b
     JOIN m_user u ON u.id_user = b.id_dosen
     JOIN m_user mhs ON mhs.id_user = b.diajukan_oleh
@@ -75,13 +87,13 @@ const listBimbinganTimDb = async (id_tim) => {
 
 const getDetailBimbinganDb = async (id_bimbingan, id_tim) => {
   const q = `
-    SELECT 
+    SELECT
       b.*,
-      u.nama_lengkap as nama_dosen,
+      u.nama_lengkap AS nama_dosen,
       d.nip,
       d.bidang_keahlian,
-      mhs.nama_lengkap as nama_pengaju,
-      p.judul as judul_proposal
+      mhs.nama_lengkap AS nama_pengaju,
+      p.judul AS judul_proposal
     FROM t_bimbingan b
     JOIN m_user u ON u.id_user = b.id_dosen
     JOIN m_dosen d ON d.id_user = b.id_dosen
@@ -113,7 +125,6 @@ const createBimbinganDb = async (payload) => {
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0)
     RETURNING *
   `;
-
   const { rows } = await pool.query(q, [
     id_tim,
     id_proposal,
@@ -124,7 +135,6 @@ const createBimbinganDb = async (payload) => {
     topik,
     deskripsi,
   ]);
-
   return rows[0];
 };
 

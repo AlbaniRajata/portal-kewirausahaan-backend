@@ -19,84 +19,37 @@ const getProfileDb = async (id_user) => {
       p.nama_prodi,
       p.jenjang,
       j.id_jurusan,
-      j.nama_jurusan,
-      prog.nama_program
+      j.nama_jurusan
     FROM m_user u
     JOIN m_mahasiswa m ON m.id_user = u.id_user
     JOIN m_prodi p ON p.id_prodi = m.id_prodi
     JOIN m_jurusan j ON j.id_jurusan = p.id_jurusan
-    LEFT JOIN t_peserta_program tp ON tp.id_user = u.id_user
-    LEFT JOIN m_program prog ON prog.id_program = tp.id_program
     WHERE u.id_user = $1
   `;
-
   const { rows } = await pool.query(q, [id_user]);
-  return rows[0];
+  return rows[0] || null;
 };
 
 const updateBiodataDb = async (id_user, data) => {
-  const client = await pool.connect();
+  const fields = [];
+  const values = [];
+  let idx = 1;
 
-  try {
-    await client.query("BEGIN");
-
-    const userFields = [];
-    const userValues = [];
-    let userIndex = 1;
-
-    if (data.nama_lengkap !== undefined) {
-      userFields.push(`nama_lengkap = $${userIndex++}`);
-      userValues.push(data.nama_lengkap);
+  const allowed = ["nama_lengkap", "username", "no_hp", "alamat", "foto"];
+  for (const key of allowed) {
+    if (data[key] !== undefined) {
+      fields.push(`${key} = $${idx++}`);
+      values.push(data[key]);
     }
-
-    if (data.username !== undefined) {
-      userFields.push(`username = $${userIndex++}`);
-      userValues.push(data.username);
-    }
-
-    if (data.no_hp !== undefined) {
-      userFields.push(`no_hp = $${userIndex++}`);
-      userValues.push(data.no_hp);
-    }
-
-    if (data.alamat !== undefined) {
-      userFields.push(`alamat = $${userIndex++}`);
-      userValues.push(data.alamat);
-    }
-
-    if (data.foto !== undefined) {
-      userFields.push(`foto = $${userIndex++}`);
-      userValues.push(data.foto);
-    }
-
-    if (userFields.length > 0) {
-      userValues.push(id_user);
-      const qUser = `
-        UPDATE m_user 
-        SET ${userFields.join(", ")}
-        WHERE id_user = $${userIndex}
-      `;
-      await client.query(qUser, userValues);
-    }
-
-    await client.query("COMMIT");
-
-    const updated = await getProfileDb(id_user);
-    return updated;
-
-  } catch (err) {
-    await client.query("ROLLBACK");
-    throw err;
-  } finally {
-    client.release();
   }
-};
 
-const updatePasswordDb = async (id_user, password_hash) => {
-  await pool.query(
-    `UPDATE m_user SET password_hash = $1 WHERE id_user = $2`,
-    [password_hash, id_user]
-  );
+  if (fields.length === 0) return null;
+
+  values.push(id_user);
+  const q = `UPDATE m_user SET ${fields.join(", ")} WHERE id_user = $${idx} RETURNING id_user`;
+  await pool.query(q, values);
+
+  return getProfileDb(id_user);
 };
 
 const getPasswordHashDb = async (id_user) => {
@@ -104,7 +57,14 @@ const getPasswordHashDb = async (id_user) => {
     `SELECT password_hash FROM m_user WHERE id_user = $1`,
     [id_user]
   );
-  return rows[0]?.password_hash;
+  return rows[0]?.password_hash || null;
+};
+
+const updatePasswordDb = async (id_user, password_hash) => {
+  await pool.query(
+    `UPDATE m_user SET password_hash = $1 WHERE id_user = $2`,
+    [password_hash, id_user]
+  );
 };
 
 const checkDuplicateBiodataDb = async (id_user, { username, no_hp }) => {
@@ -125,23 +85,19 @@ const checkDuplicateBiodataDb = async (id_user, { username, no_hp }) => {
   if (conditions.length === 0) return null;
 
   values.push(id_user);
-
   const q = `
-    SELECT username, no_hp
-    FROM m_user
-    WHERE (${conditions.join(" OR ")})
-    AND id_user != $${idx}
+    SELECT username, no_hp FROM m_user
+    WHERE (${conditions.join(" OR ")}) AND id_user != $${idx}
     LIMIT 1
   `;
-
   const { rows } = await pool.query(q, values);
-  return rows[0];
+  return rows[0] || null;
 };
 
 module.exports = {
   getProfileDb,
   updateBiodataDb,
-  updatePasswordDb,
   getPasswordHashDb,
+  updatePasswordDb,
   checkDuplicateBiodataDb,
 };

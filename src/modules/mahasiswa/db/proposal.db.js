@@ -11,7 +11,7 @@ const getTimKetuaDb = async (id_user, id_program) => {
       AND t.id_program = $2
   `;
   const { rows } = await pool.query(q, [id_user, id_program]);
-  return rows[0];
+  return rows[0] || null;
 };
 
 const getAnggotaTimDetailDb = async (id_tim) => {
@@ -33,11 +33,10 @@ const getAnggotaTimDetailDb = async (id_tim) => {
     WHERE a.id_tim = $1
     ORDER BY a.peran ASC, u.nama_lengkap ASC
   `;
-
   const { rows } = await pool.query(q, [id_tim]);
 
-  const pending = rows.filter(r => r.status === 0);
-  const accepted = rows.filter(r => r.status === 1);
+  const pending = rows.filter((r) => r.status === 0);
+  const accepted = rows.filter((r) => r.status === 1);
 
   return {
     members: rows,
@@ -61,8 +60,7 @@ const createProposalDb = async (id_tim, data) => {
   const q = `
     INSERT INTO t_proposal
       (id_tim, id_program, id_kategori, judul, modal_diajukan, file_proposal, status)
-    VALUES
-      ($1,$2,$3,$4,$5,$6,0)
+    VALUES ($1, $2, $3, $4, $5, $6, 0)
     RETURNING *
   `;
   const { rows } = await pool.query(q, [
@@ -77,38 +75,39 @@ const createProposalDb = async (id_tim, data) => {
 };
 
 const updateProposalDb = async (id_proposal, data) => {
+  const allowed = ["id_kategori", "judul", "modal_diajukan", "file_proposal"];
   const fields = [];
   const values = [];
   let i = 1;
 
-  Object.keys(data).forEach((key) => {
-    fields.push(`${key} = $${i++}`);
-    values.push(data[key]);
-  });
+  for (const key of allowed) {
+    if (data[key] !== undefined) {
+      fields.push(`${key} = $${i++}`);
+      values.push(data[key]);
+    }
+  }
+
+  if (fields.length === 0) return null;
 
   values.push(id_proposal);
-
   const q = `
-    UPDATE t_proposal
-    SET ${fields.join(", ")}
+    UPDATE t_proposal SET ${fields.join(", ")}
     WHERE id_proposal = $${i}
     RETURNING *
   `;
   const { rows } = await pool.query(q, values);
-  return rows[0];
+  return rows[0] || null;
 };
 
 const submitProposalDb = async (id_proposal) => {
   const q = `
     UPDATE t_proposal
-    SET status = 1,
-        tanggal_submit = now()
-    WHERE id_proposal = $1
-      AND status = 0
+    SET status = 1, tanggal_submit = now()
+    WHERE id_proposal = $1 AND status = 0
     RETURNING *
   `;
   const { rows } = await pool.query(q, [id_proposal]);
-  return rows[0];
+  return rows[0] || null;
 };
 
 const getProposalDetailDb = async (id_proposal) => {
@@ -139,26 +138,26 @@ const getProposalDetailDb = async (id_proposal) => {
             'nim', mm.nim,
             'nama_lengkap', um.nama_lengkap,
             'username', um.username,
-            'peran', at.peran,
-            'status', at.status
+            'peran', at2.peran,
+            'status', at2.status
           )
-          ORDER BY at.peran DESC, um.nama_lengkap
+          ORDER BY at2.peran DESC, um.nama_lengkap
         )
-        FROM t_anggota_tim at
-        JOIN m_user um ON um.id_user = at.id_user
+        FROM t_anggota_tim at2
+        JOIN m_user um ON um.id_user = at2.id_user
         JOIN m_mahasiswa mm ON mm.id_user = um.id_user
-        WHERE at.id_tim = t.id_tim
+        WHERE at2.id_tim = t.id_tim
       ) AS anggota_tim
     FROM t_proposal p
     JOIN t_tim t ON t.id_tim = p.id_tim
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
     JOIN m_program prog ON prog.id_program = p.id_program
-    JOIN t_anggota_tim a ON a.id_tim = t.id_tim AND a.peran = 1
-    JOIN m_user u ON u.id_user = a.id_user
+    JOIN t_anggota_tim at ON at.id_tim = t.id_tim AND at.peran = 1
+    JOIN m_user u ON u.id_user = at.id_user
     WHERE p.id_proposal = $1
   `;
   const { rows } = await pool.query(q, [id_proposal]);
-  return rows[0];
+  return rows[0] || null;
 };
 
 const getProgramTimelineDb = async (id_program) => {
@@ -168,7 +167,7 @@ const getProgramTimelineDb = async (id_program) => {
     WHERE id_program = $1
   `;
   const { rows } = await pool.query(q, [id_program]);
-  return rows[0];
+  return rows[0] || null;
 };
 
 const getProposalByTimDb = async (id_tim) => {
@@ -188,7 +187,7 @@ const getProposalByTimDb = async (id_tim) => {
     WHERE p.id_tim = $1
   `;
   const { rows } = await pool.query(q, [id_tim]);
-  return rows[0];
+  return rows[0] || null;
 };
 
 const getTimByUserDb = async (id_user) => {
@@ -203,11 +202,10 @@ const getTimByUserDb = async (id_user) => {
     FROM t_anggota_tim a
     JOIN t_tim t ON t.id_tim = a.id_tim
     JOIN m_program prog ON prog.id_program = t.id_program
-    WHERE a.id_user = $1
-      AND a.status = 1
+    WHERE a.id_user = $1 AND a.status = 1
   `;
   const { rows } = await pool.query(q, [id_user]);
-  return rows[0];
+  return rows[0] || null;
 };
 
 const getProposalByUserDb = async (id_user) => {
@@ -231,11 +229,10 @@ const getProposalByUserDb = async (id_user) => {
     JOIN t_tim t ON t.id_tim = p.id_tim
     JOIN m_program prog ON prog.id_program = p.id_program
     JOIN t_anggota_tim a ON a.id_tim = t.id_tim
-    WHERE a.id_user = $1
-      AND a.status = 1
+    WHERE a.id_user = $1 AND a.status = 1
   `;
   const { rows } = await pool.query(q, [id_user]);
-  return rows[0];
+  return rows[0] || null;
 };
 
 module.exports = {

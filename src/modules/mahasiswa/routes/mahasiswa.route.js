@@ -1,64 +1,51 @@
 const express = require("express");
 const router = express.Router();
 const roleMiddleware = require("../../../middlewares/role.middleware");
-const {
-  uploadFotoProfil,
-  uploadProposal,
-} = require("../../../middlewares/upload.middleware");
+const ROLE = require("../../../constants/role");
+const { uploadFotoProfil, uploadProposal } = require("../../../middlewares/upload.middleware");
 
-const {
-  getProfileController,
-  updateProfileController,
-  updatePasswordController,
+const { 
+  getProfileController, 
+  updateProfileController, 
+  updatePasswordController
 } = require("../controllers/profile.controller");
-
-const {
-  createTimController,
-  searchMahasiswaController,
-  acceptInviteController,
-  rejectInviteController,
-  getTimStatusController,
-  getTimDetailController,
+const { 
+  createTimController, 
+  searchMahasiswaController, 
+  acceptInviteController, 
+  rejectInviteController, 
+  getTimStatusController, 
+  getTimDetailController 
 } = require("../controllers/tim.controller");
-
-const {
-  createProposalController,
-  updateProposalController,
-  submitProposalController,
-  getProposalStatusController,
-  getProposalDetailController,
+const { 
+  createProposalController, 
+  updateProposalController, 
+  submitProposalController, 
+  getProposalStatusController, 
+  getProposalDetailController 
 } = require("../controllers/proposal.controller");
-
-const {
-  listDosenPembimbingController,
-  ajukanPembimbingController,
-  getStatusPembimbingController,
+const { 
+  listDosenPembimbingController, 
+  ajukanPembimbingController, 
+  getStatusPembimbingController 
 } = require("../controllers/pembimbing.controller");
-
-const {
-  listBimbinganController,
-  detailBimbinganController,
-  ajukanBimbinganController,
+const { 
+  listBimbinganController, 
+  detailBimbinganController, 
+  ajukanBimbinganController 
 } = require("../controllers/bimbingan.controller");
 
-router.use(roleMiddleware([1]));
+router.use(roleMiddleware([ROLE.MAHASISWA]));
 
-const uploadOptional = (req, res, next) => {
+const uploadFotoOptional = (req, res, next) => {
   uploadFotoProfil.single("foto")(req, res, (err) => {
-    if (err) {
-      return res.status(400).json({
-        success: false,
-        message: err.message,
-        data: {},
-        meta: {},
-      });
-    }
+    if (err) return next(err);
     next();
   });
 };
 
 router.get("/profile", getProfileController);
-router.patch("/profile", uploadOptional, updateProfileController);
+router.patch("/profile", uploadFotoOptional, updateProfileController);
 router.put("/password", updatePasswordController);
 
 router.get("/tim/status", getTimStatusController);

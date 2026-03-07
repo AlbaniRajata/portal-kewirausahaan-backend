@@ -4,42 +4,66 @@ const {
   getStatusPembimbing,
 } = require("../services/pembimbing.service");
 
-const listDosenPembimbingController = async (req, res) => {
-  const result = await listDosenPembimbing();
+const listDosenPembimbingController = async (req, res, next) => {
+  try {
+    const result = await listDosenPembimbing();
 
-  return res.json({
-    success: true,
-    message: result.message,
-    data: result.data,
-  });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-const getStatusPembimbingController = async (req, res) => {
-  const id_user = req.user.id_user;
+const getStatusPembimbingController = async (req, res, next) => {
+  try {
+    const result = await getStatusPembimbing(req.user.id_user);
 
-  const result = await getStatusPembimbing(id_user);
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: null,
+      });
+    }
 
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.message,
-    data: result.data,
-  });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-const ajukanPembimbingController = async (req, res) => {
-  const id_user = req.user.id_user;
+const ajukanPembimbingController = async (req, res, next) => {
+  try {
+    const result = await ajukanPembimbing(req.user.id_user, req.body);
 
-  const result = await ajukanPembimbing(id_user, req.body);
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: null,
+      });
+    }
 
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.message,
-    data: result.data,
-  });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {
   listDosenPembimbingController,
-  ajukanPembimbingController,
   getStatusPembimbingController,
+  ajukanPembimbingController,
 };

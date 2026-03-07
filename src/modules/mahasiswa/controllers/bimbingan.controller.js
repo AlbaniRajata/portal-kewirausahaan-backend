@@ -4,42 +4,70 @@ const {
   ajukanBimbingan,
 } = require("../services/bimbingan.service");
 
-const listBimbinganController = async (req, res) => {
-  const id_user = req.user.id_user;
+const listBimbinganController = async (req, res, next) => {
+  try {
+    const result = await listBimbingan(req.user.id_user);
 
-  const result = await listBimbingan(id_user);
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: null,
+      });
+    }
 
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.message,
-    is_ketua: result.is_ketua,
-    data: result.data,
-  });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-const detailBimbinganController = async (req, res) => {
-  const id_user = req.user.id_user;
-  const { id_bimbingan } = req.params;
+const detailBimbinganController = async (req, res, next) => {
+  try {
+    const result = await detailBimbingan(req.user.id_user, req.params.id_bimbingan);
 
-  const result = await detailBimbingan(id_user, id_bimbingan);
+    if (result.error) {
+      return res.status(404).json({
+        success: false,
+        message: result.message,
+        data: null,
+      });
+    }
 
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.message,
-    data: result.data,
-  });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-const ajukanBimbinganController = async (req, res) => {
-  const id_user = req.user.id_user;
+const ajukanBimbinganController = async (req, res, next) => {
+  try {
+    const result = await ajukanBimbingan(req.user.id_user, req.body);
 
-  const result = await ajukanBimbingan(id_user, req.body);
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: result.data || null,
+      });
+    }
 
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.message,
-    data: result.data,
-  });
+    return res.status(201).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {

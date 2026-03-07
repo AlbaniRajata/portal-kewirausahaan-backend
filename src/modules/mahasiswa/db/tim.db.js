@@ -1,85 +1,79 @@
 const db = require('../../../config/db');
 
 const getMahasiswaByUserId = async (id_user) => {
-    const q = `
-    select *
-    from m_mahasiswa
-    where id_user = $1
+  const q = `
+    SELECT id_user, nim, id_prodi, tahun_masuk, status_verifikasi, status_mahasiswa
+    FROM m_mahasiswa
+    WHERE id_user = $1
   `;
-    const r = await db.query(q, [id_user]);
-    return r.rows[0];
+  const r = await db.query(q, [id_user]);
+  return r.rows[0] || null;
 };
 
 const cekUserPunyaTim = async (id_user) => {
-    const q = `
-    select 1
-    from t_anggota_tim
-    where id_user = $1
-      and status = 1
+  const q = `
+    SELECT 1 FROM t_anggota_tim
+    WHERE id_user = $1 AND status = 1
   `;
-    const r = await db.query(q, [id_user]);
-    return r.rowCount > 0;
+  const r = await db.query(q, [id_user]);
+  return r.rowCount > 0;
 };
 
 const createTim = async (client, id_program, nama_tim) => {
-    const q = `
-    insert into t_tim (id_program, nama_tim)
-    values ($1, $2)
-    returning id_tim
+  const q = `
+    INSERT INTO t_tim (id_program, nama_tim)
+    VALUES ($1, $2)
+    RETURNING id_tim
   `;
-    const r = await client.query(q, [id_program, nama_tim]);
-    return r.rows[0];
+  const r = await client.query(q, [id_program, nama_tim]);
+  return r.rows[0];
 };
 
 const insertAnggotaTim = async (client, id_tim, id_user, peran, status) => {
-    const q = `
-    insert into t_anggota_tim (id_tim, id_user, peran, status)
-    values ($1, $2, $3, $4)
+  const q = `
+    INSERT INTO t_anggota_tim (id_tim, id_user, peran, status)
+    VALUES ($1, $2, $3, $4)
   `;
-    await client.query(q, [id_tim, id_user, peran, status]);
+  await client.query(q, [id_tim, id_user, peran, status]);
 };
 
 const getMahasiswaByNim = async (nim) => {
-    const q = `
-    select *
-    from m_mahasiswa
-    where nim = $1
+  const q = `
+    SELECT id_user, nim, status_verifikasi, status_mahasiswa
+    FROM m_mahasiswa
+    WHERE nim = $1
   `;
-    const r = await db.query(q, [nim]);
-    return r.rows[0];
+  const r = await db.query(q, [nim]);
+  return r.rows[0] || null;
 };
 
 const countAnggotaTim = async (id_tim) => {
-    const q = `
-    select count(*)::int as total
-    from t_anggota_tim
-    where id_tim = $1
-      and status = 1
+  const q = `
+    SELECT COUNT(*)::int AS total
+    FROM t_anggota_tim
+    WHERE id_tim = $1 AND status = 1
   `;
-    const r = await db.query(q, [id_tim]);
-    return r.rows[0].total;
+  const r = await db.query(q, [id_tim]);
+  return r.rows[0].total;
 };
 
 const getPeranUserDiTim = async (id_tim, id_user) => {
-    const q = `
-    select *
-    from t_anggota_tim
-    where id_tim = $1
-      and id_user = $2
-      and status = 1
+  const q = `
+    SELECT * FROM t_anggota_tim
+    WHERE id_tim = $1 AND id_user = $2 AND status = 1
   `;
-    const r = await db.query(q, [id_tim, id_user]);
-    return r.rows[0];
+  const r = await db.query(q, [id_tim, id_user]);
+  return r.rows[0] || null;
 };
 
 const getTimDetail = async (id_tim) => {
   const q = `
-    select
+    SELECT
       t.id_tim,
       t.nama_tim,
       t.id_program,
       (
-        select json_build_object(
+        SELECT json_build_object(
           'id_user', u.id_user,
           'nim', m.nim,
           'nama_lengkap', u.nama_lengkap,
@@ -92,16 +86,15 @@ const getTimDetail = async (id_tim) => {
           'id_kampus', k.id_kampus,
           'nama_kampus', k.nama_kampus
         )
-        from t_anggota_tim a
-        join m_mahasiswa m on m.id_user = a.id_user
-        join m_user u on u.id_user = m.id_user
-        join m_prodi p on p.id_prodi = m.id_prodi
-        join m_jurusan j on j.id_jurusan = p.id_jurusan
-        join m_kampus k on k.id_kampus = p.id_kampus
-        where a.id_tim = t.id_tim
-          and a.peran = 1
-        limit 1
-      ) as ketua_tim,
+        FROM t_anggota_tim a
+        JOIN m_mahasiswa m ON m.id_user = a.id_user
+        JOIN m_user u ON u.id_user = m.id_user
+        JOIN m_prodi p ON p.id_prodi = m.id_prodi
+        JOIN m_jurusan j ON j.id_jurusan = p.id_jurusan
+        JOIN m_kampus k ON k.id_kampus = p.id_kampus
+        WHERE a.id_tim = t.id_tim AND a.peran = 1
+        LIMIT 1
+      ) AS ketua_tim,
       json_agg(
         json_build_object(
           'id_user', u2.id_user,
@@ -111,21 +104,21 @@ const getTimDetail = async (id_tim) => {
           'peran', a2.peran,
           'status', a2.status
         )
-      ) as anggota
-    from t_tim t
-    join t_anggota_tim a2 on a2.id_tim = t.id_tim
-    join m_mahasiswa m2 on m2.id_user = a2.id_user
-    join m_user u2 on u2.id_user = m2.id_user
-    where t.id_tim = $1
-    group by t.id_tim
+      ) AS anggota
+    FROM t_tim t
+    JOIN t_anggota_tim a2 ON a2.id_tim = t.id_tim
+    JOIN m_mahasiswa m2 ON m2.id_user = a2.id_user
+    JOIN m_user u2 ON u2.id_user = m2.id_user
+    WHERE t.id_tim = $1
+    GROUP BY t.id_tim
   `;
   const r = await db.query(q, [id_tim]);
-  return r.rows[0];
+  return r.rows[0] || null;
 };
 
 const searchMahasiswaByNim = async (nim) => {
   const q = `
-    select
+    SELECT
       m.id_user,
       m.nim,
       u.nama_lengkap,
@@ -137,15 +130,15 @@ const searchMahasiswaByNim = async (nim) => {
       j.nama_jurusan,
       k.id_kampus,
       k.nama_kampus
-    from m_mahasiswa m
-    join m_user u on u.id_user = m.id_user
-    join m_prodi p on p.id_prodi = m.id_prodi
-    join m_jurusan j on j.id_jurusan = p.id_jurusan
-    join m_kampus k on k.id_kampus = p.id_kampus
-    where m.nim ilike $1
-      and m.status_verifikasi = 1
-      and m.status_mahasiswa = 1
-    limit 10
+    FROM m_mahasiswa m
+    JOIN m_user u ON u.id_user = m.id_user
+    JOIN m_prodi p ON p.id_prodi = m.id_prodi
+    JOIN m_jurusan j ON j.id_jurusan = p.id_jurusan
+    JOIN m_kampus k ON k.id_kampus = p.id_kampus
+    WHERE m.nim ILIKE $1
+      AND m.status_verifikasi = 1
+      AND m.status_mahasiswa = 1
+    LIMIT 10
   `;
   const r = await db.query(q, [`%${nim}%`]);
   return r.rows;
@@ -153,34 +146,26 @@ const searchMahasiswaByNim = async (nim) => {
 
 const getPendingInvite = async (id_tim, id_user) => {
   const q = `
-    select *
-    from t_anggota_tim
-    where id_tim = $1
-      and id_user = $2
-      and status = 0
+    SELECT * FROM t_anggota_tim
+    WHERE id_tim = $1 AND id_user = $2 AND status = 0
   `;
   const r = await db.query(q, [id_tim, id_user]);
-  return r.rows[0];
+  return r.rows[0] || null;
 };
 
-const acceptAnggotaTim = async (id_tim, id_user) => {
+const acceptAnggotaTim = async (client, id_tim, id_user) => {
   const q = `
-    update t_anggota_tim
-    set status = 1
-    where id_tim = $1
-      and id_user = $2
+    UPDATE t_anggota_tim SET status = 1
+    WHERE id_tim = $1 AND id_user = $2
   `;
-  await db.query(q, [id_tim, id_user]);
+  await client.query(q, [id_tim, id_user]);
 };
 
 const rejectAnggotaTim = async (id_tim, id_user, catatan) => {
   const q = `
-    update t_anggota_tim
-    set status = 2,
-        catatan = $3
-    where id_tim = $1
-      and id_user = $2
-      and status = 0
+    UPDATE t_anggota_tim
+    SET status = 2, catatan = $3
+    WHERE id_tim = $1 AND id_user = $2 AND status = 0
   `;
   const r = await db.query(q, [id_tim, id_user, catatan]);
   return r.rowCount;
@@ -188,34 +173,34 @@ const rejectAnggotaTim = async (id_tim, id_user, catatan) => {
 
 const getTimByUserId = async (id_user) => {
   const q = `
-    select
+    SELECT
       t.id_tim,
       t.nama_tim,
       t.id_program,
       t.status,
       t.created_at,
       a.peran,
-      a.status as status_anggota
-    from t_anggota_tim a
-    join t_tim t on t.id_tim = a.id_tim
-    where a.id_user = $1
+      a.status AS status_anggota
+    FROM t_anggota_tim a
+    JOIN t_tim t ON t.id_tim = a.id_tim
+    WHERE a.id_user = $1
   `;
   const r = await db.query(q, [id_user]);
-  return r.rows[0];
+  return r.rows[0] || null;
 };
 
 const getTimDetailByUserId = async (id_user) => {
   const q = `
-    select
+    SELECT
       t.id_tim,
       t.nama_tim,
       t.id_program,
       prog.nama_program,
       prog.keterangan,
-      t.status as status_tim,
+      t.status AS status_tim,
       t.created_at,
       (
-        select json_build_object(
+        SELECT json_build_object(
           'id_user', u.id_user,
           'nim', m.nim,
           'nama_lengkap', u.nama_lengkap,
@@ -228,18 +213,17 @@ const getTimDetailByUserId = async (id_user) => {
           'id_kampus', k.id_kampus,
           'nama_kampus', k.nama_kampus
         )
-        from t_anggota_tim a
-        join m_mahasiswa m on m.id_user = a.id_user
-        join m_user u on u.id_user = m.id_user
-        join m_prodi p on p.id_prodi = m.id_prodi
-        join m_jurusan j on j.id_jurusan = p.id_jurusan
-        join m_kampus k on k.id_kampus = p.id_kampus
-        where a.id_tim = t.id_tim
-          and a.peran = 1
-        limit 1
-      ) as ketua_tim,
+        FROM t_anggota_tim a
+        JOIN m_mahasiswa m ON m.id_user = a.id_user
+        JOIN m_user u ON u.id_user = m.id_user
+        JOIN m_prodi p ON p.id_prodi = m.id_prodi
+        JOIN m_jurusan j ON j.id_jurusan = p.id_jurusan
+        JOIN m_kampus k ON k.id_kampus = p.id_kampus
+        WHERE a.id_tim = t.id_tim AND a.peran = 1
+        LIMIT 1
+      ) AS ketua_tim,
       (
-        select json_agg(
+        SELECT json_agg(
           json_build_object(
             'id_user', u2.id_user,
             'nim', m2.nim,
@@ -256,51 +240,48 @@ const getTimDetailByUserId = async (id_user) => {
             'nama_kampus', k2.nama_kampus
           )
         )
-        from t_anggota_tim a2
-        join m_mahasiswa m2 on m2.id_user = a2.id_user
-        join m_user u2 on u2.id_user = m2.id_user
-        join m_prodi p2 on p2.id_prodi = m2.id_prodi
-        join m_jurusan j2 on j2.id_jurusan = p2.id_jurusan
-        join m_kampus k2 on k2.id_kampus = p2.id_kampus
-        where a2.id_tim = t.id_tim
-      ) as anggota
-    from t_anggota_tim ta
-    join t_tim t on t.id_tim = ta.id_tim
-    join m_program prog on prog.id_program = t.id_program
-    where ta.id_user = $1
+        FROM t_anggota_tim a2
+        JOIN m_mahasiswa m2 ON m2.id_user = a2.id_user
+        JOIN m_user u2 ON u2.id_user = m2.id_user
+        JOIN m_prodi p2 ON p2.id_prodi = m2.id_prodi
+        JOIN m_jurusan j2 ON j2.id_jurusan = p2.id_jurusan
+        JOIN m_kampus k2 ON k2.id_kampus = p2.id_kampus
+        WHERE a2.id_tim = t.id_tim
+      ) AS anggota
+    FROM t_anggota_tim ta
+    JOIN t_tim t ON t.id_tim = ta.id_tim
+    JOIN m_program prog ON prog.id_program = t.id_program
+    WHERE ta.id_user = $1
   `;
   const r = await db.query(q, [id_user]);
-  return r.rows[0];
+  return r.rows[0] || null;
 };
-
 
 const insertPesertaProgram = async (client, id_user, id_program, id_tim, tahun) => {
   const q = `
-    insert into t_peserta_program (id_user, id_program, id_tim, tahun, status_lolos)
-    values ($1, $2, $3, $4, 0)
-    on conflict (id_user, id_program) do nothing
+    INSERT INTO t_peserta_program (id_user, id_program, id_tim, tahun, status_lolos)
+    VALUES ($1, $2, $3, $4, 0)
+    ON CONFLICT (id_user, id_program) DO NOTHING
   `;
   await client.query(q, [id_user, id_program, id_tim, tahun]);
 };
 
 const cekLolosPMW = async (id_user) => {
   const q = `
-    select status_lolos
-    from t_peserta_program
-    where id_user = $1
-      and id_program = 1
+    SELECT status_lolos FROM t_peserta_program
+    WHERE id_user = $1 AND id_program = 1
   `;
   const r = await db.query(q, [id_user]);
-  return r.rows[0];
+  return r.rows[0] || null;
 };
 
 const cekSemuaAnggotaDisetujui = async (id_tim) => {
   const q = `
-    select 
-      count(*) filter (where status = 1) as disetujui,
-      count(*) as total
-    from t_anggota_tim
-    where id_tim = $1
+    SELECT
+      COUNT(*) FILTER (WHERE status = 1) AS disetujui,
+      COUNT(*) AS total
+    FROM t_anggota_tim
+    WHERE id_tim = $1
   `;
   const r = await db.query(q, [id_tim]);
   const { disetujui, total } = r.rows[0];
@@ -308,44 +289,38 @@ const cekSemuaAnggotaDisetujui = async (id_tim) => {
 };
 
 const getIdProgramByIdTim = async (id_tim) => {
-  const q = `
-    select id_program
-    from t_tim
-    where id_tim = $1
-  `;
+  const q = `SELECT id_program FROM t_tim WHERE id_tim = $1`;
   const r = await db.query(q, [id_tim]);
-  return r.rows[0]?.id_program;
+  return r.rows[0]?.id_program || null;
 };
 
 const getAllAnggotaTim = async (id_tim) => {
   const q = `
-    select id_user
-    from t_anggota_tim
-    where id_tim = $1
-      and status = 1
+    SELECT id_user FROM t_anggota_tim
+    WHERE id_tim = $1 AND status = 1
   `;
   const r = await db.query(q, [id_tim]);
-  return r.rows.map(row => row.id_user);
+  return r.rows.map((row) => row.id_user);
 };
 
 module.exports = {
-    getMahasiswaByUserId,
-    cekUserPunyaTim,
-    createTim,
-    insertAnggotaTim,
-    getMahasiswaByNim,
-    countAnggotaTim,
-    getPeranUserDiTim,
-    getTimDetail,
-    searchMahasiswaByNim,
-    getPendingInvite,
-    acceptAnggotaTim,
-    rejectAnggotaTim,
-    getTimByUserId,
-    getTimDetailByUserId,
-    insertPesertaProgram,
-    cekLolosPMW,
-    cekSemuaAnggotaDisetujui,
-    getIdProgramByIdTim,
-    getAllAnggotaTim,
+  getMahasiswaByUserId,
+  cekUserPunyaTim,
+  createTim,
+  insertAnggotaTim,
+  getMahasiswaByNim,
+  countAnggotaTim,
+  getPeranUserDiTim,
+  getTimDetail,
+  searchMahasiswaByNim,
+  getPendingInvite,
+  acceptAnggotaTim,
+  rejectAnggotaTim,
+  getTimByUserId,
+  getTimDetailByUserId,
+  insertPesertaProgram,
+  cekLolosPMW,
+  cekSemuaAnggotaDisetujui,
+  getIdProgramByIdTim,
+  getAllAnggotaTim,
 };

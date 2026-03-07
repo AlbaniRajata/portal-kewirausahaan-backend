@@ -1,42 +1,43 @@
 const timService = require("../services/tim.service");
 
 const createTimController = async (req, res, next) => {
-    try {
-        const result = await timService.createTim(req.user, req.body);
-        
-        if (result.error) {
-            return res.status(400).json({
-                success: false,
-                message: result.error,
-                field: result.field
-            });
-        }
+  try {
+    const result = await timService.createTim(req.user, req.body);
 
-        res.json({
-            success: true,
-            message: "Tim berhasil dibuat",
-            data: result.data
-        });
-    } catch (err) {
-        next(err);
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.error,
+        data: { field: result.field },
+      });
     }
+
+    return res.status(201).json({
+      success: true,
+      message: "Tim berhasil dibuat",
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 const searchMahasiswaController = async (req, res, next) => {
   try {
     const result = await timService.searchMahasiswa(req.user, req.query.nim);
 
-    if (result?.error) {
+    if (result.error) {
       return res.status(400).json({
         success: false,
         message: result.error,
-        field: result.field
+        data: { field: result.field },
       });
     }
 
-    res.json({
+    return res.status(200).json({
       success: true,
-      data: result.data
+      message: "Pencarian berhasil",
+      data: result.data,
     });
   } catch (err) {
     next(err);
@@ -45,23 +46,30 @@ const searchMahasiswaController = async (req, res, next) => {
 
 const acceptInviteController = async (req, res, next) => {
   try {
-    const result = await timService.acceptInvite(
-      req.user,
-      parseInt(req.params.id_tim)
-    );
+    const id_tim = parseInt(req.params.id_tim);
 
-    if (result?.error) {
+    if (isNaN(id_tim) || id_tim <= 0) {
       return res.status(400).json({
         success: false,
-        message: result.error,
-        field: result.field
+        message: "ID tim tidak valid",
+        data: { field: "id_tim" },
       });
     }
 
-    res.json({
+    const result = await timService.acceptInvite(req.user, id_tim);
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.error,
+        data: { field: result.field },
+      });
+    }
+
+    return res.status(200).json({
       success: true,
-      message: result.message || "Undangan berhasil diterima",
-      data: result.data
+      message: "Undangan berhasil diterima",
+      data: result.data,
     });
   } catch (err) {
     next(err);
@@ -70,24 +78,30 @@ const acceptInviteController = async (req, res, next) => {
 
 const rejectInviteController = async (req, res, next) => {
   try {
-    const result = await timService.rejectInvite(
-      req.user,
-      parseInt(req.params.id_tim),
-      req.body.catatan
-    );
+    const id_tim = parseInt(req.params.id_tim);
 
-    if (result?.error) {
+    if (isNaN(id_tim) || id_tim <= 0) {
       return res.status(400).json({
         success: false,
-        message: result.error,
-        field: result.field
+        message: "ID tim tidak valid",
+        data: { field: "id_tim" },
       });
     }
 
-    res.json({
+    const result = await timService.rejectInvite(req.user, id_tim, req.body.catatan);
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.error,
+        data: { field: result.field },
+      });
+    }
+
+    return res.status(200).json({
       success: true,
-      message: result.message,
-      data: result.data
+      message: "Undangan berhasil ditolak",
+      data: result.data,
     });
   } catch (err) {
     next(err);
@@ -98,9 +112,10 @@ const getTimStatusController = async (req, res, next) => {
   try {
     const result = await timService.getTimStatus(req.user);
 
-    res.json({
+    return res.status(200).json({
       success: true,
-      data: result
+      message: "Status tim berhasil diambil",
+      data: result,
     });
   } catch (err) {
     next(err);
@@ -111,17 +126,18 @@ const getTimDetailController = async (req, res, next) => {
   try {
     const result = await timService.getTimDetail(req.user);
 
-    if (result?.error) {
+    if (result.error) {
       return res.status(404).json({
         success: false,
         message: result.error,
-        field: result.field
+        data: { field: result.field },
       });
     }
 
-    res.json({
+    return res.status(200).json({
       success: true,
-      data: result.data
+      message: "Detail tim berhasil diambil",
+      data: result.data,
     });
   } catch (err) {
     next(err);
@@ -129,10 +145,10 @@ const getTimDetailController = async (req, res, next) => {
 };
 
 module.exports = {
-    createTimController,
-    searchMahasiswaController,
-    acceptInviteController,
-    rejectInviteController,
-    getTimStatusController,
-    getTimDetailController,
+  createTimController,
+  searchMahasiswaController,
+  acceptInviteController,
+  rejectInviteController,
+  getTimStatusController,
+  getTimDetailController,
 };

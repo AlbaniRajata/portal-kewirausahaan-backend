@@ -1,3 +1,4 @@
+const fs = require("fs");
 const {
   getProposalStatus,
   createProposal,
@@ -6,170 +7,123 @@ const {
   getProposalDetail,
 } = require("../services/proposal.service");
 
-const getProposalStatusController = async (req, res) => {
+const getProposalStatusController = async (req, res, next) => {
   try {
-    const { id_user } = req.user;
+    const result = await getProposalStatus(req.user.id_user);
 
-    const result = await getProposalStatus(id_user);
-
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: result.message,
       data: result,
-      meta: {},
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan pada sistem",
-      data: { error: err.message },
-      meta: {},
-    });
+    next(err);
   }
 };
 
-const createProposalController = async (req, res) => {
+const createProposalController = async (req, res, next) => {
   try {
-    const { id_user } = req.user;
-    const data = req.body;
-
     if (!req.file) {
       return res.status(400).json({
         success: false,
         message: "File proposal wajib diunggah",
-        data: {},
-        meta: {},
+        data: { field: "file_proposal" },
       });
     }
 
-    const result = await createProposal(id_user, {
-      ...data,
+    const result = await createProposal(req.user.id_user, {
+      ...req.body,
       file_proposal: req.file.filename,
     });
 
     if (result.error) {
+      if (req.file) fs.unlink(req.file.path, () => {});
       return res.status(400).json({
         success: false,
         message: result.message,
-        data: result.data || {},
-        meta: {},
+        data: result.data || null,
       });
     }
 
-    return res.json({
+    return res.status(201).json({
       success: true,
       message: result.message,
       data: result.data,
-      meta: {},
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan pada sistem",
-      data: { error: err.message },
-      meta: {},
-    });
+    if (req.file) fs.unlink(req.file.path, () => {});
+    next(err);
   }
 };
 
-const updateProposalController = async (req, res) => {
+const updateProposalController = async (req, res, next) => {
   try {
-    const { id_user } = req.user;
-    const { id_proposal } = req.params;
+    const data = { ...req.body };
+    if (req.file) data.file_proposal = req.file.filename;
 
-    const data = req.body;
-    if (req.file) {
-      data.file_proposal = req.file.filename;
+    const result = await updateProposal(req.user.id_user, req.params.id_proposal, data);
+
+    if (result.error) {
+      if (req.file) fs.unlink(req.file.path, () => {});
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: result.data || null,
+      });
     }
 
-    const result = await updateProposal(id_user, id_proposal, data);
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    if (req.file) fs.unlink(req.file.path, () => {});
+    next(err);
+  }
+};
+
+const submitProposalController = async (req, res, next) => {
+  try {
+    const result = await submitProposal(req.user.id_user, req.params.id_proposal);
 
     if (result.error) {
       return res.status(400).json({
         success: false,
         message: result.message,
-        data: result.data || {},
-        meta: {},
+        data: result.data || null,
       });
     }
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: result.message,
       data: result.data,
-      meta: {},
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan pada sistem",
-      data: { error: err.message },
-      meta: {},
-    });
+    next(err);
   }
 };
 
-const submitProposalController = async (req, res) => {
+const getProposalDetailController = async (req, res, next) => {
   try {
-    const { id_user } = req.user;
-    const { id_proposal } = req.params;
-
-    const result = await submitProposal(id_user, id_proposal);
-
-    if (result.error) {
-      return res.status(400).json({
-        success: false,
-        message: result.message,
-        data: result.data || {},
-        meta: {},
-      });
-    }
-
-    return res.json({
-      success: true,
-      message: result.message,
-      data: result.data,
-      meta: {},
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan pada sistem",
-      data: { error: err.message },
-      meta: {},
-    });
-  }
-};
-
-const getProposalDetailController = async (req, res) => {
-  try {
-    const { id_user } = req.user;
-    const { id_proposal } = req.params;
-
-    const result = await getProposalDetail(id_user, id_proposal);
+    const result = await getProposalDetail(req.user.id_user, req.params.id_proposal);
 
     if (result.error) {
       return res.status(404).json({
         success: false,
         message: result.message,
-        data: result.data || {},
-        meta: {},
+        data: result.data || null,
       });
     }
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: result.message,
       data: result.data,
-      meta: {},
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan pada sistem",
-      data: { error: err.message },
-      meta: {},
-    });
+    next(err);
   }
 };
 
