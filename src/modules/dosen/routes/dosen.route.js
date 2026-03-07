@@ -1,47 +1,38 @@
 const express = require("express");
 const router = express.Router();
-
 const roleMiddleware = require("../../../middlewares/role.middleware");
-const {
-  uploadFotoProfil,
-} = require("../../../middlewares/upload.middleware");
+const ROLE = require("../../../constants/role");
+const { uploadFotoProfil } = require("../../../middlewares/upload.middleware");
 
-const {
-  getProfileController,
-  updateProfileController,
-  updatePasswordController,
+const { 
+  getProfileController, 
+  updateProfileController, 
+  updatePasswordController 
 } = require("../controllers/profile.controller");
-
-const {
-  getPengajuanMasukController,
-  getDetailPengajuanController,
-  approvePengajuanController,
-  rejectPengajuanController,
+const { 
+  getPengajuanMasukController, 
+  getDetailPengajuanController, 
+  approvePengajuanController, 
+  rejectPengajuanController 
 } = require("../controllers/pembimbing.controller");
-
-const {
-  getBimbinganMasukController,
-  getDetailBimbinganController,
-  approveBimbinganController,
-  rejectBimbinganController,
+const { 
+  getBimbinganMasukController, 
+  getDetailBimbinganController, 
+  approveBimbinganController, 
+  rejectBimbinganController 
 } = require("../controllers/bimbingan.controller");
 
-router.use(roleMiddleware([3]));
+router.use(roleMiddleware([ROLE.DOSEN]));
 
-const uploadOptional = (req, res, next) => {
+const uploadFotoOptional = (req, res, next) => {
   uploadFotoProfil.single("foto")(req, res, (err) => {
-    if (err) {
-      return res.status(400).json({
-        success: false,
-        message: err.message,
-      });
-    }
+    if (err) return next(err);
     next();
   });
 };
 
 router.get("/profile", getProfileController);
-router.patch("/profile", uploadOptional, updateProfileController);
+router.patch("/profile", uploadFotoOptional, updateProfileController);
 router.put("/password", updatePasswordController);
 
 router.get("/pembimbing/pengajuan", getPengajuanMasukController);

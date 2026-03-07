@@ -11,7 +11,6 @@ const getBimbinganMasukDb = async (id_dosen) => {
       b.deskripsi,
       b.status,
       b.created_at,
-      
       t.nama_tim,
       u.nama_lengkap AS mahasiswa_pengaju,
       p.judul AS judul_proposal
@@ -29,7 +28,17 @@ const getBimbinganMasukDb = async (id_dosen) => {
 const getDetailBimbinganDb = async (id_bimbingan, id_dosen) => {
   const q = `
     SELECT
-      b.*,
+      b.id_bimbingan,
+      b.id_tim,
+      b.id_proposal,
+      b.tanggal_bimbingan,
+      b.metode,
+      b.topik,
+      b.deskripsi,
+      b.status,
+      b.catatan_dosen,
+      b.created_at,
+      b.responded_at,
       t.nama_tim,
       u.nama_lengkap AS mahasiswa_pengaju,
       p.judul AS judul_proposal
@@ -50,10 +59,8 @@ const getTimLengkapDb = async (id_tim) => {
       t.id_tim,
       t.nama_tim,
       t.id_program,
-
       ketua.id_user AS id_ketua,
       ketua.nama_lengkap AS nama_ketua,
-
       COALESCE(
         json_agg(
           json_build_object(
@@ -67,23 +74,13 @@ const getTimLengkapDb = async (id_tim) => {
         '[]'
       ) AS anggota
     FROM t_tim t
-
-    LEFT JOIN t_anggota_tim a
-      ON a.id_tim = t.id_tim
-
-    LEFT JOIN m_user u
-      ON u.id_user = a.id_user
-
-    LEFT JOIN t_anggota_tim ak
-      ON ak.id_tim = t.id_tim AND ak.peran = 1
-
-    LEFT JOIN m_user ketua
-      ON ketua.id_user = ak.id_user
-
+    LEFT JOIN t_anggota_tim a ON a.id_tim = t.id_tim
+    LEFT JOIN m_user u ON u.id_user = a.id_user
+    LEFT JOIN t_anggota_tim ak ON ak.id_tim = t.id_tim AND ak.peran = 1
+    LEFT JOIN m_user ketua ON ketua.id_user = ak.id_user
     WHERE t.id_tim = $1
     GROUP BY t.id_tim, ketua.id_user, ketua.nama_lengkap
   `;
-
   const { rows } = await pool.query(q, [id_tim]);
   return rows[0] || null;
 };
@@ -110,10 +107,8 @@ const getProposalByTimDb = async (id_tim) => {
 const approveBimbinganDb = async (id_bimbingan) => {
   const q = `
     UPDATE t_bimbingan
-    SET status = 1,
-        responded_at = now()
-    WHERE id_bimbingan = $1
-      AND status = 0
+    SET status = 1, responded_at = now()
+    WHERE id_bimbingan = $1 AND status = 0
     RETURNING *
   `;
   const { rows } = await pool.query(q, [id_bimbingan]);
@@ -123,11 +118,8 @@ const approveBimbinganDb = async (id_bimbingan) => {
 const rejectBimbinganDb = async (id_bimbingan, catatan) => {
   const q = `
     UPDATE t_bimbingan
-    SET status = 2,
-        catatan_dosen = $2,
-        responded_at = now()
-    WHERE id_bimbingan = $1
-      AND status = 0
+    SET status = 2, catatan_dosen = $2, responded_at = now()
+    WHERE id_bimbingan = $1 AND status = 0
     RETURNING *
   `;
   const { rows } = await pool.query(q, [id_bimbingan, catatan]);

@@ -8,111 +8,85 @@ const {
 } = require("../db/bimbingan.db");
 
 const getBimbinganMasuk = async (id_dosen) => {
-  const rows = await getBimbinganMasukDb(id_dosen);
-
+  const data = await getBimbinganMasukDb(id_dosen);
   return {
     error: false,
-    message: "Daftar pengajuan bimbingan masuk",
-    data: rows,
+    message: "Daftar pengajuan bimbingan berhasil diambil",
+    data,
   };
 };
 
 const getDetailBimbingan = async (id_dosen, id_bimbingan) => {
-  const detail = await getDetailBimbinganDb(id_bimbingan, id_dosen);
-
-  if (!detail) {
-    return {
-      error: true,
-      message: "Bimbingan tidak ditemukan",
-      data: null,
-    };
+  if (!Number.isInteger(id_bimbingan) || id_bimbingan <= 0) {
+    return { error: true, message: "ID bimbingan tidak valid", data: null };
   }
 
-  const proposal = await getProposalByTimDb(detail.id_tim);
-  const tim = await getTimLengkapDb(detail.id_tim);
+  const detail = await getDetailBimbinganDb(id_bimbingan, id_dosen);
+  if (!detail) {
+    return { error: true, message: "Bimbingan tidak ditemukan", data: null };
+  }
+
+  const [proposal, tim] = await Promise.all([
+    getProposalByTimDb(detail.id_tim),
+    getTimLengkapDb(detail.id_tim),
+  ]);
 
   return {
     error: false,
-    message: "Detail bimbingan lengkap",
-    data: {
-      bimbingan: detail,
-      proposal,
-      tim,
-    },
+    message: "Detail bimbingan berhasil diambil",
+    data: { bimbingan: detail, proposal, tim },
   };
 };
 
 const approveBimbingan = async (id_dosen, id_bimbingan) => {
-  const detail = await getDetailBimbinganDb(id_bimbingan, id_dosen);
+  if (!Number.isInteger(id_bimbingan) || id_bimbingan <= 0) {
+    return { error: true, message: "ID bimbingan tidak valid", data: null };
+  }
 
+  const detail = await getDetailBimbinganDb(id_bimbingan, id_dosen);
   if (!detail) {
-    return {
-      error: true,
-      message: "Bimbingan tidak ditemukan",
-      data: null,
-    };
+    return { error: true, message: "Bimbingan tidak ditemukan", data: null };
   }
 
   if (detail.status !== 0) {
-    return {
-      error: true,
-      message: "Bimbingan sudah direspon",
-      data: detail,
-    };
+    return { error: true, message: "Bimbingan sudah direspon sebelumnya", data: null };
   }
 
   const approved = await approveBimbinganDb(id_bimbingan);
-
   const tim = await getTimLengkapDb(detail.id_tim);
 
   return {
     error: false,
     message: "Bimbingan disetujui",
-    data: {
-      bimbingan: approved,
-      tim,
-    },
+    data: { bimbingan: approved, tim },
   };
 };
 
 const rejectBimbingan = async (id_dosen, id_bimbingan, catatan) => {
-  const detail = await getDetailBimbinganDb(id_bimbingan, id_dosen);
+  if (!Number.isInteger(id_bimbingan) || id_bimbingan <= 0) {
+    return { error: true, message: "ID bimbingan tidak valid", data: null };
+  }
 
+  if (!catatan || typeof catatan !== "string" || catatan.trim().length < 5) {
+    return { error: true, message: "Catatan penolakan harus diisi minimal 5 karakter", data: null };
+  }
+
+  const detail = await getDetailBimbinganDb(id_bimbingan, id_dosen);
   if (!detail) {
-    return {
-      error: true,
-      message: "Bimbingan tidak ditemukan",
-      data: null,
-    };
+    return { error: true, message: "Bimbingan tidak ditemukan", data: null };
   }
 
   if (detail.status !== 0) {
-    return {
-      error: true,
-      message: "Bimbingan sudah direspon",
-      data: detail,
-    };
+    return { error: true, message: "Bimbingan sudah direspon sebelumnya", data: null };
   }
 
-  if (!catatan || catatan.trim() === "") {
-    return {
-      error: true,
-      message: "Catatan wajib diisi saat menolak",
-      data: null,
-    };
-  }
-
-  const rejected = await rejectBimbinganDb(id_bimbingan, catatan);
-
+  const rejected = await rejectBimbinganDb(id_bimbingan, catatan.trim());
   const tim = await getTimLengkapDb(detail.id_tim);
 
   return {
     error: false,
     message: "Bimbingan ditolak",
-    data: {
-      bimbingan: rejected,
-      tim,
-    },
+    data: { bimbingan: rejected, tim },
   };
 };
 

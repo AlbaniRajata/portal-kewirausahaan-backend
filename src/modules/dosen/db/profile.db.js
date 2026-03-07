@@ -24,81 +24,56 @@ const getProfileDb = async (id_user) => {
     JOIN m_jurusan j ON j.id_jurusan = p.id_jurusan
     WHERE u.id_user = $1
   `;
-
   const { rows } = await pool.query(q, [id_user]);
-  return rows[0];
+  return rows[0] || null;
 };
 
 const updateBiodataDb = async (id_user, data) => {
-  const client = await pool.connect();
+  const userAllowed = ["nama_lengkap", "username", "no_hp", "alamat", "foto"];
+  const userFields = [];
+  const userValues = [];
+  let idx = 1;
 
+  for (const key of userAllowed) {
+    if (data[key] !== undefined) {
+      userFields.push(`${key} = $${idx++}`);
+      userValues.push(data[key]);
+    }
+  }
+
+  const dosenFields = [];
+  const dosenValues = [];
+  let dosenIdx = 1;
+
+  if (data.bidang_keahlian !== undefined) {
+    dosenFields.push(`bidang_keahlian = $${dosenIdx++}`);
+    dosenValues.push(data.bidang_keahlian);
+  }
+
+  if (userFields.length === 0 && dosenFields.length === 0) return null;
+
+  const client = await pool.connect();
   try {
     await client.query("BEGIN");
 
-    const userFields = [];
-    const userValues = [];
-    let userIndex = 1;
-
-    if (data.nama_lengkap !== undefined) {
-      userFields.push(`nama_lengkap = $${userIndex++}`);
-      userValues.push(data.nama_lengkap);
-    }
-
-    if (data.username !== undefined) {
-      userFields.push(`username = $${userIndex++}`);
-      userValues.push(data.username);
-    }
-
-    if (data.no_hp !== undefined) {
-      userFields.push(`no_hp = $${userIndex++}`);
-      userValues.push(data.no_hp);
-    }
-
-    if (data.alamat !== undefined) {
-      userFields.push(`alamat = $${userIndex++}`);
-      userValues.push(data.alamat);
-    }
-
-    if (data.foto !== undefined) {
-      userFields.push(`foto = $${userIndex++}`);
-      userValues.push(data.foto);
-    }
-
     if (userFields.length > 0) {
       userValues.push(id_user);
-      const qUser = `
-        UPDATE m_user 
-        SET ${userFields.join(", ")}
-        WHERE id_user = $${userIndex}
-      `;
-      await client.query(qUser, userValues);
-    }
-
-    // Update m_dosen jika ada
-    const dosenFields = [];
-    const dosenValues = [];
-    let dosenIndex = 1;
-
-    if (data.bidang_keahlian !== undefined) {
-      dosenFields.push(`bidang_keahlian = $${dosenIndex++}`);
-      dosenValues.push(data.bidang_keahlian);
+      await client.query(
+        `UPDATE m_user SET ${userFields.join(", ")} WHERE id_user = $${idx}`,
+        userValues
+      );
     }
 
     if (dosenFields.length > 0) {
       dosenValues.push(id_user);
-      const qDosen = `
-        UPDATE m_dosen 
-        SET ${dosenFields.join(", ")}
-        WHERE id_user = $${dosenIndex}
-      `;
-      await client.query(qDosen, dosenValues);
+      await client.query(
+        `UPDATE m_dosen SET ${dosenFields.join(", ")} WHERE id_user = $${dosenIdx}`,
+        dosenValues
+      );
     }
 
     await client.query("COMMIT");
-
-    const updated = await getProfileDb(id_user);
-    return updated;
-
+    return getProfileDb(id_user);
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;
@@ -107,19 +82,19 @@ const updateBiodataDb = async (id_user, data) => {
   }
 };
 
-const updatePasswordDb = async (id_user, password_hash) => {
-  await pool.query(
-    `UPDATE m_user SET password_hash = $1 WHERE id_user = $2`,
-    [password_hash, id_user]
-  );
-};
-
 const getPasswordHashDb = async (id_user) => {
   const { rows } = await pool.query(
     `SELECT password_hash FROM m_user WHERE id_user = $1`,
     [id_user]
   );
-  return rows[0]?.password_hash;
+  return rows[0]?.password_hash || null;
+};
+
+const updatePasswordDb = async (id_user, password_hash) => {
+  await pool.query(
+    `UPDATE m_user SET password_hash = $1 WHERE id_user = $2`,
+    [password_hash, id_user]
+  );
 };
 
 const checkDuplicateBiodataDb = async (id_user, { username, no_hp }) => {
@@ -140,23 +115,19 @@ const checkDuplicateBiodataDb = async (id_user, { username, no_hp }) => {
   if (conditions.length === 0) return null;
 
   values.push(id_user);
-
   const q = `
-    SELECT username, no_hp
-    FROM m_user
-    WHERE (${conditions.join(" OR ")})
-    AND id_user != $${idx}
+    SELECT username, no_hp FROM m_user
+    WHERE (${conditions.join(" OR ")}) AND id_user != $${idx}
     LIMIT 1
   `;
-
   const { rows } = await pool.query(q, values);
-  return rows[0];
+  return rows[0] || null;
 };
 
 module.exports = {
   getProfileDb,
   updateBiodataDb,
-  updatePasswordDb,
   getPasswordHashDb,
+  updatePasswordDb,
   checkDuplicateBiodataDb,
 };

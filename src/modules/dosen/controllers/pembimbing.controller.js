@@ -5,59 +5,114 @@ const {
   rejectPengajuan,
 } = require("../services/pembimbing.service");
 
-const getPengajuanMasukController = async (req, res) => {
-  const id_dosen = req.user.id_user;
+const getPengajuanMasukController = async (req, res, next) => {
+  try {
+    const result = await getPengajuanMasuk(req.user.id_user);
 
-  const result = await getPengajuanMasuk(id_dosen);
-
-  return res.json({
-    success: true,
-    message: result.message,
-    data: result.data,
-  });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-const getDetailPengajuanController = async (req, res) => {
-  const id_dosen = req.user.id_user;
-  const id_pengajuan = Number(req.params.id_pengajuan);
+const getDetailPengajuanController = async (req, res, next) => {
+  try {
+    const id_pengajuan = parseInt(req.params.id_pengajuan);
 
-  const result = await getDetailPengajuan(id_dosen, id_pengajuan);
+    if (isNaN(id_pengajuan) || id_pengajuan <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "ID pengajuan tidak valid",
+        data: null,
+      });
+    }
 
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.message,
-    data: result.data,
-  });
+    const result = await getDetailPengajuan(req.user.id_user, id_pengajuan);
+
+    if (result.error) {
+      return res.status(404).json({
+        success: false,
+        message: result.message,
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-const approvePengajuanController = async (req, res) => {
-  const id_dosen = req.user.id_user;
-  const id_pengajuan = Number(req.params.id_pengajuan);
+const approvePengajuanController = async (req, res, next) => {
+  try {
+    const id_pengajuan = parseInt(req.params.id_pengajuan);
 
-  const result = await approvePengajuan(id_dosen, id_pengajuan);
+    if (isNaN(id_pengajuan) || id_pengajuan <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "ID pengajuan tidak valid",
+        data: null,
+      });
+    }
 
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.message,
-    data: result.data,
-  });
+    const result = await approvePengajuan(req.user.id_user, id_pengajuan);
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-const rejectPengajuanController = async (req, res) => {
-  const id_dosen = req.user.id_user;
-  const id_pengajuan = Number(req.params.id_pengajuan);
+const rejectPengajuanController = async (req, res, next) => {
+  try {
+    const id_pengajuan = parseInt(req.params.id_pengajuan);
 
-  const result = await rejectPengajuan(
-    id_dosen,
-    id_pengajuan,
-    req.body.catatan
-  );
+    if (isNaN(id_pengajuan) || id_pengajuan <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "ID pengajuan tidak valid",
+        data: null,
+      });
+    }
 
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.message,
-    data: result.data,
-  });
+    const result = await rejectPengajuan(req.user.id_user, id_pengajuan, req.body.catatan);
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {
