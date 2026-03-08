@@ -5,71 +5,132 @@ const {
   rejectPenugasan,
 } = require("../services/penugasan.services");
 
-const getPenugasanController = async (req, res) => {
-  const { id_user } = req.user;
-  const status = req.query.status;
+const getPenugasanController = async (req, res, next) => {
+  try {
+    const result = await getPenugasan(req.user.id_user, req.query.status);
 
-  const tahap = 2;
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: result.data,
+      });
+    }
 
-  const result = await getPenugasan(id_user, tahap, status);
-
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.message,
-    data: result.data,
-    meta: {},
-  });
-};
-
-const getDetailPenugasanController = async (req, res) => {
-  const { id_user } = req.user;
-  const id_distribusi = Number(req.params.id_distribusi);
-
-  const result = await getDetailPenugasan(id_user, id_distribusi);
-
-  return res.status(result.error ? 404 : 200).json({
-    success: !result.error,
-    message: result.message,
-    data: result.data,
-    meta: {},
-  });
-};
-
-const acceptPenugasanController = async (req, res) => {
-  const { id_user } = req.user;
-  const id_distribusi = Number(req.params.id_distribusi);
-
-  const result = await acceptPenugasan(id_user, id_distribusi);
-
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.message,
-    data: result.data,
-    meta: {},
-  });
-};
-
-const rejectPenugasanController = async (req, res) => {
-  const { id_user } = req.user;
-  const id_distribusi = Number(req.params.id_distribusi);
-  const { catatan } = req.body || {};
-
-  if (!catatan || catatan.trim() === "" || catatan.trim().length < 10) {
-    return res.status(400).json({
-      success: false,
-      message: "Catatan penolakan wajib diisi minimal 10 karakter",
-      data: null,
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
     });
+  } catch (err) {
+    next(err);
   }
+};
 
-  const result = await rejectPenugasan(id_user, id_distribusi, catatan);
+const getDetailPenugasanController = async (req, res, next) => {
+  try {
+    const id_distribusi = parseInt(req.params.id_distribusi);
 
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.message,
-    data: result.data,
-    meta: {},
-  });
+    if (isNaN(id_distribusi) || id_distribusi <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "ID distribusi tidak valid",
+        data: null,
+      });
+    }
+
+    const result = await getDetailPenugasan(req.user.id_user, id_distribusi);
+
+    if (result.error) {
+      return res.status(404).json({
+        success: false,
+        message: result.message,
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const acceptPenugasanController = async (req, res, next) => {
+  try {
+    const id_distribusi = parseInt(req.params.id_distribusi);
+
+    if (isNaN(id_distribusi) || id_distribusi <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "ID distribusi tidak valid",
+        data: null,
+      });
+    }
+
+    const result = await acceptPenugasan(req.user.id_user, id_distribusi);
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const rejectPenugasanController = async (req, res, next) => {
+  try {
+    const id_distribusi = parseInt(req.params.id_distribusi);
+
+    if (isNaN(id_distribusi) || id_distribusi <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "ID distribusi tidak valid",
+        data: null,
+      });
+    }
+
+    const { catatan } = req.body || {};
+
+    if (!catatan || typeof catatan !== "string" || catatan.trim().length < 10) {
+      return res.status(400).json({
+        success: false,
+        message: "Catatan penolakan wajib diisi minimal 10 karakter",
+        data: null,
+      });
+    }
+
+    const result = await rejectPenugasan(req.user.id_user, id_distribusi, catatan);
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {

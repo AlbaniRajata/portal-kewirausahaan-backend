@@ -1,72 +1,109 @@
-const {
-  getFormPenilaian,
-  simpanNilai,
-  submitPenilaian,
-} = require("../services/penilaian.service");
+const { getFormPenilaian, simpanNilai, submitPenilaian } = require("../services/penilaian.service");
 
-const getFormPenilaianController = async (req, res) => {
-  const id_user = req.user.id_user;
-  const id_distribusi = Number(req.params.id_distribusi);
+const getFormPenilaianController = async (req, res, next) => {
+  try {
+    const id_distribusi = parseInt(req.params.id_distribusi);
 
-  const result = await getFormPenilaian(id_user, id_distribusi);
+    if (isNaN(id_distribusi) || id_distribusi <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "ID distribusi tidak valid",
+        data: null,
+      });
+    }
 
-  if (result.error) {
-    return res.status(400).json({
-      success: false,
+    const result = await getFormPenilaian(req.user.id_user, id_distribusi);
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: result.data,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
       message: result.message,
       data: result.data,
     });
+  } catch (err) {
+    next(err);
   }
-
-  return res.json({
-    success: true,
-    message: "Form penilaian juri",
-    data: result.data,
-  });
 };
 
-const simpanNilaiController = async (req, res) => {
-  const id_user = req.user.id_user;
-  const id_distribusi = Number(req.params.id_distribusi);
+const simpanNilaiController = async (req, res, next) => {
+  try {
+    const id_distribusi = parseInt(req.params.id_distribusi);
 
-  const payload = req.body.nilai;
+    if (isNaN(id_distribusi) || id_distribusi <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "ID distribusi tidak valid",
+        data: null,
+      });
+    }
 
-  const result = await simpanNilai(id_user, id_distribusi, payload);
+    const payload = req.body.nilai;
 
-  if (result.error) {
-    return res.status(400).json({
-      success: false,
+    if (!Array.isArray(payload) || payload.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Field 'nilai' wajib berupa array dan tidak boleh kosong",
+        data: null,
+      });
+    }
+
+    const result = await simpanNilai(req.user.id_user, id_distribusi, payload);
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: result.data,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
       message: result.message,
       data: result.data,
     });
+  } catch (err) {
+    next(err);
   }
-
-  return res.json({
-    success: true,
-    message: result.message,
-    data: result.data,
-  });
 };
 
-const submitPenilaianController = async (req, res) => {
-  const id_user = req.user.id_user;
-  const id_distribusi = Number(req.params.id_distribusi);
+const submitPenilaianController = async (req, res, next) => {
+  try {
+    const id_distribusi = parseInt(req.params.id_distribusi);
 
-  const result = await submitPenilaian(id_user, id_distribusi);
+    if (isNaN(id_distribusi) || id_distribusi <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "ID distribusi tidak valid",
+        data: null,
+      });
+    }
 
-  if (result.error) {
-    return res.status(400).json({
-      success: false,
+    const result = await submitPenilaian(req.user.id_user, id_distribusi);
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        data: result.data,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
       message: result.message,
       data: result.data,
     });
+  } catch (err) {
+    next(err);
   }
-
-  return res.json({
-    success: true,
-    message: "Penilaian juri berhasil disubmit",
-    data: result.data,
-  });
 };
 
 module.exports = {

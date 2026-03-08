@@ -6,98 +6,74 @@ const {
   rejectDistribusiDb,
 } = require("../db/penugasan.db");
 
-const getPenugasan = async (id_user, urutan, status_filter) => {
-  const data = await getPenugasanDb(id_user, urutan, status_filter);
+const URUTAN_JURI = 2;
+
+const getPenugasan = async (id_user, status_filter) => {
+  const data = await getPenugasanDb(id_user, URUTAN_JURI, status_filter);
 
   if (!data.length) {
     return {
       error: false,
       message: "Daftar penugasan juri kosong",
-      data: {
-        tahap: urutan,
-        total: 0,
-        penugasan: [],
-      },
+      data: { tahap: URUTAN_JURI, total: 0, penugasan: [] },
     };
   }
 
-  const id_program = data[0].id_program;
-  const tahapAktif = await getTahapAktifDb(id_program, urutan);
-
+  const tahapAktif = await getTahapAktifDb(data[0].id_program, URUTAN_JURI);
   if (!tahapAktif) {
     return {
       error: true,
       message: "Tahap penilaian tidak aktif",
-      data: { tahap: urutan, id_program },
+      data: { tahap: URUTAN_JURI, id_program: data[0].id_program },
     };
   }
 
   return {
     error: false,
-    message: "Daftar penugasan juri",
-    data: {
-      tahap: urutan,
-      total: data.length,
-      penugasan: data,
-    },
+    message: "Daftar penugasan juri berhasil diambil",
+    data: { tahap: URUTAN_JURI, total: data.length, penugasan: data },
   };
 };
 
 const getDetailPenugasan = async (id_user, id_distribusi) => {
-  const data = await getDetailPenugasanDb(id_distribusi, id_user);
+  if (!Number.isInteger(id_distribusi) || id_distribusi <= 0) {
+    return { error: true, message: "ID distribusi tidak valid", data: null };
+  }
 
-  if (!data) {
-    return {
-      error: true,
-      message: "Penugasan tidak ditemukan",
-      data: null,
-    };
+  const detail = await getDetailPenugasanDb(id_distribusi, id_user);
+  if (!detail) {
+    return { error: true, message: "Penugasan tidak ditemukan", data: null };
   }
 
   return {
     error: false,
-    message: "Detail penugasan juri",
-    data,
+    message: "Detail penugasan juri berhasil diambil",
+    data: detail,
   };
 };
 
 const acceptPenugasan = async (id_user, id_distribusi) => {
-  const detail = await getDetailPenugasanDb(id_distribusi, id_user);
+  if (!Number.isInteger(id_distribusi) || id_distribusi <= 0) {
+    return { error: true, message: "ID distribusi tidak valid", data: null };
+  }
 
+  const detail = await getDetailPenugasanDb(id_distribusi, id_user);
   if (!detail) {
-    return {
-      error: true,
-      message: "Penugasan tidak ditemukan",
-      data: null,
-    };
+    return { error: true, message: "Penugasan tidak ditemukan", data: null };
   }
 
   if (detail.status !== 0) {
-    return {
-      error: true,
-      message: "Penugasan sudah direspon",
-      data: detail,
-    };
+    return { error: true, message: "Penugasan sudah direspon sebelumnya", data: null };
   }
 
-  const tahapAktif = await getTahapAktifDb(detail.id_program, 2);
-
+  const tahapAktif = await getTahapAktifDb(detail.id_program, URUTAN_JURI);
   if (!tahapAktif) {
-    return {
-      error: true,
-      message: "Tahap sudah ditutup",
-      data: { tahap: 2 },
-    };
+    return { error: true, message: "Tahap penilaian sudah ditutup", data: null };
   }
 
   const updated = await acceptDistribusiDb(id_distribusi, id_user);
-
   if (!updated) {
-    return {
-      error: true,
-      message: "Penugasan gagal diterima",
-      data: null,
-    };
+    return { error: true, message: "Penugasan gagal diterima", data: null };
   }
 
   return {
@@ -108,42 +84,31 @@ const acceptPenugasan = async (id_user, id_distribusi) => {
 };
 
 const rejectPenugasan = async (id_user, id_distribusi, catatan) => {
-  const detail = await getDetailPenugasanDb(id_distribusi, id_user);
+  if (!Number.isInteger(id_distribusi) || id_distribusi <= 0) {
+    return { error: true, message: "ID distribusi tidak valid", data: null };
+  }
 
+  if (!catatan || typeof catatan !== "string" || catatan.trim().length < 10) {
+    return { error: true, message: "Catatan penolakan wajib diisi minimal 10 karakter", data: null };
+  }
+
+  const detail = await getDetailPenugasanDb(id_distribusi, id_user);
   if (!detail) {
-    return {
-      error: true,
-      message: "Penugasan tidak ditemukan",
-      data: null,
-    };
+    return { error: true, message: "Penugasan tidak ditemukan", data: null };
   }
 
   if (detail.status !== 0) {
-    return {
-      error: true,
-      message: "Penugasan sudah direspon",
-      data: detail,
-    };
+    return { error: true, message: "Penugasan sudah direspon sebelumnya", data: null };
   }
 
-  const tahapAktif = await getTahapAktifDb(detail.id_program, 2);
-
+  const tahapAktif = await getTahapAktifDb(detail.id_program, URUTAN_JURI);
   if (!tahapAktif) {
-    return {
-      error: true,
-      message: "Tahap sudah ditutup",
-      data: { tahap: 2 },
-    };
+    return { error: true, message: "Tahap penilaian sudah ditutup", data: null };
   }
 
-  const updated = await rejectDistribusiDb(id_distribusi, id_user, catatan);
-
+  const updated = await rejectDistribusiDb(id_distribusi, id_user, catatan.trim());
   if (!updated) {
-    return {
-      error: true,
-      message: "Penugasan gagal ditolak",
-      data: null,
-    };
+    return { error: true, message: "Penugasan gagal ditolak", data: null };
   }
 
   return {

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-
 const roleMiddleware = require("../../../middlewares/role.middleware");
+const ROLE = require("../../../constants/role");
 
 const {
   getPenugasanController,
@@ -16,7 +16,7 @@ const {
   submitPenilaianController,
 } = require("../controllers/penilaian.controller");
 
-router.use(roleMiddleware([4])); // Reviewer
+router.use(roleMiddleware([ROLE.REVIEWER]));
 
 router.get("/penugasan", getPenugasanController);
 router.get("/penugasan/:id_distribusi", getDetailPenugasanController);

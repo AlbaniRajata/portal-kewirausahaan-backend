@@ -7,17 +7,13 @@ const getDistribusiForPenilaianDb = async (id_distribusi) => {
       d.id_reviewer,
       d.status AS status_distribusi,
       d.tahap AS urutan_tahap,
-
       p.id_program,
-
       t.id_tahap,
       t.penilaian_mulai,
       t.penilaian_selesai,
-
       p.id_proposal,
       p.judul,
       p.status AS status_proposal
-
     FROM t_distribusi_reviewer d
     JOIN t_proposal p ON p.id_proposal = d.id_proposal
     JOIN m_tahap_penilaian t
@@ -26,7 +22,6 @@ const getDistribusiForPenilaianDb = async (id_distribusi) => {
      AND t.status = 1
     WHERE d.id_distribusi = $1
   `;
-
   const { rows } = await pool.query(q, [id_distribusi]);
   return rows[0] || null;
 };
@@ -43,28 +38,22 @@ const getKriteriaByTahapDb = async (id_tahap) => {
       AND status = 1
     ORDER BY urutan ASC
   `;
-
   const { rows } = await pool.query(q, [id_tahap]);
   return rows;
 };
 
 const getOrCreatePenilaianDb = async (id_distribusi, id_tahap) => {
-  const insert = `
-    INSERT INTO t_penilaian_reviewer (id_distribusi, id_tahap)
-    VALUES ($1, $2)
-    ON CONFLICT (id_distribusi)
-    DO NOTHING
-  `;
+  await pool.query(
+    `INSERT INTO t_penilaian_reviewer (id_distribusi, id_tahap)
+     VALUES ($1, $2)
+     ON CONFLICT (id_distribusi) DO NOTHING`,
+    [id_distribusi, id_tahap]
+  );
 
-  await pool.query(insert, [id_distribusi, id_tahap]);
-
-  const q = `
-    SELECT *
-    FROM t_penilaian_reviewer
-    WHERE id_distribusi = $1
-  `;
-
-  const { rows } = await pool.query(q, [id_distribusi]);
+  const { rows } = await pool.query(
+    `SELECT * FROM t_penilaian_reviewer WHERE id_distribusi = $1`,
+    [id_distribusi]
+  );
   return rows[0] || null;
 };
 
@@ -82,18 +71,11 @@ const getDetailNilaiDb = async (id_penilaian) => {
     WHERE d.id_penilaian = $1
     ORDER BY k.urutan ASC
   `;
-
   const { rows } = await pool.query(q, [id_penilaian]);
   return rows;
 };
 
-const upsertNilaiDb = async (
-  id_penilaian,
-  id_kriteria,
-  skor,
-  nilai,
-  catatan
-) => {
+const upsertNilaiDb = async (id_penilaian, id_kriteria, skor, nilai, catatan) => {
   const q = `
     INSERT INTO t_penilaian_reviewer_detail
       (id_penilaian, id_kriteria, skor, nilai, catatan)
@@ -106,28 +88,17 @@ const upsertNilaiDb = async (
       updated_at = now()
     RETURNING *
   `;
-
-  const { rows } = await pool.query(q, [
-    id_penilaian,
-    id_kriteria,
-    skor,
-    nilai,
-    catatan,
-  ]);
-
+  const { rows } = await pool.query(q, [id_penilaian, id_kriteria, skor, nilai, catatan]);
   return rows[0] || null;
 };
 
 const submitPenilaianDb = async (id_penilaian) => {
   const q = `
     UPDATE t_penilaian_reviewer
-    SET status = 1,
-        submitted_at = now()
-    WHERE id_penilaian = $1
-      AND status = 0
+    SET status = 1, submitted_at = now()
+    WHERE id_penilaian = $1 AND status = 0
     RETURNING *
   `;
-
   const { rows } = await pool.query(q, [id_penilaian]);
   return rows[0] || null;
 };
@@ -136,8 +107,7 @@ const markDistribusiDraftDb = async (id_distribusi) => {
   const q = `
     UPDATE t_distribusi_reviewer
     SET status = 3
-    WHERE id_distribusi = $1
-      AND status IN (1, 3)
+    WHERE id_distribusi = $1 AND status IN (1, 3)
     RETURNING *
   `;
   const { rows } = await pool.query(q, [id_distribusi]);
@@ -147,10 +117,8 @@ const markDistribusiDraftDb = async (id_distribusi) => {
 const markDistribusiSubmittedDb = async (id_distribusi) => {
   const q = `
     UPDATE t_distribusi_reviewer
-    SET status = 4,
-        responded_at = now()
-    WHERE id_distribusi = $1
-      AND status IN (1, 3)
+    SET status = 4, responded_at = now()
+    WHERE id_distribusi = $1 AND status IN (1, 3)
     RETURNING *
   `;
   const { rows } = await pool.query(q, [id_distribusi]);

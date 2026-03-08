@@ -13,16 +13,11 @@ const getPenugasan = async (id_user, urutan, status_filter) => {
     return {
       error: false,
       message: "Daftar penugasan reviewer kosong",
-      data: {
-        tahap: urutan,
-        total: 0,
-        penugasan: [],
-      },
+      data: { tahap: urutan, total: 0, penugasan: [] },
     };
   }
 
   const id_program = data[0].id_program;
-
   const tahapAktif = await getTahapAktifDb(id_program, urutan);
 
   if (!tahapAktif) {
@@ -35,73 +30,50 @@ const getPenugasan = async (id_user, urutan, status_filter) => {
 
   return {
     error: false,
-    message: "Daftar penugasan reviewer",
-    data: {
-      tahap: urutan,
-      total: data.length,
-      penugasan: data,
-    },
+    message: "Daftar penugasan reviewer berhasil diambil",
+    data: { tahap: urutan, total: data.length, penugasan: data },
   };
 };
 
 const getDetailPenugasan = async (id_user, id_distribusi) => {
-  const detail = await getDetailPenugasanDb(id_distribusi, id_user);
+  if (!Number.isInteger(id_distribusi) || id_distribusi <= 0) {
+    return { error: true, message: "ID distribusi tidak valid", data: null };
+  }
 
+  const detail = await getDetailPenugasanDb(id_distribusi, id_user);
   if (!detail) {
-    return {
-      error: true,
-      message: "Penugasan tidak ditemukan",
-      data: null,
-    };
+    return { error: true, message: "Penugasan tidak ditemukan", data: null };
   }
 
   return {
     error: false,
-    message: "Detail penugasan reviewer",
+    message: "Detail penugasan berhasil diambil",
     data: detail,
   };
 };
 
 const acceptPenugasan = async (id_user, id_distribusi) => {
-  const detail = await getDetailPenugasanDb(id_distribusi, id_user);
+  if (!Number.isInteger(id_distribusi) || id_distribusi <= 0) {
+    return { error: true, message: "ID distribusi tidak valid", data: null };
+  }
 
+  const detail = await getDetailPenugasanDb(id_distribusi, id_user);
   if (!detail) {
-    return {
-      error: true,
-      message: "Penugasan tidak ditemukan",
-      data: null,
-    };
+    return { error: true, message: "Penugasan tidak ditemukan", data: null };
   }
 
   if (detail.status !== 0) {
-    return {
-      error: true,
-      message: "Penugasan sudah direspon",
-      data: detail,
-    };
+    return { error: true, message: "Penugasan sudah direspon sebelumnya", data: null };
   }
 
-  const tahapAktif = await getTahapAktifDb(
-    detail.id_program,
-    detail.urutan_tahap
-  );
-
+  const tahapAktif = await getTahapAktifDb(detail.id_program, detail.urutan_tahap);
   if (!tahapAktif) {
-    return {
-      error: true,
-      message: "Tahap sudah ditutup",
-      data: { tahap: detail.urutan_tahap },
-    };
+    return { error: true, message: "Tahap penilaian sudah ditutup", data: null };
   }
 
   const updated = await acceptDistribusiDb(id_distribusi, id_user);
-
   if (!updated) {
-    return {
-      error: true,
-      message: "Penugasan gagal diterima",
-      data: null,
-    };
+    return { error: true, message: "Penugasan gagal diterima", data: null };
   }
 
   return {
@@ -112,49 +84,31 @@ const acceptPenugasan = async (id_user, id_distribusi) => {
 };
 
 const rejectPenugasan = async (id_user, id_distribusi, catatan) => {
-  const detail = await getDetailPenugasanDb(id_distribusi, id_user);
+  if (!Number.isInteger(id_distribusi) || id_distribusi <= 0) {
+    return { error: true, message: "ID distribusi tidak valid", data: null };
+  }
 
+  if (!catatan || typeof catatan !== "string" || catatan.trim().length < 10) {
+    return { error: true, message: "Catatan penolakan wajib diisi minimal 10 karakter", data: null };
+  }
+
+  const detail = await getDetailPenugasanDb(id_distribusi, id_user);
   if (!detail) {
-    return {
-      error: true,
-      message: "Penugasan tidak ditemukan",
-      data: null,
-    };
+    return { error: true, message: "Penugasan tidak ditemukan", data: null };
   }
 
   if (detail.status !== 0) {
-    return {
-      error: true,
-      message: "Penugasan sudah direspon",
-      data: detail,
-    };
+    return { error: true, message: "Penugasan sudah direspon sebelumnya", data: null };
   }
 
-  const tahapAktif = await getTahapAktifDb(
-    detail.id_program,
-    detail.urutan_tahap
-  );
-
+  const tahapAktif = await getTahapAktifDb(detail.id_program, detail.urutan_tahap);
   if (!tahapAktif) {
-    return {
-      error: true,
-      message: "Tahap sudah ditutup",
-      data: { tahap: detail.urutan_tahap },
-    };
+    return { error: true, message: "Tahap penilaian sudah ditutup", data: null };
   }
 
-  const updated = await rejectDistribusiDb(
-    id_distribusi,
-    id_user,
-    catatan
-  );
-
+  const updated = await rejectDistribusiDb(id_distribusi, id_user, catatan.trim());
   if (!updated) {
-    return {
-      error: true,
-      message: "Penugasan gagal ditolak",
-      data: null,
-    };
+    return { error: true, message: "Penugasan gagal ditolak", data: null };
   }
 
   return {
