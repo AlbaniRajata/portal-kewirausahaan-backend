@@ -4,6 +4,7 @@ const ROLE = {
   DOSEN: 3,
   REVIEWER: 4,
   JURI: 5,
+  SUPER_ADMIN: 6,
 };
 
-module.exports = ROLE;
+module.exports = { ROLE };

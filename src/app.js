@@ -37,11 +37,13 @@ app.use(
 
 app.use(
   helmet({
-    crossOriginResourcePolicy: { policy: "same-site" },
+    crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
 
 app.use(morgan("dev"));
+
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));

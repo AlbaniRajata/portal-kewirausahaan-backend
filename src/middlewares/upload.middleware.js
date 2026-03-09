@@ -38,10 +38,7 @@ const uploadKTM = multer({
     ["image/jpeg", "image/jpg", "image/png", "application/pdf"],
     "Hanya file JPG, PNG, atau PDF yang diperbolehkan"
   ),
-  limits: {
-    fileSize: 5 * 1024 * 1024,
-    files: 1,
-  },
+  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
 });
 
 const profilDir = "uploads/profil";
@@ -56,10 +53,7 @@ const uploadFotoProfil = multer({
     ["image/jpeg", "image/jpg", "image/png"],
     "Hanya file JPG atau PNG yang diperbolehkan untuk foto profil"
   ),
-  limits: {
-    fileSize: 3 * 1024 * 1024,
-    files: 1,
-  },
+  limits: { fileSize: 3 * 1024 * 1024, files: 1 },
 });
 
 const proposalDir = "uploads/proposal";
@@ -74,14 +68,27 @@ const uploadProposal = multer({
     ["application/pdf"],
     "File proposal harus berupa PDF"
   ),
-  limits: {
-    fileSize: 10 * 1024 * 1024,
-    files: 1,
-  },
+  limits: { fileSize: 10 * 1024 * 1024, files: 1 },
+});
+
+const beritaDir = "uploads/berita";
+ensureDir(beritaDir);
+
+const uploadBerita = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, beritaDir),
+    filename: createFilename("berita"),
+  }),
+  fileFilter: createFileFilter(
+    ["image/jpeg", "image/jpg", "image/png", "image/webp"],
+    "Hanya file JPG, PNG, atau WebP yang diperbolehkan untuk gambar berita"
+  ),
+  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
 });
 
 module.exports = {
   uploadKTM,
   uploadFotoProfil,
   uploadProposal,
+  uploadBerita,
 };

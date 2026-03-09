@@ -1,4 +1,4 @@
-const { login } = require("../services/auth.service");
+const { login, refresh, logout } = require("../services/auth.service");
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -55,4 +55,53 @@ const loginHandler = async (req, res, next) => {
   }
 };
 
-module.exports = loginHandler;
+const refreshHandler = async (req, res, next) => {
+  try {
+    const { refresh_token } = req.body;
+
+    if (!refresh_token) {
+      return res.status(400).json({
+        success: false,
+        message: "Refresh token wajib diisi",
+        data: null,
+      });
+    }
+
+    const result = await refresh(refresh_token);
+
+    if (result.error) {
+      return res.status(result.code || 401).json({
+        success: false,
+        message: result.error,
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Token berhasil diperbarui",
+      data: { token: result.token },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const logoutHandler = async (req, res, next) => {
+  try {
+    const { refresh_token } = req.body;
+    const id_user = req.user?.id_user;
+
+    await logout(refresh_token, id_user);
+
+    return res.status(200).json({
+      success: true,
+      message: "Logout berhasil",
+      data: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { loginHandler, refreshHandler, logoutHandler };
