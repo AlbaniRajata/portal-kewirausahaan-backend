@@ -53,7 +53,7 @@ const uploadFotoProfil = multer({
     ["image/jpeg", "image/jpg", "image/png"],
     "Hanya file JPG atau PNG yang diperbolehkan untuk foto profil"
   ),
-  limits: { fileSize: 3 * 1024 * 1024, files: 1 },
+  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
 });
 
 const proposalDir = "uploads/proposal";
