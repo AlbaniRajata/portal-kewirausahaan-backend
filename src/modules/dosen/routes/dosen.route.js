@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const roleMiddleware = require("../../../middlewares/role.middleware");
-const ROLE = require("../../../constants/role");
+const { ROLE } = require("../../../constants/role");
 const { uploadFotoProfil } = require("../../../middlewares/upload.middleware");
 
 const { 
