@@ -5,112 +5,161 @@ const {
   toggleUserActive, resetPassword,
 } = require("../services/pengguna.service");
 
-const getMahasiswaListController = async (req, res) => {
-  const { is_active, id_prodi, id_jurusan, search } = req.query;
-  const result = await getMahasiswaList({
-    is_active: is_active !== undefined ? is_active === "true" : undefined,
-    id_prodi: id_prodi || undefined,
-    search: search || undefined,
-  });
-  return res.status(200).json({ success: true, message: result.message, data: result.data });
+const getMahasiswaListController = async (req, res, next) => {
+  try {
+    const { is_active, id_prodi, id_jurusan, search } = req.query;
+    const result = await getMahasiswaList({
+      is_active: is_active !== undefined ? is_active === "true" : undefined,
+      id_prodi: id_prodi ? parseInt(id_prodi) : undefined,
+      id_jurusan: id_jurusan ? parseInt(id_jurusan) : undefined,
+      search: search || undefined,
+    });
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const getDosenListController = async (req, res) => {
-  const { is_active, id_prodi, status_verifikasi, search } = req.query;
-  const result = await getDosenList({
-    is_active: is_active !== undefined ? is_active === "true" : undefined,
-    id_prodi: id_prodi || undefined,
-    search: search || undefined,
-  });
-  return res.status(200).json({ success: true, message: result.message, data: result.data });
+const getDosenListController = async (req, res, next) => {
+  try {
+    const { is_active, id_prodi, search } = req.query;
+    const result = await getDosenList({
+      is_active: is_active !== undefined ? is_active === "true" : undefined,
+      id_prodi: id_prodi ? parseInt(id_prodi) : undefined,
+      search: search || undefined,
+    });
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const getReviewerListPenggunaController = async (req, res) => {
-  const { is_active, search } = req.query;
-  const result = await getReviewerList({
-    is_active: is_active !== undefined ? is_active === "true" : undefined,
-    search: search || undefined,
-  });
-  return res.status(200).json({ success: true, message: result.message, data: result.data });
+const getReviewerListController = async (req, res, next) => {
+  try {
+    const { is_active, search } = req.query;
+    const result = await getReviewerList({
+      is_active: is_active !== undefined ? is_active === "true" : undefined,
+      search: search || undefined,
+    });
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const getJuriListPenggunaController = async (req, res) => {
-  const { is_active, search } = req.query;
-  const result = await getJuriList({
-    is_active: is_active !== undefined ? is_active === "true" : undefined,
-    search: search || undefined,
-  });
-  return res.status(200).json({ success: true, message: result.message, data: result.data });
+const getJuriListController = async (req, res, next) => {
+  try {
+    const { is_active, search } = req.query;
+    const result = await getJuriList({
+      is_active: is_active !== undefined ? is_active === "true" : undefined,
+      search: search || undefined,
+    });
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const createMahasiswaController = async (req, res) => {
-  const result = await createMahasiswa(req.body);
-  return res.status(result.error ? 400 : 201).json({ success: !result.error, message: result.message, data: result.data });
+const createMahasiswaController = async (req, res, next) => {
+  try {
+    const result = await createMahasiswa(req.body);
+    if (result.error) return res.status(400).json({ success: false, message: result.message, data: result.data });
+    return res.status(201).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const createDosenController = async (req, res) => {
-  const result = await createDosen(req.body);
-  return res.status(result.error ? 400 : 201).json({ success: !result.error, message: result.message, data: result.data });
+const createDosenController = async (req, res, next) => {
+  try {
+    const result = await createDosen(req.body);
+    if (result.error) return res.status(400).json({ success: false, message: result.message, data: result.data });
+    return res.status(201).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const createReviewerPenggunaController = async (req, res) => {
-  const result = await createReviewer(req.body);
-  return res.status(result.error ? 400 : 201).json({ success: !result.error, message: result.message, data: result.data });
+const createReviewerController = async (req, res, next) => {
+  try {
+    const result = await createReviewer(req.body);
+    if (result.error) return res.status(400).json({ success: false, message: result.message, data: result.data });
+    return res.status(201).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const createJuriPenggunaController = async (req, res) => {
-  const result = await createJuri(req.body);
-  return res.status(result.error ? 400 : 201).json({ success: !result.error, message: result.message, data: result.data });
+const createJuriController = async (req, res, next) => {
+  try {
+    const result = await createJuri(req.body);
+    if (result.error) return res.status(400).json({ success: false, message: result.message, data: result.data });
+    return res.status(201).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const updateMahasiswaController = async (req, res) => {
-  const { id_user } = req.params;
-  const result = await updateMahasiswa(id_user, req.body);
-  return res.status(result.error ? 400 : 200).json({ success: !result.error, message: result.message, data: result.data });
+const updateMahasiswaController = async (req, res, next) => {
+  try {
+    const id_user = parseInt(req.params.id_user);
+    if (isNaN(id_user) || id_user <= 0) return res.status(400).json({ success: false, message: "ID user tidak valid", data: null });
+    const result = await updateMahasiswa(id_user, req.body);
+    if (result.error) return res.status(400).json({ success: false, message: result.message, data: result.data });
+    return res.status(200).json({ success: true, message: result.message, data: null });
+  } catch (err) { next(err); }
 };
 
-const updateDosenController = async (req, res) => {
-  const { id_user } = req.params;
-  const result = await updateDosen(id_user, req.body);
-  return res.status(result.error ? 400 : 200).json({ success: !result.error, message: result.message, data: result.data });
+const updateDosenController = async (req, res, next) => {
+  try {
+    const id_user = parseInt(req.params.id_user);
+    if (isNaN(id_user) || id_user <= 0) return res.status(400).json({ success: false, message: "ID user tidak valid", data: null });
+    const result = await updateDosen(id_user, req.body);
+    if (result.error) return res.status(400).json({ success: false, message: result.message, data: result.data });
+    return res.status(200).json({ success: true, message: result.message, data: null });
+  } catch (err) { next(err); }
 };
 
-const updateReviewerController = async (req, res) => {
-  const { id_user } = req.params;
-  const result = await updateReviewer(id_user, req.body);
-  return res.status(result.error ? 400 : 200).json({ success: !result.error, message: result.message, data: result.data });
+const updateReviewerController = async (req, res, next) => {
+  try {
+    const id_user = parseInt(req.params.id_user);
+    if (isNaN(id_user) || id_user <= 0) return res.status(400).json({ success: false, message: "ID user tidak valid", data: null });
+    const result = await updateReviewer(id_user, req.body);
+    if (result.error) return res.status(400).json({ success: false, message: result.message, data: result.data });
+    return res.status(200).json({ success: true, message: result.message, data: null });
+  } catch (err) { next(err); }
 };
 
-const updateJuriController = async (req, res) => {
-  const { id_user } = req.params;
-  const result = await updateJuri(id_user, req.body);
-  return res.status(result.error ? 400 : 200).json({ success: !result.error, message: result.message, data: result.data });
+const updateJuriController = async (req, res, next) => {
+  try {
+    const id_user = parseInt(req.params.id_user);
+    if (isNaN(id_user) || id_user <= 0) return res.status(400).json({ success: false, message: "ID user tidak valid", data: null });
+    const result = await updateJuri(id_user, req.body);
+    if (result.error) return res.status(400).json({ success: false, message: result.message, data: result.data });
+    return res.status(200).json({ success: true, message: result.message, data: null });
+  } catch (err) { next(err); }
 };
 
-const toggleUserActiveController = async (req, res) => {
-  const { id_user } = req.params;
-  const { is_active } = req.body;
-  if (is_active === undefined)
-    return res.status(400).json({ success: false, message: "is_active wajib diisi", data: null });
-  const result = await toggleUserActive(id_user, is_active);
-  return res.status(result.error ? 400 : 200).json({ success: !result.error, message: result.message, data: result.data });
+const toggleUserActiveController = async (req, res, next) => {
+  try {
+    const id_user = parseInt(req.params.id_user);
+    if (isNaN(id_user) || id_user <= 0) return res.status(400).json({ success: false, message: "ID user tidak valid", data: null });
+    if (req.body.is_active === undefined || req.body.is_active === null) {
+      return res.status(400).json({ success: false, message: "is_active wajib diisi", data: null });
+    }
+    const is_active = req.body.is_active === true || req.body.is_active === "true";
+    const result = await toggleUserActive(id_user, is_active);
+    if (result.error) return res.status(404).json({ success: false, message: result.message, data: null });
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const resetPasswordController = async (req, res) => {
-  const { id_user } = req.params;
-  const result = await resetPassword(id_user, req.body);
-  return res.status(result.error ? 400 : 200).json({ success: !result.error, message: result.message, data: result.data });
+const resetPasswordController = async (req, res, next) => {
+  try {
+    const id_user = parseInt(req.params.id_user);
+    if (isNaN(id_user) || id_user <= 0) return res.status(400).json({ success: false, message: "ID user tidak valid", data: null });
+    const result = await resetPassword(id_user, req.body);
+    if (result.error) {
+      const status = result.message.includes("tidak ditemukan") ? 404 : 400;
+      return res.status(status).json({ success: false, message: result.message, data: null });
+    }
+    return res.status(200).json({ success: true, message: result.message, data: null });
+  } catch (err) { next(err); }
 };
 
 module.exports = {
   getMahasiswaListController,
   getDosenListController,
-  getReviewerListPenggunaController,
-  getJuriListPenggunaController,
+  getReviewerListController,
+  getJuriListController,
   createMahasiswaController,
   createDosenController,
-  createReviewerPenggunaController,
-  createJuriPenggunaController,
+  createReviewerController,
+  createJuriController,
   updateMahasiswaController,
   updateDosenController,
   updateReviewerController,

@@ -4,66 +4,39 @@ const {
   getMonitoringDistribusi,
 } = require("../services/proposal.service");
 
-const getProposalListController = async (req, res) => {
+const getProposalListController = async (req, res, next) => {
   try {
     const { id_program, status } = req.query;
-
     const result = await getProposalList({
-      id_program,
-      status,
+      id_program: id_program ? parseInt(id_program) : undefined,
+      status: status !== undefined ? parseInt(status) : undefined,
     });
-
-    return res.json({
-      success: true,
-      message: "Daftar proposal",
-      data: result.data,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      message: "Terjadi kesalahan pada sistem",
-      data: null,
-    });
-  }
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const getProposalDetailAdminController = async (req, res) => {
+const getProposalDetailAdminController = async (req, res, next) => {
   try {
-    const { id_proposal } = req.params;
-
-    const result = await getProposalDetailAdmin(id_proposal);
-
-    if (result.error) {
-      return res.status(404).json({
-        message: result.message,
-        data: result.data,
-      });
+    const id_proposal = parseInt(req.params.id_proposal);
+    if (isNaN(id_proposal) || id_proposal <= 0) {
+      return res.status(400).json({ success: false, message: "ID proposal tidak valid", data: null });
     }
-
-    return res.json({
-      message: "Detail proposal",
-      data: result.data,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      message: "Terjadi kesalahan pada sistem",
-      data: null,
-    });
-  }
+    const result = await getProposalDetailAdmin(id_proposal);
+    if (result.error) return res.status(404).json({ success: false, message: result.message, data: null });
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const getMonitoringDistribusiController = async (req, res) => {
-  const { id_program, tahap, status } = req.query;
-
-  const result = await getMonitoringDistribusi({
-    id_program,
-    tahap,
-    status,
-  });
-
-  return res.json({
-    message: "Monitoring distribusi reviewer",
-    data: result.data,
-  });
+const getMonitoringDistribusiController = async (req, res, next) => {
+  try {
+    const { id_program, tahap, status } = req.query;
+    const result = await getMonitoringDistribusi({
+      id_program: id_program ? parseInt(id_program) : undefined,
+      tahap: tahap !== undefined ? parseInt(tahap) : undefined,
+      status: status !== undefined ? parseInt(status) : undefined,
+    });
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
 module.exports = {

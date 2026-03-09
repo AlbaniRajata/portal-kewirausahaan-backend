@@ -1,49 +1,61 @@
-const bcrypt = require("bcrypt");
 const {
   getMahasiswaListDb, getDosenListDb, getReviewerListDb, getJuriListDb,
-  getUserByIdDb, checkEmailExistsDb, checkUsernameExistsDb, checkNimExistsDb, checkNipExistsDb,
+  getUserByIdDb,
+  checkEmailExistsDb, checkUsernameExistsDb, checkNimExistsDb, checkNipExistsDb,
   insertMahasiswaDb, insertDosenDb, insertReviewerDb, insertJuriDb,
   updateUserBaseDb, updateMahasiswaDetailDb, updateDosenDetailDb, updateReviewerDetailDb, updateJuriDetailDb,
   toggleUserActiveDb, resetPasswordDb, getPoolClient,
 } = require("../db/pengguna.db");
+const { hashPassword } = require("../../../helpers/password.helper");
 
 const getMahasiswaList = async (filters) => {
   const data = await getMahasiswaListDb(filters);
-  return { error: false, message: "Daftar mahasiswa", data };
+  return { error: false, message: "Daftar mahasiswa berhasil diambil", data };
 };
 
 const getDosenList = async (filters) => {
   const data = await getDosenListDb(filters);
-  return { error: false, message: "Daftar dosen", data };
+  return { error: false, message: "Daftar dosen berhasil diambil", data };
 };
 
 const getReviewerList = async (filters) => {
   const data = await getReviewerListDb(filters);
-  return { error: false, message: "Daftar reviewer", data };
+  return { error: false, message: "Daftar reviewer berhasil diambil", data };
 };
 
 const getJuriList = async (filters) => {
   const data = await getJuriListDb(filters);
-  return { error: false, message: "Daftar juri", data };
+  return { error: false, message: "Daftar juri berhasil diambil", data };
 };
 
 const createMahasiswa = async (payload) => {
   const { username, email, password, nama_lengkap, no_hp, alamat, nim, id_prodi, tahun_masuk } = payload;
-  if (!username || !email || !password || !nama_lengkap || !nim || !id_prodi || !tahun_masuk)
-    return { error: true, message: "Semua field wajib diisi", data: null };
-  if (password.length < 8)
-    return { error: true, message: "Password minimal 8 karakter", data: null };
-  if (await checkEmailExistsDb(email))
-    return { error: true, message: "Email sudah digunakan", data: null };
-  if (await checkUsernameExistsDb(username))
-    return { error: true, message: "Username sudah digunakan", data: null };
-  if (await checkNimExistsDb(nim))
-    return { error: true, message: "NIM sudah digunakan", data: null };
+
+  const missing = [];
+  if (!username) missing.push("username");
+  if (!email) missing.push("email");
+  if (!password) missing.push("password");
+  if (!nama_lengkap) missing.push("nama_lengkap");
+  if (!nim) missing.push("nim");
+  if (!id_prodi) missing.push("id_prodi");
+  if (!tahun_masuk) missing.push("tahun_masuk");
+  if (missing.length) return { error: true, message: "Field wajib belum diisi", data: { missing_fields: missing } };
+
+  if (password.length < 8) return { error: true, message: "Password minimal 8 karakter", data: null };
+
+  const [emailExists, usernameExists, nimExists] = await Promise.all([
+    checkEmailExistsDb(email),
+    checkUsernameExistsDb(username),
+    checkNimExistsDb(nim),
+  ]);
+  if (emailExists) return { error: true, message: "Email sudah digunakan", data: { field: "email" } };
+  if (usernameExists) return { error: true, message: "Username sudah digunakan", data: { field: "username" } };
+  if (nimExists) return { error: true, message: "NIM sudah digunakan", data: { field: "nim" } };
 
   const client = await getPoolClient();
   try {
     await client.query("BEGIN");
-    const id_user = await insertMahasiswaDb({ username, email, password, nama_lengkap, no_hp, alamat }, { nim, id_prodi, tahun_masuk }, client);
+    const id_user = await insertMahasiswaDb(client, { username, email, password, nama_lengkap, no_hp, alamat }, { nim, id_prodi: parseInt(id_prodi), tahun_masuk: parseInt(tahun_masuk) });
     await client.query("COMMIT");
     return { error: false, message: "Mahasiswa berhasil dibuat", data: { id_user } };
   } catch (err) {
@@ -56,21 +68,31 @@ const createMahasiswa = async (payload) => {
 
 const createDosen = async (payload) => {
   const { username, email, password, nama_lengkap, no_hp, alamat, nip, id_prodi, bidang_keahlian } = payload;
-  if (!username || !email || !password || !nama_lengkap || !nip || !id_prodi)
-    return { error: true, message: "Semua field wajib diisi", data: null };
-  if (password.length < 8)
-    return { error: true, message: "Password minimal 8 karakter", data: null };
-  if (await checkEmailExistsDb(email))
-    return { error: true, message: "Email sudah digunakan", data: null };
-  if (await checkUsernameExistsDb(username))
-    return { error: true, message: "Username sudah digunakan", data: null };
-  if (await checkNipExistsDb(nip))
-    return { error: true, message: "NIP sudah digunakan", data: null };
+
+  const missing = [];
+  if (!username) missing.push("username");
+  if (!email) missing.push("email");
+  if (!password) missing.push("password");
+  if (!nama_lengkap) missing.push("nama_lengkap");
+  if (!nip) missing.push("nip");
+  if (!id_prodi) missing.push("id_prodi");
+  if (missing.length) return { error: true, message: "Field wajib belum diisi", data: { missing_fields: missing } };
+
+  if (password.length < 8) return { error: true, message: "Password minimal 8 karakter", data: null };
+
+  const [emailExists, usernameExists, nipExists] = await Promise.all([
+    checkEmailExistsDb(email),
+    checkUsernameExistsDb(username),
+    checkNipExistsDb(nip),
+  ]);
+  if (emailExists) return { error: true, message: "Email sudah digunakan", data: { field: "email" } };
+  if (usernameExists) return { error: true, message: "Username sudah digunakan", data: { field: "username" } };
+  if (nipExists) return { error: true, message: "NIP sudah digunakan", data: { field: "nip" } };
 
   const client = await getPoolClient();
   try {
     await client.query("BEGIN");
-    const id_user = await insertDosenDb({ username, email, password, nama_lengkap, no_hp, alamat }, { nip, id_prodi, bidang_keahlian }, client);
+    const id_user = await insertDosenDb(client, { username, email, password, nama_lengkap, no_hp, alamat }, { nip, id_prodi: parseInt(id_prodi), bidang_keahlian });
     await client.query("COMMIT");
     return { error: false, message: "Dosen berhasil dibuat", data: { id_user } };
   } catch (err) {
@@ -83,19 +105,27 @@ const createDosen = async (payload) => {
 
 const createReviewer = async (payload) => {
   const { username, email, password, nama_lengkap, no_hp, alamat, institusi, bidang_keahlian } = payload;
-  if (!username || !email || !password || !nama_lengkap)
-    return { error: true, message: "Semua field wajib diisi", data: null };
-  if (password.length < 8)
-    return { error: true, message: "Password minimal 8 karakter", data: null };
-  if (await checkEmailExistsDb(email))
-    return { error: true, message: "Email sudah digunakan", data: null };
-  if (await checkUsernameExistsDb(username))
-    return { error: true, message: "Username sudah digunakan", data: null };
+
+  const missing = [];
+  if (!username) missing.push("username");
+  if (!email) missing.push("email");
+  if (!password) missing.push("password");
+  if (!nama_lengkap) missing.push("nama_lengkap");
+  if (missing.length) return { error: true, message: "Field wajib belum diisi", data: { missing_fields: missing } };
+
+  if (password.length < 8) return { error: true, message: "Password minimal 8 karakter", data: null };
+
+  const [emailExists, usernameExists] = await Promise.all([
+    checkEmailExistsDb(email),
+    checkUsernameExistsDb(username),
+  ]);
+  if (emailExists) return { error: true, message: "Email sudah digunakan", data: { field: "email" } };
+  if (usernameExists) return { error: true, message: "Username sudah digunakan", data: { field: "username" } };
 
   const client = await getPoolClient();
   try {
     await client.query("BEGIN");
-    const id_user = await insertReviewerDb({ username, email, password, nama_lengkap, no_hp, alamat }, { institusi, bidang_keahlian }, client);
+    const id_user = await insertReviewerDb(client, { username, email, password, nama_lengkap, no_hp, alamat }, { institusi, bidang_keahlian });
     await client.query("COMMIT");
     return { error: false, message: "Reviewer berhasil dibuat", data: { id_user } };
   } catch (err) {
@@ -108,19 +138,27 @@ const createReviewer = async (payload) => {
 
 const createJuri = async (payload) => {
   const { username, email, password, nama_lengkap, no_hp, alamat, institusi, bidang_keahlian } = payload;
-  if (!username || !email || !password || !nama_lengkap)
-    return { error: true, message: "Semua field wajib diisi", data: null };
-  if (password.length < 8)
-    return { error: true, message: "Password minimal 8 karakter", data: null };
-  if (await checkEmailExistsDb(email))
-    return { error: true, message: "Email sudah digunakan", data: null };
-  if (await checkUsernameExistsDb(username))
-    return { error: true, message: "Username sudah digunakan", data: null };
+
+  const missing = [];
+  if (!username) missing.push("username");
+  if (!email) missing.push("email");
+  if (!password) missing.push("password");
+  if (!nama_lengkap) missing.push("nama_lengkap");
+  if (missing.length) return { error: true, message: "Field wajib belum diisi", data: { missing_fields: missing } };
+
+  if (password.length < 8) return { error: true, message: "Password minimal 8 karakter", data: null };
+
+  const [emailExists, usernameExists] = await Promise.all([
+    checkEmailExistsDb(email),
+    checkUsernameExistsDb(username),
+  ]);
+  if (emailExists) return { error: true, message: "Email sudah digunakan", data: { field: "email" } };
+  if (usernameExists) return { error: true, message: "Username sudah digunakan", data: { field: "username" } };
 
   const client = await getPoolClient();
   try {
     await client.query("BEGIN");
-    const id_user = await insertJuriDb({ username, email, password, nama_lengkap, no_hp, alamat }, { institusi, bidang_keahlian }, client);
+    const id_user = await insertJuriDb(client, { username, email, password, nama_lengkap, no_hp, alamat }, { institusi, bidang_keahlian });
     await client.query("COMMIT");
     return { error: false, message: "Juri berhasil dibuat", data: { id_user } };
   } catch (err) {
@@ -133,18 +171,27 @@ const createJuri = async (payload) => {
 
 const updateMahasiswa = async (id_user, payload) => {
   const { nama_lengkap, email, no_hp, alamat, nim, id_prodi, tahun_masuk } = payload;
-  if (!nama_lengkap || !email || !nim || !id_prodi || !tahun_masuk)
-    return { error: true, message: "Semua field wajib diisi", data: null };
-  if (await checkEmailExistsDb(email, id_user))
-    return { error: true, message: "Email sudah digunakan", data: null };
-  if (await checkNimExistsDb(nim, id_user))
-    return { error: true, message: "NIM sudah digunakan", data: null };
+
+  const missing = [];
+  if (!nama_lengkap) missing.push("nama_lengkap");
+  if (!email) missing.push("email");
+  if (!nim) missing.push("nim");
+  if (!id_prodi) missing.push("id_prodi");
+  if (!tahun_masuk) missing.push("tahun_masuk");
+  if (missing.length) return { error: true, message: "Field wajib belum diisi", data: { missing_fields: missing } };
+
+  const [emailExists, nimExists] = await Promise.all([
+    checkEmailExistsDb(email, id_user),
+    checkNimExistsDb(nim, id_user),
+  ]);
+  if (emailExists) return { error: true, message: "Email sudah digunakan", data: { field: "email" } };
+  if (nimExists) return { error: true, message: "NIM sudah digunakan", data: { field: "nim" } };
 
   const client = await getPoolClient();
   try {
     await client.query("BEGIN");
-    await updateUserBaseDb(id_user, { nama_lengkap, email, no_hp, alamat }, client);
-    await updateMahasiswaDetailDb(id_user, { nim, id_prodi, tahun_masuk }, client);
+    await updateUserBaseDb(client, id_user, { nama_lengkap, email, no_hp, alamat });
+    await updateMahasiswaDetailDb(client, id_user, { nim, id_prodi: parseInt(id_prodi), tahun_masuk: parseInt(tahun_masuk) });
     await client.query("COMMIT");
     return { error: false, message: "Data mahasiswa berhasil diperbarui", data: null };
   } catch (err) {
@@ -157,18 +204,26 @@ const updateMahasiswa = async (id_user, payload) => {
 
 const updateDosen = async (id_user, payload) => {
   const { nama_lengkap, email, no_hp, alamat, nip, id_prodi, bidang_keahlian } = payload;
-  if (!nama_lengkap || !email || !nip || !id_prodi)
-    return { error: true, message: "Semua field wajib diisi", data: null };
-  if (await checkEmailExistsDb(email, id_user))
-    return { error: true, message: "Email sudah digunakan", data: null };
-  if (await checkNipExistsDb(nip, id_user))
-    return { error: true, message: "NIP sudah digunakan", data: null };
+
+  const missing = [];
+  if (!nama_lengkap) missing.push("nama_lengkap");
+  if (!email) missing.push("email");
+  if (!nip) missing.push("nip");
+  if (!id_prodi) missing.push("id_prodi");
+  if (missing.length) return { error: true, message: "Field wajib belum diisi", data: { missing_fields: missing } };
+
+  const [emailExists, nipExists] = await Promise.all([
+    checkEmailExistsDb(email, id_user),
+    checkNipExistsDb(nip, id_user),
+  ]);
+  if (emailExists) return { error: true, message: "Email sudah digunakan", data: { field: "email" } };
+  if (nipExists) return { error: true, message: "NIP sudah digunakan", data: { field: "nip" } };
 
   const client = await getPoolClient();
   try {
     await client.query("BEGIN");
-    await updateUserBaseDb(id_user, { nama_lengkap, email, no_hp, alamat }, client);
-    await updateDosenDetailDb(id_user, { nip, id_prodi, bidang_keahlian }, client);
+    await updateUserBaseDb(client, id_user, { nama_lengkap, email, no_hp, alamat });
+    await updateDosenDetailDb(client, id_user, { nip, id_prodi: parseInt(id_prodi), bidang_keahlian });
     await client.query("COMMIT");
     return { error: false, message: "Data dosen berhasil diperbarui", data: null };
   } catch (err) {
@@ -181,16 +236,16 @@ const updateDosen = async (id_user, payload) => {
 
 const updateReviewer = async (id_user, payload) => {
   const { nama_lengkap, email, no_hp, alamat, institusi, bidang_keahlian } = payload;
-  if (!nama_lengkap || !email)
-    return { error: true, message: "Nama lengkap dan email wajib diisi", data: null };
-  if (await checkEmailExistsDb(email, id_user))
-    return { error: true, message: "Email sudah digunakan", data: null };
+
+  if (!nama_lengkap || !email) return { error: true, message: "Nama lengkap dan email wajib diisi", data: null };
+
+  if (await checkEmailExistsDb(email, id_user)) return { error: true, message: "Email sudah digunakan", data: { field: "email" } };
 
   const client = await getPoolClient();
   try {
     await client.query("BEGIN");
-    await updateUserBaseDb(id_user, { nama_lengkap, email, no_hp, alamat }, client);
-    await updateReviewerDetailDb(id_user, { institusi, bidang_keahlian }, client);
+    await updateUserBaseDb(client, id_user, { nama_lengkap, email, no_hp, alamat });
+    await updateReviewerDetailDb(client, id_user, { institusi, bidang_keahlian });
     await client.query("COMMIT");
     return { error: false, message: "Data reviewer berhasil diperbarui", data: null };
   } catch (err) {
@@ -203,16 +258,16 @@ const updateReviewer = async (id_user, payload) => {
 
 const updateJuri = async (id_user, payload) => {
   const { nama_lengkap, email, no_hp, alamat, institusi, bidang_keahlian } = payload;
-  if (!nama_lengkap || !email)
-    return { error: true, message: "Nama lengkap dan email wajib diisi", data: null };
-  if (await checkEmailExistsDb(email, id_user))
-    return { error: true, message: "Email sudah digunakan", data: null };
+
+  if (!nama_lengkap || !email) return { error: true, message: "Nama lengkap dan email wajib diisi", data: null };
+
+  if (await checkEmailExistsDb(email, id_user)) return { error: true, message: "Email sudah digunakan", data: { field: "email" } };
 
   const client = await getPoolClient();
   try {
     await client.query("BEGIN");
-    await updateUserBaseDb(id_user, { nama_lengkap, email, no_hp, alamat }, client);
-    await updateJuriDetailDb(id_user, { institusi, bidang_keahlian }, client);
+    await updateUserBaseDb(client, id_user, { nama_lengkap, email, no_hp, alamat });
+    await updateJuriDetailDb(client, id_user, { institusi, bidang_keahlian });
     await client.query("COMMIT");
     return { error: false, message: "Data juri berhasil diperbarui", data: null };
   } catch (err) {
@@ -232,11 +287,12 @@ const toggleUserActive = async (id_user, is_active) => {
 
 const resetPassword = async (id_user, payload) => {
   const { password } = payload;
-  if (!password || password.length < 8)
-    return { error: true, message: "Password minimal 8 karakter", data: null };
+  if (!password || password.length < 8) return { error: true, message: "Password minimal 8 karakter", data: null };
+
   const user = await getUserByIdDb(id_user);
   if (!user) return { error: true, message: "User tidak ditemukan", data: null };
-  const password_hash = await bcrypt.hash(password, 10);
+
+  const password_hash = await hashPassword(password);
   await resetPasswordDb(id_user, password_hash);
   return { error: false, message: "Password berhasil direset", data: null };
 };

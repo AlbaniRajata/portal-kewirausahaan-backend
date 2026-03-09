@@ -3,33 +3,20 @@ const {
   getDashboardBimbingan,
 } = require("../services/bimbingan.service");
 
-const getDashboardPengajuanPembimbingController = async (req, res) => {
-  const id_admin = req.user.id_user;
-  const status_filter = req.query.status;
-
-  const result = await getDashboardPengajuanPembimbing(id_admin, status_filter);
-
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.message,
-    data: result.data,
-  });
+const getDashboardPengajuanPembimbingController = async (req, res, next) => {
+  try {
+    const result = await getDashboardPengajuanPembimbing(req.user.id_user, req.query.status);
+    if (result.error) return res.status(400).json({ success: false, message: result.message, data: null });
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const getDashboardBimbinganController = async (req, res) => {
-  const id_admin = req.user.id_user;
-  const status_filter = req.query.status;
-
-  const result = await getDashboardBimbingan(id_admin, status_filter);
-
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.message,
-    data: result.data,
-  });
+const getDashboardBimbinganController = async (req, res, next) => {
+  try {
+    const result = await getDashboardBimbingan(req.user.id_user, req.query.status);
+    if (result.error) return res.status(400).json({ success: false, message: result.message, data: null });
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-module.exports = {
-  getDashboardPengajuanPembimbingController,
-  getDashboardBimbinganController,
-};
+module.exports = { getDashboardPengajuanPembimbingController, getDashboardBimbinganController };

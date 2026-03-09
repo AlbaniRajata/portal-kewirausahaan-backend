@@ -42,7 +42,7 @@ const updateProgramTimelineDb = async (id_program, data) => {
     SET pendaftaran_mulai = $1,
         pendaftaran_selesai = $2
     WHERE id_program = $3
-    RETURNING *
+    RETURNING id_program, nama_program, pendaftaran_mulai, pendaftaran_selesai
   `;
   const { rows } = await pool.query(q, [
     data.pendaftaran_mulai,
@@ -54,7 +54,14 @@ const updateProgramTimelineDb = async (id_program, data) => {
 
 const getTahapByProgramDb = async (id_program) => {
   const q = `
-    SELECT *
+    SELECT
+      id_tahap,
+      id_program,
+      nama_tahap,
+      urutan,
+      penilaian_mulai,
+      penilaian_selesai,
+      status
     FROM m_tahap_penilaian
     WHERE id_program = $1
     ORDER BY urutan ASC
@@ -66,10 +73,14 @@ const getTahapByProgramDb = async (id_program) => {
 const getTahapByIdDb = async (id_tahap) => {
   const q = `
     SELECT
-      t.*,
-      p.id_program
+      t.id_tahap,
+      t.id_program,
+      t.nama_tahap,
+      t.urutan,
+      t.penilaian_mulai,
+      t.penilaian_selesai,
+      t.status
     FROM m_tahap_penilaian t
-    JOIN m_program p ON p.id_program = t.id_program
     WHERE t.id_tahap = $1
   `;
   const { rows } = await pool.query(q, [id_tahap]);
@@ -77,19 +88,9 @@ const getTahapByIdDb = async (id_tahap) => {
 };
 
 const checkUrutanExistsDb = async (id_program, urutan, exclude_id_tahap = null) => {
-  let q = `
-    SELECT id_tahap
-    FROM m_tahap_penilaian
-    WHERE id_program = $1
-      AND urutan = $2
-  `;
+  let q = `SELECT id_tahap FROM m_tahap_penilaian WHERE id_program = $1 AND urutan = $2`;
   const values = [id_program, urutan];
-
-  if (exclude_id_tahap) {
-    q += ` AND id_tahap != $3`;
-    values.push(exclude_id_tahap);
-  }
-
+  if (exclude_id_tahap) { q += ` AND id_tahap != $3`; values.push(exclude_id_tahap); }
   const { rows } = await pool.query(q, values);
   return rows.length > 0;
 };
@@ -119,27 +120,28 @@ const updateTahapDb = async (id_tahap, data) => {
     WHERE id_tahap = $1
     RETURNING *
   `;
-  const { rows } = await pool.query(q, [
-    id_tahap,
-    data.penilaian_mulai,
-    data.penilaian_selesai,
-  ]);
+  const { rows } = await pool.query(q, [id_tahap, data.penilaian_mulai, data.penilaian_selesai]);
   return rows[0] || null;
 };
 
 const deleteTahapDb = async (id_tahap) => {
-  const q = `
-    DELETE FROM m_tahap_penilaian
-    WHERE id_tahap = $1
-    RETURNING *
-  `;
-  const { rows } = await pool.query(q, [id_tahap]);
+  const { rows } = await pool.query(
+    `DELETE FROM m_tahap_penilaian WHERE id_tahap = $1 RETURNING *`,
+    [id_tahap]
+  );
   return rows[0] || null;
 };
 
 const getKriteriaByTahapDb = async (id_tahap) => {
   const q = `
-    SELECT *
+    SELECT
+      id_kriteria,
+      id_tahap,
+      nama_kriteria,
+      deskripsi,
+      bobot,
+      urutan,
+      status
     FROM m_kriteria_penilaian
     WHERE id_tahap = $1
     ORDER BY urutan ASC
@@ -151,7 +153,13 @@ const getKriteriaByTahapDb = async (id_tahap) => {
 const getKriteriaByIdDb = async (id_kriteria) => {
   const q = `
     SELECT
-      k.*,
+      k.id_kriteria,
+      k.id_tahap,
+      k.nama_kriteria,
+      k.deskripsi,
+      k.bobot,
+      k.urutan,
+      k.status,
       t.id_program
     FROM m_kriteria_penilaian k
     JOIN m_tahap_penilaian t ON t.id_tahap = k.id_tahap
@@ -162,19 +170,9 @@ const getKriteriaByIdDb = async (id_kriteria) => {
 };
 
 const checkUrutanKriteriaExistsDb = async (id_tahap, urutan, exclude_id_kriteria = null) => {
-  let q = `
-    SELECT id_kriteria
-    FROM m_kriteria_penilaian
-    WHERE id_tahap = $1
-      AND urutan = $2
-  `;
+  let q = `SELECT id_kriteria FROM m_kriteria_penilaian WHERE id_tahap = $1 AND urutan = $2`;
   const values = [id_tahap, urutan];
-
-  if (exclude_id_kriteria) {
-    q += ` AND id_kriteria != $3`;
-    values.push(exclude_id_kriteria);
-  }
-
+  if (exclude_id_kriteria) { q += ` AND id_kriteria != $3`; values.push(exclude_id_kriteria); }
   const { rows } = await pool.query(q, values);
   return rows.length > 0;
 };
@@ -220,12 +218,10 @@ const updateKriteriaDb = async (id_kriteria, data) => {
 };
 
 const deleteKriteriaDb = async (id_kriteria) => {
-  const q = `
-    DELETE FROM m_kriteria_penilaian
-    WHERE id_kriteria = $1
-    RETURNING *
-  `;
-  const { rows } = await pool.query(q, [id_kriteria]);
+  const { rows } = await pool.query(
+    `DELETE FROM m_kriteria_penilaian WHERE id_kriteria = $1 RETURNING *`,
+    [id_kriteria]
+  );
   return rows[0] || null;
 };
 

@@ -28,7 +28,7 @@ const getTimListDb = async (filters = {}) => {
     WHERE 1=1
   `;
 
-  if (id_program) { q += ` AND t.id_program = $${idx++}`; values.push(id_program); }
+  if (id_program !== undefined && id_program !== null) { q += ` AND t.id_program = $${idx++}`; values.push(id_program); }
   if (status !== undefined && status !== null) { q += ` AND t.status = $${idx++}`; values.push(status); }
   if (search) {
     q += ` AND (t.nama_tim ILIKE $${idx} OR pr.judul ILIKE $${idx})`;
@@ -53,34 +53,35 @@ const getTimDetailDb = async (id_tim) => {
   );
   if (!tim[0]) return null;
 
-  const { rows: anggota } = await pool.query(
-    `SELECT
-      at.id_user, at.peran, at.status, at.catatan,
-      u.nama_lengkap, u.username, u.email, u.no_hp,
-      m.nim, m.tahun_masuk,
-      pr.nama_prodi, pr.jenjang,
-      j.nama_jurusan, k.nama_kampus
-    FROM t_anggota_tim at
-    JOIN m_user u ON u.id_user = at.id_user
-    JOIN m_mahasiswa m ON m.id_user = at.id_user
-    JOIN m_prodi pr ON pr.id_prodi = m.id_prodi
-    JOIN m_jurusan j ON j.id_jurusan = pr.id_jurusan
-    JOIN m_kampus k ON k.id_kampus = pr.id_kampus
-    WHERE at.id_tim = $1
-    ORDER BY at.peran ASC`,
-    [id_tim]
-  );
-
-  const { rows: proposal } = await pool.query(
-    `SELECT
-      pr.id_proposal, pr.judul, pr.file_proposal, pr.status,
-      pr.modal_diajukan, pr.tanggal_submit, pr.wawancara_at,
-      k.id_kategori, k.nama_kategori
-    FROM t_proposal pr
-    JOIN m_kategori k ON k.id_kategori = pr.id_kategori
-    WHERE pr.id_tim = $1 AND pr.id_program = $2`,
-    [id_tim, tim[0].id_program]
-  );
+  const [{ rows: anggota }, { rows: proposal }] = await Promise.all([
+    pool.query(
+      `SELECT
+        at.id_user, at.peran, at.status, at.catatan,
+        u.nama_lengkap, u.username, u.email, u.no_hp,
+        m.nim, m.tahun_masuk,
+        pr.nama_prodi, pr.jenjang,
+        j.nama_jurusan, k.nama_kampus
+      FROM t_anggota_tim at
+      JOIN m_user u ON u.id_user = at.id_user
+      JOIN m_mahasiswa m ON m.id_user = at.id_user
+      JOIN m_prodi pr ON pr.id_prodi = m.id_prodi
+      JOIN m_jurusan j ON j.id_jurusan = pr.id_jurusan
+      JOIN m_kampus k ON k.id_kampus = pr.id_kampus
+      WHERE at.id_tim = $1
+      ORDER BY at.peran ASC`,
+      [id_tim]
+    ),
+    pool.query(
+      `SELECT
+        pr.id_proposal, pr.judul, pr.file_proposal, pr.status,
+        pr.modal_diajukan, pr.tanggal_submit, pr.wawancara_at,
+        k.id_kategori, k.nama_kategori
+      FROM t_proposal pr
+      JOIN m_kategori k ON k.id_kategori = pr.id_kategori
+      WHERE pr.id_tim = $1 AND pr.id_program = $2`,
+      [id_tim, tim[0].id_program]
+    ),
+  ]);
 
   return { ...tim[0], anggota, proposal: proposal[0] || null };
 };
@@ -118,7 +119,7 @@ const getPesertaListDb = async (filters = {}) => {
     WHERE 1=1
   `;
 
-  if (id_program) { q += ` AND pp.id_program = $${idx++}`; values.push(id_program); }
+  if (id_program !== undefined && id_program !== null) { q += ` AND pp.id_program = $${idx++}`; values.push(id_program); }
   if (status_lolos !== undefined && status_lolos !== null) { q += ` AND pp.status_lolos = $${idx++}`; values.push(status_lolos); }
   if (status_peserta !== undefined && status_peserta !== null) { q += ` AND pp.status_peserta = $${idx++}`; values.push(status_peserta); }
   if (search) {
@@ -157,9 +158,4 @@ const getPesertaDetailDb = async (id_user, id_program) => {
   return rows[0] || null;
 };
 
-module.exports = {
-  getTimListDb,
-  getTimDetailDb,
-  getPesertaListDb,
-  getPesertaDetailDb,
-};
+module.exports = { getTimListDb, getTimDetailDb, getPesertaListDb, getPesertaDetailDb };

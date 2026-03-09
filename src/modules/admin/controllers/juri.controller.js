@@ -1,53 +1,30 @@
-const {
-  createJuri,
-  getJuris,
-  getJuriDetail,
-} = require("../services/juri.services");
+const { createJuri, getJuris, getJuriDetail } = require("../services/juri.service");
 
-const createJuriController = async (req, res) => {
+const createJuriController = async (req, res, next) => {
   try {
     const result = await createJuri(req.body);
+    if (result.error) return res.status(400).json({ success: false, message: result.message, data: result.data });
+    return res.status(201).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
 
-    if (result.error) {
-      return res.status(400).json(result);
+const getJurisController = async (req, res, next) => {
+  try {
+    const result = await getJuris();
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
+
+const getJuriDetailController = async (req, res, next) => {
+  try {
+    const id_user = parseInt(req.params.id_user);
+    if (isNaN(id_user) || id_user <= 0) {
+      return res.status(400).json({ success: false, message: "ID user tidak valid", data: null });
     }
-
-    return res.json({
-      message: "Juri eksternal berhasil didaftarkan",
-      data: result.data,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      message: "Terjadi kesalahan pada sistem",
-      data: { error: err.message },
-    });
-  }
+    const result = await getJuriDetail(id_user);
+    if (result.error) return res.status(404).json({ success: false, message: result.message, data: null });
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const getJurisController = async (req, res) => {
-  const result = await getJuris();
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.error ? result.message : "Daftar juri eksternal",
-    data: result.data,
-  });
-};
-
-const getJuriDetailController = async (req, res) => {
-  const result = await getJuriDetail(req.params.id_user);
-
-  if (result.error) {
-    return res.status(404).json(result);
-  }
-
-  return res.json({
-    message: "Detail juri eksternal",
-    data: result.data,
-  });
-};
-
-module.exports = {
-  createJuriController,
-  getJurisController,
-  getJuriDetailController,
-};
+module.exports = { createJuriController, getJurisController, getJuriDetailController };

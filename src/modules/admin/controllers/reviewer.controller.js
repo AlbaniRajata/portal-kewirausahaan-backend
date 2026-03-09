@@ -1,53 +1,30 @@
-const {
-  createReviewer,
-  getReviewers,
-  getReviewerDetail,
-} = require("../services/reviewer.service");
+const { createReviewer, getReviewers, getReviewerDetail } = require("../services/reviewer.service");
 
-const createReviewerController = async (req, res) => {
+const createReviewerController = async (req, res, next) => {
   try {
     const result = await createReviewer(req.body);
+    if (result.error) return res.status(400).json({ success: false, message: result.message, data: result.data });
+    return res.status(201).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
 
-    if (result.error) {
-      return res.status(400).json(result);
+const getReviewersController = async (req, res, next) => {
+  try {
+    const result = await getReviewers();
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
+
+const getReviewerDetailController = async (req, res, next) => {
+  try {
+    const id_user = parseInt(req.params.id_user);
+    if (isNaN(id_user) || id_user <= 0) {
+      return res.status(400).json({ success: false, message: "ID user tidak valid", data: null });
     }
-
-    return res.json({
-      message: "Reviewer internal berhasil didaftarkan",
-      data: result.data,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      message: "Terjadi kesalahan pada sistem",
-      data: { error: err.message },
-    });
-  }
+    const result = await getReviewerDetail(id_user);
+    if (result.error) return res.status(404).json({ success: false, message: result.message, data: null });
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
 };
 
-const getReviewersController = async (req, res) => {
-  const result = await getReviewers();
-  return res.status(result.error ? 400 : 200).json({
-    success: !result.error,
-    message: result.error ? result.message : "Daftar reviewer internal",
-    data: result.data,
-  });
-};
-
-const getReviewerDetailController = async (req, res) => {
-  const result = await getReviewerDetail(req.params.id_user);
-
-  if (result.error) {
-    return res.status(404).json(result);
-  }
-
-  return res.json({
-    message: "Detail reviewer internal",
-    data: result.data,
-  });
-};
-
-module.exports = {
-  createReviewerController,
-  getReviewersController,
-  getReviewerDetailController,
-};
+module.exports = { createReviewerController, getReviewersController, getReviewerDetailController };

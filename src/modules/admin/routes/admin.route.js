@@ -2,14 +2,14 @@ const express = require("express");
 const router = express.Router();
 
 const {
-    getPendingMahasiswa,
-    getDetailMahasiswa,
-    approveMahasiswaController,
-    rejectMahasiswaController,
-    getPendingDosen,
-    getDetailDosen,
-    approveDosenController,
-    rejectDosenController,
+  getPendingMahasiswaController,
+  getDetailMahasiswaController,
+  approveMahasiswaController,
+  rejectMahasiswaController,
+  getPendingDosenController,
+  getDetailDosenController,
+  approveDosenController,
+  rejectDosenController,
 } = require("../controllers/verification.controller");
 
 const {
@@ -32,18 +32,6 @@ const {
 } = require("../controllers/proposal.controller");
 
 const {
-  createReviewerController,
-  getReviewersController,
-  getReviewerDetailController
-} = require("../controllers/reviewer.controller");
-
-const {
-  createJuriController,
-  getJurisController,
-  getJuriDetailController,
-} = require("../controllers/juri.controller");
-
-const {
   previewDistribusiTahap1Controller,
   autoDistribusiTahap1Controller,
   manualDistribusiTahap1Controller,
@@ -61,11 +49,6 @@ const {
   getRekapWawancaraTahap2Controller,
   finalisasiWawancaraBatchController,
 } = require("../controllers/penilaian.controller");
-
-const {
-  scheduleWawancaraController,
-  scheduleWawancaraBulkController,
-} = require("../controllers/wawancara.controller");
 
 const {
   previewDistribusiTahap2Controller,
@@ -109,12 +92,12 @@ const {
 const {
   getMahasiswaListController,
   getDosenListController,
-  getReviewerListPenggunaController,
-  getJuriListPenggunaController,
+  getReviewerListController,
+  getJuriListController,
   createMahasiswaController,
   createDosenController,
-  createReviewerPenggunaController,
-  createJuriPenggunaController,
+  createReviewerController,
+  createJuriController,
   updateMahasiswaController,
   updateDosenController,
   updateReviewerController,
@@ -130,18 +113,28 @@ const {
   getPesertaDetailController,
 } = require("../controllers/timpeserta.controller");
 
+const {
+  getBeritaListAdminController,
+  getBeritaDetailAdminController,
+  createBeritaController,
+  updateBeritaController,
+  updateGambarController,
+  deleteBeritaController,
+} = require("../controllers/berita.controller");
 
+const { uploadBerita } = require("../../../middlewares/upload.middleware");
 const roleMiddleware = require("../../../middlewares/role.middleware");
+const { ROLE } = require("../../../constants/role");
 
-router.use(roleMiddleware([2, 6])); // Admin and Super Admin
+router.use(roleMiddleware([ROLE.ADMIN, ROLE.SUPER_ADMIN]));
 
-router.get("/verifikasi/mahasiswa", getPendingMahasiswa);
-router.get("/verifikasi/mahasiswa/:id", getDetailMahasiswa);
+router.get("/verifikasi/mahasiswa", getPendingMahasiswaController);
+router.get("/verifikasi/mahasiswa/:id", getDetailMahasiswaController);
 router.post("/verifikasi/mahasiswa/:id/approve", approveMahasiswaController);
 router.post("/verifikasi/mahasiswa/:id/reject", rejectMahasiswaController);
 
-router.get("/verifikasi/dosen", getPendingDosen);
-router.get("/verifikasi/dosen/:id", getDetailDosen);
+router.get("/verifikasi/dosen", getPendingDosenController);
+router.get("/verifikasi/dosen/:id", getDetailDosenController);
 router.post("/verifikasi/dosen/:id/approve", approveDosenController);
 router.post("/verifikasi/dosen/:id/reject", rejectDosenController);
 
@@ -160,14 +153,6 @@ router.get("/proposal", getProposalListController);
 router.get("/proposal/monitoring", getMonitoringDistribusiController);
 router.get("/proposal/:id_proposal", getProposalDetailAdminController);
 
-router.post("/reviewer", createReviewerController);
-router.get("/reviewer", getReviewersController);
-router.get("/reviewer/:id_user", getReviewerDetailController);
-
-router.post("/juri", createJuriController);
-router.get("/juri", getJurisController);
-router.get("/juri/:id_user", getJuriDetailController);
-
 router.get("/program/:id_program/distribusi/reviewer/tahap/:tahap/preview", previewDistribusiTahap1Controller);
 router.post("/program/:id_program/distribusi/reviewer/tahap/:tahap/auto", autoDistribusiTahap1Controller);
 router.post("/program/:id_program/distribusi/reviewer/tahap/:tahap/manual", manualDistribusiTahap1Controller);
@@ -178,14 +163,10 @@ router.post("/program/:id_program/distribusi/reviewer/tahap/:tahap/:id_distribus
 
 router.get("/program/:id_program/rekap-tahap1/list", getListProposalRekapTahap1Controller);
 router.get("/program/:id_program/rekap-tahap2/list", getListProposalRekapTahap2Controller);
-
 router.get("/program/:id_program/proposal/:id_proposal/rekap-desk", getRekapDeskEvaluasiController);
 router.post("/program/:id_program/proposal/finalisasi-desk-batch", finalisasiDeskBatchController);
 router.get("/program/:id_program/proposal/:id_proposal/rekap-wawancara", getRekapWawancaraTahap2Controller);
 router.post("/program/:id_program/proposal/finalisasi-wawancara-batch", finalisasiWawancaraBatchController);
-
-router.patch("/proposal/:id_proposal/wawancara", scheduleWawancaraController);
-router.patch("/proposal/wawancara/bulk", scheduleWawancaraBulkController);
 
 router.get("/program/:id_program/panel/tahap2/preview", previewDistribusiTahap2Controller);
 router.post("/program/:id_program/panel/tahap2/auto", autoDistribusiTahap2Controller);
@@ -228,12 +209,12 @@ router.get("/pengguna/dosen", getDosenListController);
 router.post("/pengguna/dosen", createDosenController);
 router.patch("/pengguna/dosen/:id_user", updateDosenController);
 
-router.get("/pengguna/reviewer", getReviewerListPenggunaController);
-router.post("/pengguna/reviewer", createReviewerPenggunaController);
+router.get("/pengguna/reviewer", getReviewerListController);
+router.post("/pengguna/reviewer", createReviewerController);
 router.patch("/pengguna/reviewer/:id_user", updateReviewerController);
 
-router.get("/pengguna/juri", getJuriListPenggunaController);
-router.post("/pengguna/juri", createJuriPenggunaController);
+router.get("/pengguna/juri", getJuriListController);
+router.post("/pengguna/juri", createJuriController);
 router.patch("/pengguna/juri/:id_user", updateJuriController);
 
 router.patch("/pengguna/:id_user/toggle-active", toggleUserActiveController);
@@ -241,10 +222,14 @@ router.patch("/pengguna/:id_user/reset-password", resetPasswordController);
 
 router.get("/tim-peserta/tim", getTimListController);
 router.get("/tim-peserta/tim/:id_tim", getTimDetailController);
-
 router.get("/tim-peserta/peserta", getPesertaListController);
 router.get("/tim-peserta/peserta/:id_user/:id_program", getPesertaDetailController);
 
-module.exports = router;
+router.get("/berita", getBeritaListAdminController);
+router.get("/berita/:id_berita", getBeritaDetailAdminController);
+router.post("/berita", uploadBerita.single("file_gambar"), createBeritaController);
+router.patch("/berita/:id_berita", uploadBerita.single("file_gambar"), updateBeritaController);
+router.patch("/berita/:id_berita/gambar", uploadBerita.single("file_gambar"), updateGambarController);
+router.delete("/berita/:id_berita", deleteBeritaController);
 
 module.exports = router;

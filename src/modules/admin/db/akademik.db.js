@@ -1,13 +1,13 @@
 const pool = require("../../../config/db");
 
 const getAllKampusDb = async () => {
-  const q = `SELECT * FROM m_kampus ORDER BY nama_kampus ASC`;
+  const q = `SELECT id_kampus, nama_kampus FROM m_kampus ORDER BY nama_kampus ASC`;
   const { rows } = await pool.query(q);
   return rows;
 };
 
 const getKampusByIdDb = async (id_kampus) => {
-  const q = `SELECT * FROM m_kampus WHERE id_kampus = $1`;
+  const q = `SELECT id_kampus, nama_kampus FROM m_kampus WHERE id_kampus = $1`;
   const { rows } = await pool.query(q, [id_kampus]);
   return rows[0] || null;
 };
@@ -23,32 +23,32 @@ const getKampusByNamaDb = async (nama_kampus, exclude_id = null) => {
   return rows.length > 0;
 };
 
-const insertKampusDb = async (data) => {
-  const q = `INSERT INTO m_kampus (nama_kampus) VALUES ($1) RETURNING *`;
-  const { rows } = await pool.query(q, [data.nama_kampus]);
+const insertKampusDb = async (nama_kampus) => {
+  const q = `INSERT INTO m_kampus (nama_kampus) VALUES ($1) RETURNING id_kampus, nama_kampus`;
+  const { rows } = await pool.query(q, [nama_kampus]);
   return rows[0];
 };
 
-const updateKampusDb = async (id_kampus, data) => {
-  const q = `UPDATE m_kampus SET nama_kampus = $2 WHERE id_kampus = $1 RETURNING *`;
-  const { rows } = await pool.query(q, [id_kampus, data.nama_kampus]);
+const updateKampusDb = async (id_kampus, nama_kampus) => {
+  const q = `UPDATE m_kampus SET nama_kampus = $2 WHERE id_kampus = $1 RETURNING id_kampus, nama_kampus`;
+  const { rows } = await pool.query(q, [id_kampus, nama_kampus]);
   return rows[0] || null;
 };
 
 const deleteKampusDb = async (id_kampus) => {
-  const q = `DELETE FROM m_kampus WHERE id_kampus = $1 RETURNING *`;
+  const q = `DELETE FROM m_kampus WHERE id_kampus = $1 RETURNING id_kampus, nama_kampus`;
   const { rows } = await pool.query(q, [id_kampus]);
   return rows[0] || null;
 };
 
 const getAllJurusanDb = async () => {
-  const q = `SELECT * FROM m_jurusan ORDER BY nama_jurusan ASC`;
+  const q = `SELECT id_jurusan, nama_jurusan FROM m_jurusan ORDER BY nama_jurusan ASC`;
   const { rows } = await pool.query(q);
   return rows;
 };
 
 const getJurusanByIdDb = async (id_jurusan) => {
-  const q = `SELECT * FROM m_jurusan WHERE id_jurusan = $1`;
+  const q = `SELECT id_jurusan, nama_jurusan FROM m_jurusan WHERE id_jurusan = $1`;
   const { rows } = await pool.query(q, [id_jurusan]);
   return rows[0] || null;
 };
@@ -64,20 +64,20 @@ const getJurusanByNamaDb = async (nama_jurusan, exclude_id = null) => {
   return rows.length > 0;
 };
 
-const insertJurusanDb = async (data) => {
-  const q = `INSERT INTO m_jurusan (nama_jurusan) VALUES ($1) RETURNING *`;
-  const { rows } = await pool.query(q, [data.nama_jurusan]);
+const insertJurusanDb = async (nama_jurusan) => {
+  const q = `INSERT INTO m_jurusan (nama_jurusan) VALUES ($1) RETURNING id_jurusan, nama_jurusan`;
+  const { rows } = await pool.query(q, [nama_jurusan]);
   return rows[0];
 };
 
-const updateJurusanDb = async (id_jurusan, data) => {
-  const q = `UPDATE m_jurusan SET nama_jurusan = $2 WHERE id_jurusan = $1 RETURNING *`;
-  const { rows } = await pool.query(q, [id_jurusan, data.nama_jurusan]);
+const updateJurusanDb = async (id_jurusan, nama_jurusan) => {
+  const q = `UPDATE m_jurusan SET nama_jurusan = $2 WHERE id_jurusan = $1 RETURNING id_jurusan, nama_jurusan`;
+  const { rows } = await pool.query(q, [id_jurusan, nama_jurusan]);
   return rows[0] || null;
 };
 
 const deleteJurusanDb = async (id_jurusan) => {
-  const q = `DELETE FROM m_jurusan WHERE id_jurusan = $1 RETURNING *`;
+  const q = `DELETE FROM m_jurusan WHERE id_jurusan = $1 RETURNING id_jurusan, nama_jurusan`;
   const { rows } = await pool.query(q, [id_jurusan]);
   return rows[0] || null;
 };

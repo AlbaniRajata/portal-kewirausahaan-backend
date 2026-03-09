@@ -1,19 +1,12 @@
 const pool = require("../../../config/db");
 
-const getProposalListDb = async ({ id_program, status }) => {
+const getProposalListDb = async ({ id_program, status } = {}) => {
   const values = [];
-  let i = 1;
+  let idx = 1;
   let where = "WHERE 1=1";
 
-  if (id_program) {
-    where += ` AND p.id_program = $${i++}`;
-    values.push(id_program);
-  }
-
-  if (status !== undefined) {
-    where += ` AND p.status = $${i++}`;
-    values.push(status);
-  }
+  if (id_program !== undefined && id_program !== null) { where += ` AND p.id_program = $${idx++}`; values.push(id_program); }
+  if (status !== undefined && status !== null) { where += ` AND p.status = $${idx++}`; values.push(status); }
 
   const q = `
     SELECT
@@ -98,28 +91,17 @@ const getProposalDetailAdminDb = async (id_proposal) => {
   `;
 
   const { rows } = await pool.query(q, [id_proposal]);
-  return rows[0];
+  return rows[0] || null;
 };
 
-const getMonitoringDistribusiDb = async ({ id_program, tahap, status }) => {
+const getMonitoringDistribusiDb = async ({ id_program, tahap, status } = {}) => {
   const values = [];
-  let i = 1;
+  let idx = 1;
   let where = "WHERE 1=1";
 
-  if (id_program) {
-    where += ` AND p.id_program = $${i++}`;
-    values.push(id_program);
-  }
-
-  if (tahap !== undefined) {
-    where += ` AND d.tahap = $${i++}`;
-    values.push(tahap);
-  }
-
-  if (status !== undefined) {
-    where += ` AND d.status = $${i++}`;
-    values.push(status);
-  }
+  if (id_program !== undefined && id_program !== null) { where += ` AND p.id_program = $${idx++}`; values.push(id_program); }
+  if (tahap !== undefined && tahap !== null) { where += ` AND d.tahap = $${idx++}`; values.push(tahap); }
+  if (status !== undefined && status !== null) { where += ` AND d.status = $${idx++}`; values.push(status); }
 
   const q = `
     SELECT
@@ -129,14 +111,11 @@ const getMonitoringDistribusiDb = async ({ id_program, tahap, status }) => {
       d.assigned_at,
       d.responded_at,
       d.catatan_reviewer,
-
       p.id_proposal,
       p.judul,
       p.modal_diajukan,
-
       t.nama_tim,
       pr.nama_program,
-
       u.id_user AS id_reviewer,
       u.nama_lengkap AS nama_reviewer
     FROM t_distribusi_reviewer d
@@ -152,8 +131,4 @@ const getMonitoringDistribusiDb = async ({ id_program, tahap, status }) => {
   return rows;
 };
 
-module.exports = {
-  getProposalListDb,
-  getProposalDetailAdminDb,
-  getMonitoringDistribusiDb,
-};
+module.exports = { getProposalListDb, getProposalDetailAdminDb, getMonitoringDistribusiDb };

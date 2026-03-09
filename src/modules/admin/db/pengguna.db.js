@@ -1,4 +1,6 @@
 const pool = require("../../../config/db");
+const { hashPassword } = require("../../../helpers/password.helper");
+const { ROLE } = require("../../../constants/role");
 
 const getMahasiswaListDb = async (filters = {}) => {
   const { is_active, id_prodi, id_jurusan, search } = filters;
@@ -156,13 +158,12 @@ const checkNipExistsDb = async (nip, exclude_id = null) => {
   return rows.length > 0;
 };
 
-const insertMahasiswaDb = async (userData, mahasiswaData, client) => {
-  const bcrypt = require("bcrypt");
-  const password_hash = await bcrypt.hash(userData.password, 10);
+const insertMahasiswaDb = async (client, userData, mahasiswaData) => {
+  const password_hash = await hashPassword(userData.password);
   const { rows } = await client.query(
     `INSERT INTO m_user (id_role, username, email, password_hash, nama_lengkap, no_hp, alamat, is_active, email_verified_at)
-     VALUES (3, $1, $2, $3, $4, $5, $6, false, NULL) RETURNING id_user`,
-    [userData.username, userData.email, password_hash, userData.nama_lengkap, userData.no_hp || null, userData.alamat || null]
+     VALUES ($1, $2, $3, $4, $5, $6, $7, false, NULL) RETURNING id_user`,
+    [ROLE.MAHASISWA, userData.username, userData.email, password_hash, userData.nama_lengkap, userData.no_hp || null, userData.alamat || null]
   );
   const id_user = rows[0].id_user;
   await client.query(
@@ -172,13 +173,12 @@ const insertMahasiswaDb = async (userData, mahasiswaData, client) => {
   return id_user;
 };
 
-const insertDosenDb = async (userData, dosenData, client) => {
-  const bcrypt = require("bcrypt");
-  const password_hash = await bcrypt.hash(userData.password, 10);
+const insertDosenDb = async (client, userData, dosenData) => {
+  const password_hash = await hashPassword(userData.password);
   const { rows } = await client.query(
     `INSERT INTO m_user (id_role, username, email, password_hash, nama_lengkap, no_hp, alamat, is_active, email_verified_at)
-     VALUES (4, $1, $2, $3, $4, $5, $6, false, NULL) RETURNING id_user`,
-    [userData.username, userData.email, password_hash, userData.nama_lengkap, userData.no_hp || null, userData.alamat || null]
+     VALUES ($1, $2, $3, $4, $5, $6, $7, false, NULL) RETURNING id_user`,
+    [ROLE.DOSEN, userData.username, userData.email, password_hash, userData.nama_lengkap, userData.no_hp || null, userData.alamat || null]
   );
   const id_user = rows[0].id_user;
   await client.query(
@@ -188,13 +188,12 @@ const insertDosenDb = async (userData, dosenData, client) => {
   return id_user;
 };
 
-const insertReviewerDb = async (userData, reviewerData, client) => {
-  const bcrypt = require("bcrypt");
-  const password_hash = await bcrypt.hash(userData.password, 10);
+const insertReviewerDb = async (client, userData, reviewerData) => {
+  const password_hash = await hashPassword(userData.password);
   const { rows } = await client.query(
     `INSERT INTO m_user (id_role, username, email, password_hash, nama_lengkap, no_hp, alamat, is_active, email_verified_at)
-     VALUES (5, $1, $2, $3, $4, $5, $6, false, NULL) RETURNING id_user`,
-    [userData.username, userData.email, password_hash, userData.nama_lengkap, userData.no_hp || null, userData.alamat || null]
+     VALUES ($1, $2, $3, $4, $5, $6, $7, false, NULL) RETURNING id_user`,
+    [ROLE.REVIEWER, userData.username, userData.email, password_hash, userData.nama_lengkap, userData.no_hp || null, userData.alamat || null]
   );
   const id_user = rows[0].id_user;
   await client.query(
@@ -204,13 +203,12 @@ const insertReviewerDb = async (userData, reviewerData, client) => {
   return id_user;
 };
 
-const insertJuriDb = async (userData, juriData, client) => {
-  const bcrypt = require("bcrypt");
-  const password_hash = await bcrypt.hash(userData.password, 10);
+const insertJuriDb = async (client, userData, juriData) => {
+  const password_hash = await hashPassword(userData.password);
   const { rows } = await client.query(
     `INSERT INTO m_user (id_role, username, email, password_hash, nama_lengkap, no_hp, alamat, is_active, email_verified_at)
-     VALUES (7, $1, $2, $3, $4, $5, $6, false, NULL) RETURNING id_user`,
-    [userData.username, userData.email, password_hash, userData.nama_lengkap, userData.no_hp || null, userData.alamat || null]
+     VALUES ($1, $2, $3, $4, $5, $6, $7, false, NULL) RETURNING id_user`,
+    [ROLE.JURI, userData.username, userData.email, password_hash, userData.nama_lengkap, userData.no_hp || null, userData.alamat || null]
   );
   const id_user = rows[0].id_user;
   await client.query(
@@ -220,36 +218,36 @@ const insertJuriDb = async (userData, juriData, client) => {
   return id_user;
 };
 
-const updateUserBaseDb = async (id_user, data, client) => {
+const updateUserBaseDb = async (client, id_user, data) => {
   const { rows } = await client.query(
-    `UPDATE m_user SET nama_lengkap = $2, email = $3, no_hp = $4, alamat = $5 WHERE id_user = $1 RETURNING *`,
+    `UPDATE m_user SET nama_lengkap = $2, email = $3, no_hp = $4, alamat = $5 WHERE id_user = $1 RETURNING id_user`,
     [id_user, data.nama_lengkap, data.email, data.no_hp || null, data.alamat || null]
   );
   return rows[0] || null;
 };
 
-const updateMahasiswaDetailDb = async (id_user, data, client) => {
+const updateMahasiswaDetailDb = async (client, id_user, data) => {
   await client.query(
     `UPDATE m_mahasiswa SET nim = $2, id_prodi = $3, tahun_masuk = $4 WHERE id_user = $1`,
     [id_user, data.nim, data.id_prodi, data.tahun_masuk]
   );
 };
 
-const updateDosenDetailDb = async (id_user, data, client) => {
+const updateDosenDetailDb = async (client, id_user, data) => {
   await client.query(
     `UPDATE m_dosen SET nip = $2, id_prodi = $3, bidang_keahlian = $4 WHERE id_user = $1`,
     [id_user, data.nip, data.id_prodi, data.bidang_keahlian || null]
   );
 };
 
-const updateReviewerDetailDb = async (id_user, data, client) => {
+const updateReviewerDetailDb = async (client, id_user, data) => {
   await client.query(
     `UPDATE m_reviewer SET institusi = $2, bidang_keahlian = $3 WHERE id_user = $1`,
     [id_user, data.institusi || null, data.bidang_keahlian || null]
   );
 };
 
-const updateJuriDetailDb = async (id_user, data, client) => {
+const updateJuriDetailDb = async (client, id_user, data) => {
   await client.query(
     `UPDATE m_juri SET institusi = $2, bidang_keahlian = $3 WHERE id_user = $1`,
     [id_user, data.institusi || null, data.bidang_keahlian || null]
@@ -262,42 +260,26 @@ const toggleUserActiveDb = async (id_user, is_active) => {
     await client.query("BEGIN");
 
     const { rows: updated } = await client.query(
-      `UPDATE m_user SET is_active = $2 WHERE id_user = $1 RETURNING *`,
+      `UPDATE m_user SET is_active = $2 WHERE id_user = $1 RETURNING id_user, is_active`,
       [id_user, is_active]
     );
+    if (!updated.length) { await client.query("ROLLBACK"); return null; }
 
-    if (updated.length === 0) {
-      await client.query("ROLLBACK");
-      return null;
+    const { rows: mahasiswa } = await client.query(`SELECT id_user FROM m_mahasiswa WHERE id_user = $1`, [id_user]);
+    if (mahasiswa.length) {
+      await client.query(`UPDATE m_mahasiswa SET status_verifikasi = $2 WHERE id_user = $1`, [id_user, is_active ? 1 : 0]);
     }
 
-    const { rows: mahasiswa } = await client.query(
-      `SELECT id_user FROM m_mahasiswa WHERE id_user = $1`,
-      [id_user]
-    );
-    if (mahasiswa.length > 0) {
-      await client.query(
-        `UPDATE m_mahasiswa SET status_verifikasi = $2 WHERE id_user = $1`,
-        [id_user, is_active ? 1 : 0]
-      );
-    }
-
-    const { rows: dosen } = await client.query(
-      `SELECT id_user FROM m_dosen WHERE id_user = $1`,
-      [id_user]
-    );
-    if (dosen.length > 0) {
-      await client.query(
-        `UPDATE m_dosen SET status_verifikasi = $2 WHERE id_user = $1`,
-        [id_user, is_active ? 1 : 0]
-      );
+    const { rows: dosen } = await client.query(`SELECT id_user FROM m_dosen WHERE id_user = $1`, [id_user]);
+    if (dosen.length) {
+      await client.query(`UPDATE m_dosen SET status_verifikasi = $2 WHERE id_user = $1`, [id_user, is_active ? 1 : 0]);
     }
 
     await client.query("COMMIT");
     return updated[0];
-  } catch (e) {
+  } catch (err) {
     await client.query("ROLLBACK");
-    throw e;
+    throw err;
   } finally {
     client.release();
   }
@@ -315,7 +297,8 @@ const getPoolClient = () => pool.connect();
 
 module.exports = {
   getMahasiswaListDb, getDosenListDb, getReviewerListDb, getJuriListDb,
-  getUserByIdDb, checkEmailExistsDb, checkUsernameExistsDb, checkNimExistsDb, checkNipExistsDb,
+  getUserByIdDb,
+  checkEmailExistsDb, checkUsernameExistsDb, checkNimExistsDb, checkNipExistsDb,
   insertMahasiswaDb, insertDosenDb, insertReviewerDb, insertJuriDb,
   updateUserBaseDb, updateMahasiswaDetailDb, updateDosenDetailDb, updateReviewerDetailDb, updateJuriDetailDb,
   toggleUserActiveDb, resetPasswordDb, getPoolClient,
