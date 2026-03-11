@@ -22,7 +22,7 @@ const getBeritaDetailAdminController = async (req, res, next) => {
 
 const createBeritaController = async (req, res, next) => {
   try {
-    const file_gambar = req.file ? req.file.path : null;
+    const file_gambar = req.file ? req.file.filename : null;
     const result = await createBerita(req.user.id_user, req.body, file_gambar);
     if (result.error) return res.status(400).json({ success: false, message: result.message, data: null });
     return res.status(201).json({ success: true, message: result.message, data: result.data });
@@ -33,7 +33,7 @@ const updateBeritaController = async (req, res, next) => {
   try {
     const id_berita = parseInt(req.params.id_berita);
     if (isNaN(id_berita) || id_berita <= 0) return res.status(400).json({ success: false, message: "ID berita tidak valid", data: null });
-    const file_gambar_baru = req.file ? req.file.path : null;
+    const file_gambar_baru = req.file ? req.file.filename : null;
     const result = await updateBerita(id_berita, req.body, file_gambar_baru);
     if (result.error) {
       const status = result.message.includes("tidak ditemukan") ? 404 : 400;
@@ -48,7 +48,7 @@ const updateGambarController = async (req, res, next) => {
     const id_berita = parseInt(req.params.id_berita);
     if (isNaN(id_berita) || id_berita <= 0) return res.status(400).json({ success: false, message: "ID berita tidak valid", data: null });
     if (!req.file) return res.status(400).json({ success: false, message: "File gambar wajib diunggah", data: null });
-    const result = await updateGambar(id_berita, req.file.path);
+    const result = await updateGambar(id_berita, req.file.filename);
     if (result.error) return res.status(404).json({ success: false, message: result.message, data: null });
     return res.status(200).json({ success: true, message: result.message, data: result.data });
   } catch (err) { next(err); }

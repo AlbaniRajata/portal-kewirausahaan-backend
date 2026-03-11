@@ -122,6 +122,15 @@ const {
   deleteBeritaController,
 } = require("../controllers/berita.controller");
 
+const {
+  getHistoryPenilaianTahap1Controller,
+  getHistoryPenilaianTahap2Controller,
+  getHistoryDetailTahap1Controller,
+  getHistoryDetailTahap2Controller,
+} = require("../controllers/historyPenilaian.controller");
+
+const { getDashboardAdminController } = require("../controllers/dashboard.controller");
+
 const { uploadBerita } = require("../../../middlewares/upload.middleware");
 const roleMiddleware = require("../../../middlewares/role.middleware");
 const { ROLE } = require("../../../constants/role");
@@ -231,5 +240,12 @@ router.post("/berita", uploadBerita.single("file_gambar"), createBeritaControlle
 router.patch("/berita/:id_berita", uploadBerita.single("file_gambar"), updateBeritaController);
 router.patch("/berita/:id_berita/gambar", uploadBerita.single("file_gambar"), updateGambarController);
 router.delete("/berita/:id_berita", deleteBeritaController);
+
+router.get("/program/:id_program/history-penilaian/tahap1", getHistoryPenilaianTahap1Controller);
+router.get("/program/:id_program/history-penilaian/tahap2", getHistoryPenilaianTahap2Controller);
+router.get("/program/:id_program/proposal/:id_proposal/history-penilaian/tahap1", getHistoryDetailTahap1Controller);
+router.get("/program/:id_program/proposal/:id_proposal/history-penilaian/tahap2", getHistoryDetailTahap2Controller);
+
+router.get("/program/:id_program/dashboard", getDashboardAdminController);
 
 module.exports = router;
