@@ -1,13 +1,18 @@
 const pool = require("../../../config/db");
 const { createBaseUser } = require("../../auth/services/auth.service");
-const { createDosenDb } = require("../db/dosen.db");
+const { createDosenDb, deleteRejectedDosenDb } = require("../db/dosen.db");
 const { createVerificationToken } = require("../../auth/services/emailVerification.service");
-const ROLE = require("../../../constants/role");
+const { ROLE } = require("../../../constants/role");
 
 const registerDosen = async (data) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+
+    await deleteRejectedDosenDb(
+      { email: data.email, username: data.username, nip: data.nip },
+      client
+    );
 
     const user = await createBaseUser(
       {

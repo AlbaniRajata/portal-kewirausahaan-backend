@@ -1,13 +1,18 @@
 const pool = require("../../../config/db");
 const { createBaseUser } = require("../../auth/services/auth.service");
-const { createMahasiswaDb } = require("../db/mahasiswa.db");
+const { createMahasiswaDb, deleteRejectedMahasiswaDb } = require("../db/mahasiswa.db");
 const { createVerificationToken } = require("../../auth/services/emailVerification.service");
-const ROLE = require("../../../constants/role");
+const { ROLE } = require("../../../constants/role");
 
 const registerMahasiswa = async (data) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+
+    await deleteRejectedMahasiswaDb(
+      { email: data.email, username: data.username, nim: data.nim },
+      client
+    );
 
     const user = await createBaseUser(
       {
