@@ -26,6 +26,31 @@ const createFilename = (prefix) => {
   };
 };
 
+const validateProposalFilename = (filename) => {
+  const nameWithoutExt = path.basename(filename, path.extname(filename));
+  const parts = nameWithoutExt.split("_");
+
+  if (parts.length !== 3) {
+    return {
+      valid: false,
+      message:
+        'Format nama file tidak valid. Gunakan format: "Program_Nama Tim_Judul Proposal" (dipisahkan tepat 2 underscore). Contoh: "PKM-K_Tim Inovasi_Alat Pembersih Otomatis.pdf"',
+    };
+  }
+
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i].trim() === "") {
+      const labels = ["Program", "Nama Tim", "Judul Proposal"];
+      return {
+        valid: false,
+        message: `Bagian "${labels[i]}" pada nama file tidak boleh kosong. Format: "Program_Nama Tim_Judul Proposal"`,
+      };
+    }
+  }
+
+  return { valid: true };
+};
+
 const ktmDir = "uploads/ktm";
 ensureDir(ktmDir);
 
@@ -62,12 +87,22 @@ ensureDir(proposalDir);
 const uploadProposal = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => cb(null, proposalDir),
-    filename: createFilename("proposal"),
+    filename: (req, file, cb) => {
+      cb(null, file.originalname);
+    },
   }),
-  fileFilter: createFileFilter(
-    ["application/pdf"],
-    "File proposal harus berupa PDF"
-  ),
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype !== "application/pdf") {
+      return cb(new Error("File proposal harus berupa PDF"));
+    }
+
+    const result = validateProposalFilename(file.originalname);
+    if (!result.valid) {
+      return cb(new Error(result.message));
+    }
+
+    cb(null, true);
+  },
   limits: { fileSize: 10 * 1024 * 1024, files: 1 },
 });
 

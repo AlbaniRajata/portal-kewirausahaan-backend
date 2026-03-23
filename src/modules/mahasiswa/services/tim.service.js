@@ -93,17 +93,20 @@ const createTim = async (user, payload) => {
     return { data: detailTim };
   } catch (err) {
     await client.query("ROLLBACK");
+    if (err.code === "23505" && err.constraint === "unique_tim_per_program") {
+      return { error: "Nama tim sudah digunakan untuk program ini. Silakan gunakan nama tim yang lain.", field: "nama_tim" };
+    }
     throw err;
   } finally {
     client.release();
   }
 };
 
-const searchMahasiswa = async (user, nim) => {
-  if (!nim || nim.trim().length < 3) {
-    return { error: "Masukkan minimal 3 karakter NIM untuk melakukan pencarian.", field: "nim" };
+const searchMahasiswa = async (user, query) => {
+  if (!query || query.trim().length < 3) {
+    return { error: "Masukkan minimal 3 karakter NIM atau nama untuk melakukan pencarian.", field: "query" };
   }
-  const data = await timDb.searchMahasiswaByNim(nim.trim());
+  const data = await timDb.searchMahasiswaByNim(query.trim(), user.id_user);
   return { data };
 };
 
@@ -192,6 +195,83 @@ const getTimDetail = async (user) => {
   return { data: detail };
 };
 
+const addAnggotaToTim = async (user, nim) => {
+  const tim = await timDb.getTimByUserId(user.id_user);
+  if (!tim || tim.peran !== 1) {
+    return { error: "Anda bukan ketua tim.", field: "tim" };
+  }
+
+  const hasRejected = await timDb.cekAdaAnggotaDitolak(tim.id_tim);
+  if (!hasRejected) {
+    return { error: "Tidak ada anggota yang ditolak. Penambahan anggota baru hanya bisa dilakukan jika ada undangan yang ditolak.", field: "tim" };
+  }
+
+  const activeCount = await timDb.countActiveAnggota(tim.id_tim);
+  if (activeCount >= 5) {
+    return { error: "Tim sudah penuh (maksimal 4 anggota).", field: "anggota" };
+  }
+
+  if (!nim || typeof nim !== "string" || !nim.trim()) {
+    return { error: "NIM wajib diisi.", field: "nim" };
+  }
+
+  const target = await timDb.getMahasiswaByNim(nim.trim());
+  if (!target || target.status_verifikasi !== 1 || target.status_mahasiswa !== 1) {
+    return { error: `Mahasiswa dengan NIM ${nim} tidak memenuhi syarat sebagai anggota tim.`, field: "nim" };
+  }
+
+  if (target.id_user === user.id_user) {
+    return { error: "Anda tidak dapat menambahkan diri sendiri sebagai anggota.", field: "nim" };
+  }
+
+  const aktifDiTim = await timDb.cekAktifDiTim(tim.id_tim, target.id_user);
+  if (aktifDiTim) {
+    return { error: "Mahasiswa ini sudah memiliki undangan aktif atau sudah bergabung dalam tim ini.", field: "nim" };
+  }
+
+  const punyaTim = await timDb.cekUserPunyaTim(target.id_user);
+  if (punyaTim) {
+    return { error: `Mahasiswa dengan NIM ${nim} sudah terdaftar dalam tim lain.`, field: "nim" };
+  }
+
+  const id_program = await timDb.getIdProgramByIdTim(tim.id_tim);
+  if (id_program === PROGRAM.INBIS) {
+    const pmwStatus = await timDb.cekLolosPMW(target.id_user);
+    if (!pmwStatus || pmwStatus.status_lolos !== 1) {
+      return { error: `Mahasiswa dengan NIM ${nim} belum lolos program PMW dan tidak dapat bergabung di program INBIS.`, field: "nim" };
+    }
+  }
+
+  await timDb.insertAnggotaTimDirect(tim.id_tim, target.id_user, 2, 0);
+  const data = await timDb.getTimDetail(tim.id_tim);
+  return { data };
+};
+
+const resetTim = async (user) => {
+  const tim = await timDb.getTimByUserId(user.id_user);
+  if (!tim || tim.peran !== 1) {
+    return { error: "Anda bukan ketua tim.", field: "tim" };
+  }
+
+  const hasProposal = await timDb.cekTimPunyaProposal(tim.id_tim);
+  if (hasProposal) {
+    return { error: "Tim sudah memiliki proposal dan tidak dapat direset.", field: "tim" };
+  }
+
+  const client = await db.connect();
+  try {
+    await client.query("BEGIN");
+    await timDb.deleteTimFull(client, tim.id_tim);
+    await client.query("COMMIT");
+    return { success: true };
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   createTim,
   searchMahasiswa,
@@ -199,4 +279,6 @@ module.exports = {
   rejectInvite,
   getTimStatus,
   getTimDetail,
+  addAnggotaToTim,
+  resetTim,
 };

@@ -78,7 +78,13 @@ app.use((err, req, res, next) => {
     });
   }
 
-  if (err.message && err.message.includes("Hanya file")) {
+  const isFileValidationError =
+    err.message &&
+    (err.message.includes("Hanya file") ||
+      err.message.includes("Format nama file") ||
+      err.message.includes("File proposal") ||
+      err.message.includes("Bagian "));
+  if (isFileValidationError) {
     return res.status(400).json({
       success: false,
       message: err.message,

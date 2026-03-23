@@ -24,7 +24,7 @@ const createTimController = async (req, res, next) => {
 
 const searchMahasiswaController = async (req, res, next) => {
   try {
-    const result = await timService.searchMahasiswa(req.user, req.query.nim);
+    const result = await timService.searchMahasiswa(req.user, req.query.query);
 
     if (result.error) {
       return res.status(400).json({
@@ -144,6 +144,49 @@ const getTimDetailController = async (req, res, next) => {
   }
 };
 
+const addAnggotaController = async (req, res, next) => {
+  try {
+    const result = await timService.addAnggotaToTim(req.user, req.body.nim);
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.error,
+        data: { field: result.field },
+      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: "Undangan berhasil dikirim ke anggota baru",
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const resetTimController = async (req, res, next) => {
+  try {
+    const result = await timService.resetTim(req.user);
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.error,
+        data: { field: result.field },
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Tim berhasil direset. Anda dapat mengajukan tim baru.",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createTimController,
   searchMahasiswaController,
@@ -151,4 +194,6 @@ module.exports = {
   rejectInviteController,
   getTimStatusController,
   getTimDetailController,
+  addAnggotaController,
+  resetTimController,
 };

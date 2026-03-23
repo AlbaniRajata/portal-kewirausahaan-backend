@@ -116,7 +116,7 @@ const getTimDetail = async (id_tim) => {
   return r.rows[0] || null;
 };
 
-const searchMahasiswaByNim = async (nim) => {
+const searchMahasiswaByNim = async (query, excludeUserId) => {
   const q = `
     SELECT
       m.id_user,
@@ -129,18 +129,23 @@ const searchMahasiswaByNim = async (nim) => {
       j.id_jurusan,
       j.nama_jurusan,
       k.id_kampus,
-      k.nama_kampus
+      k.nama_kampus,
+      EXISTS (
+        SELECT 1 FROM t_anggota_tim a
+        WHERE a.id_user = m.id_user AND a.status = 1
+      ) AS sudah_punya_tim
     FROM m_mahasiswa m
     JOIN m_user u ON u.id_user = m.id_user
     JOIN m_prodi p ON p.id_prodi = m.id_prodi
     JOIN m_jurusan j ON j.id_jurusan = p.id_jurusan
     JOIN m_kampus k ON k.id_kampus = p.id_kampus
-    WHERE m.nim ILIKE $1
+    WHERE (m.nim ILIKE $1 OR u.nama_lengkap ILIKE $1)
       AND m.status_verifikasi = 1
       AND m.status_mahasiswa = 1
+      AND m.id_user != $2
     LIMIT 10
   `;
-  const r = await db.query(q, [`%${nim}%`]);
+  const r = await db.query(q, [`%${query}%`, excludeUserId]);
   return r.rows;
 };
 
@@ -275,6 +280,55 @@ const cekLolosPMW = async (id_user) => {
   return r.rows[0] || null;
 };
 
+const countActiveAnggota = async (id_tim) => {
+  const q = `
+    SELECT COUNT(*)::int AS total
+    FROM t_anggota_tim
+    WHERE id_tim = $1 AND status IN (0, 1)
+  `;
+  const r = await db.query(q, [id_tim]);
+  return r.rows[0].total;
+};
+
+const insertAnggotaTimDirect = async (id_tim, id_user, peran, status) => {
+  const q = `
+    INSERT INTO t_anggota_tim (id_tim, id_user, peran, status)
+    VALUES ($1, $2, $3, $4)
+  `;
+  await db.query(q, [id_tim, id_user, peran, status]);
+};
+
+const cekAktifDiTim = async (id_tim, id_user) => {
+  const q = `
+    SELECT 1 FROM t_anggota_tim
+    WHERE id_tim = $1 AND id_user = $2 AND status IN (0, 1)
+  `;
+  const r = await db.query(q, [id_tim, id_user]);
+  return r.rowCount > 0;
+};
+
+const cekAdaAnggotaDitolak = async (id_tim) => {
+  const q = `
+    SELECT 1 FROM t_anggota_tim
+    WHERE id_tim = $1 AND peran = 2 AND status = 2
+    LIMIT 1
+  `;
+  const r = await db.query(q, [id_tim]);
+  return r.rowCount > 0;
+};
+
+const cekTimPunyaProposal = async (id_tim) => {
+  const q = `SELECT 1 FROM t_proposal WHERE id_tim = $1 LIMIT 1`;
+  const r = await db.query(q, [id_tim]);
+  return r.rowCount > 0;
+};
+
+const deleteTimFull = async (client, id_tim) => {
+  await client.query(`DELETE FROM t_peserta_program WHERE id_tim = $1`, [id_tim]);
+  await client.query(`DELETE FROM t_anggota_tim WHERE id_tim = $1`, [id_tim]);
+  await client.query(`DELETE FROM t_tim WHERE id_tim = $1`, [id_tim]);
+};
+
 const cekSemuaAnggotaDisetujui = async (id_tim) => {
   const q = `
     SELECT
@@ -308,8 +362,12 @@ module.exports = {
   cekUserPunyaTim,
   createTim,
   insertAnggotaTim,
+  insertAnggotaTimDirect,
   getMahasiswaByNim,
   countAnggotaTim,
+  countActiveAnggota,
+  cekAktifDiTim,
+  cekAdaAnggotaDitolak,
   getPeranUserDiTim,
   getTimDetail,
   searchMahasiswaByNim,
@@ -321,6 +379,8 @@ module.exports = {
   insertPesertaProgram,
   cekLolosPMW,
   cekSemuaAnggotaDisetujui,
+  cekTimPunyaProposal,
+  deleteTimFull,
   getIdProgramByIdTim,
   getAllAnggotaTim,
 };

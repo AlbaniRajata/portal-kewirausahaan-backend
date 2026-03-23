@@ -2,7 +2,6 @@ const {
   getPesertaAktifDb,
   getProposalLolosDb,
   getPembimbingTimDb,
-  getBimbinganPendingDb,
   listBimbinganTimDb,
   getDetailBimbinganDb,
   createBimbinganDb,
@@ -75,10 +74,6 @@ const ajukanBimbingan = async (id_user, payload) => {
     return { error: true, message: "Format tanggal bimbingan tidak valid", data: { field: "tanggal_bimbingan" } };
   }
 
-  if (tanggal <= new Date()) {
-    return { error: true, message: "Tanggal bimbingan harus di masa mendatang", data: { field: "tanggal_bimbingan" } };
-  }
-
   if (typeof topik !== "string" || topik.trim().length < 3) {
     return { error: true, message: "Topik bimbingan minimal 3 karakter", data: { field: "topik" } };
   }
@@ -96,11 +91,6 @@ const ajukanBimbingan = async (id_user, payload) => {
   const pembimbing = await getPembimbingTimDb(peserta.id_tim);
   if (!pembimbing) {
     return { error: true, message: "Tim belum memiliki pembimbing yang disetujui", data: null };
-  }
-
-  const pending = await getBimbinganPendingDb(peserta.id_tim);
-  if (pending) {
-    return { error: true, message: "Masih ada pengajuan bimbingan yang belum direspon dosen", data: null };
   }
 
   const bimbingan = await createBimbinganDb({
