@@ -9,8 +9,6 @@ const getHistoryPenilaianTahap1Db = async (id_program) => {
       p.tanggal_submit AS tanggal_finalisasi,
       t.nama_tim,
       k.nama_kategori,
-      COUNT(DISTINCT dr.id_distribusi)                                            AS total_reviewer,
-      COUNT(DISTINCT pr.id_penilaian) FILTER (WHERE pr.status = 1)               AS total_submit,
       ROUND(AVG(sub.total_nilai)::numeric, 2)                                     AS rata_rata_nilai
      FROM t_proposal p
      JOIN t_tim t       ON t.id_tim       = p.id_tim

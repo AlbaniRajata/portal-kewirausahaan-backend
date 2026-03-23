@@ -124,7 +124,7 @@ const getDistribusiHistoryDb = async (id_program, tahap) => {
      JOIN m_reviewer r ON r.id_user = d.id_reviewer
      JOIN m_user u ON u.id_user = r.id_user
      JOIN m_user admin ON admin.id_user = d.assigned_by
-     WHERE p.id_program = $1 AND d.tahap = $2 AND d.status != 3
+     WHERE p.id_program = $1 AND d.tahap = $2 AND d.status != 5
      ORDER BY d.assigned_at DESC`,
     [id_program, tahap]
   );
@@ -192,6 +192,25 @@ const updateProposalStatusDb = async (client, id_proposal, status) => {
   return rows[0];
 };
 
+const getDistribusiByProposalReviewerDb = async (client, id_proposal, id_reviewer, tahap) => {
+  const { rows } = await client.query(
+    `SELECT * FROM t_distribusi_reviewer
+     WHERE id_proposal = $1 AND id_reviewer = $2 AND tahap = $3`,
+    [id_proposal, id_reviewer, tahap]
+  );
+  return rows[0] || null;
+};
+
+const reaktifkanDistribusiDb = async (client, id_distribusi, assigned_by) => {
+  const { rows } = await client.query(
+    `UPDATE t_distribusi_reviewer
+     SET status = 0, assigned_by = $2, assigned_at = NOW(), responded_at = NULL, catatan_reviewer = NULL
+     WHERE id_distribusi = $1 AND status = 5 RETURNING *`,
+    [id_distribusi, assigned_by]
+  );
+  return rows[0];
+};
+
 module.exports = {
   getTahapAktifDb,
   getReviewerAktifDb,
@@ -207,4 +226,6 @@ module.exports = {
   getDistribusiDetailDb,
   updateDistribusiStatusDb,
   updateProposalStatusDb,
+  getDistribusiByProposalReviewerDb,
+  reaktifkanDistribusiDb,
 };

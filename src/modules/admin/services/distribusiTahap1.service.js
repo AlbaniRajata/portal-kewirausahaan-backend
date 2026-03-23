@@ -15,6 +15,8 @@ const {
   getDistribusiDetailDb,
   updateDistribusiStatusDb,
   updateProposalStatusDb,
+  getDistribusiByProposalReviewerDb,
+  reaktifkanDistribusiDb,
 } = require("../db/distribusiTahap1.db");
 
 const TAHAP = 1;
@@ -200,8 +202,20 @@ const reassignReviewer = async (admin_id, id_distribusi, id_reviewer_baru, id_pr
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    await updateDistribusiStatusDb(client, id_distribusi, 3);
-    const distribusiBaru = await insertDistribusiDb(client, [distribusi.id_proposal, id_reviewer_baru, distribusi.tahap, admin_id]);
+    await updateDistribusiStatusDb(client, id_distribusi, 5); // status 5 = diarsipkan/diganti
+
+    // Cek apakah reviewer baru pernah punya record untuk proposal+tahap ini
+    const existingDistribusi = await getDistribusiByProposalReviewerDb(client, distribusi.id_proposal, id_reviewer_baru, distribusi.tahap);
+    let distribusiBaru;
+    if (existingDistribusi) {
+      // Reaktifkan record lama daripada insert baru (hindari duplicate key)
+      // Hanya jika record tersebut merupakan arsip (status 5)
+      distribusiBaru = await reaktifkanDistribusiDb(client, existingDistribusi.id_distribusi, admin_id);
+    }
+    if (!distribusiBaru) {
+      distribusiBaru = await insertDistribusiDb(client, [distribusi.id_proposal, id_reviewer_baru, distribusi.tahap, admin_id]);
+    }
+
     await updateProposalStatusDb(client, distribusi.id_proposal, 2);
     await client.query("COMMIT");
 
