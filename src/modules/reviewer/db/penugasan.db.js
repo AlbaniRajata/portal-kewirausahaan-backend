@@ -49,6 +49,7 @@ const getPenugasanDb = async (id_reviewer, urutan, status_filter = null) => {
     LEFT JOIN m_tahap_penilaian tp ON tp.id_tahap = d.tahap
     WHERE d.id_reviewer = $1
       AND tp.urutan = $2
+      AND d.status != 5
       ${statusClause}
     ORDER BY d.assigned_at DESC
   `;
@@ -88,6 +89,7 @@ const getDetailPenugasanDb = async (id_distribusi, id_reviewer) => {
     LEFT JOIN m_tahap_penilaian tp ON tp.id_tahap = d.tahap
     WHERE d.id_distribusi = $1
       AND d.id_reviewer = $2
+      AND d.status != 5
   `;
   const { rows } = await pool.query(q, [id_distribusi, id_reviewer]);
   return rows[0] || null;

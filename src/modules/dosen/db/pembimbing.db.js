@@ -60,7 +60,7 @@ const getPengajuanMasukDb = async (id_dosen) => {
       t.id_tim,
       t.nama_tim,
       pr.id_program,
-      pr.nama_program,
+      pr.keterangan,
       u.nama_lengkap AS mahasiswa_pengaju
     FROM t_pengajuan_pembimbing pg
     JOIN t_tim t ON t.id_tim = pg.id_tim

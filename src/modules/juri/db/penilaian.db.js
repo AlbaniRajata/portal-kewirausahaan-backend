@@ -20,7 +20,7 @@ const getDistribusiForPenilaianDb = async (id_distribusi) => {
       ON t.urutan = d.tahap
      AND t.id_program = p.id_program
      AND t.status = 1
-    WHERE d.id_distribusi = $1
+    WHERE d.id_distribusi = $1 AND d.status != 5
   `;
   const { rows } = await pool.query(q, [id_distribusi]);
   return rows[0] || null;
