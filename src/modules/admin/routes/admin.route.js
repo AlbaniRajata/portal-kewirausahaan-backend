@@ -131,6 +131,16 @@ const {
   getHistoryDetailTahap2Controller,
 } = require("../controllers/historyPenilaian.controller");
 
+const {
+  getLuaranProgramController,
+  createLuaranController,
+  updateLuaranController,
+  deleteLuaranController,
+  getProgressLuaranTimController,
+  getDetailLuaranTimController,
+  reviewLuaranTimController,
+} = require("../controllers/monev.controller");
+
 const { getDashboardAdminController } = require("../controllers/dashboard.controller");
 
 const { uploadBerita } = require("../../../middlewares/upload.middleware");
@@ -249,6 +259,14 @@ router.get("/program/:id_program/history-penilaian/tahap1", getHistoryPenilaianT
 router.get("/program/:id_program/history-penilaian/tahap2", getHistoryPenilaianTahap2Controller);
 router.get("/program/:id_program/proposal/:id_proposal/history-penilaian/tahap1", getHistoryDetailTahap1Controller);
 router.get("/program/:id_program/proposal/:id_proposal/history-penilaian/tahap2", getHistoryDetailTahap2Controller);
+
+router.get("/program/:id_program/luaran", getLuaranProgramController);
+router.post("/program/:id_program/luaran", createLuaranController);
+router.patch("/luaran/:id_luaran", updateLuaranController);
+router.delete("/luaran/:id_luaran", deleteLuaranController);
+router.get("/program/:id_program/monev/progress", getProgressLuaranTimController);
+router.get("/program/:id_program/tim/:id_tim/monev", getDetailLuaranTimController);
+router.patch("/monev/luaran-tim/:id_luaran_tim/review", reviewLuaranTimController);
 
 router.get("/program/:id_program/dashboard", getDashboardAdminController);
 

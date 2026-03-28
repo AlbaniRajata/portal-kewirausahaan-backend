@@ -121,9 +121,25 @@ const uploadBerita = multer({
   limits: { fileSize: 5 * 1024 * 1024, files: 1 },
 });
 
+const luaranDir = "uploads/luaran";
+ensureDir(luaranDir);
+
+const uploadLuaran = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, luaranDir),
+    filename: createFilename("luaran"),
+  }),
+  fileFilter: createFileFilter(
+    ["application/pdf"],
+    "File luaran harus berupa PDF"
+  ),
+  limits: { fileSize: 10 * 1024 * 1024, files: 1 },
+});
+
 module.exports = {
   uploadKTM,
   uploadFotoProfil,
   uploadProposal,
   uploadBerita,
+  uploadLuaran,
 };

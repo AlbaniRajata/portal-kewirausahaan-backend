@@ -2,13 +2,14 @@ const express = require("express");
 const router = express.Router();
 const roleMiddleware = require("../../../middlewares/role.middleware");
 const { ROLE } = require("../../../constants/role");
-const { uploadFotoProfil, uploadProposal } = require("../../../middlewares/upload.middleware");
+const { uploadFotoProfil, uploadProposal, uploadLuaran } = require("../../../middlewares/upload.middleware");
 
 const { 
   getProfileController, 
   updateProfileController, 
   updatePasswordController
 } = require("../controllers/profile.controller");
+
 const { 
   createTimController, 
   searchMahasiswaController, 
@@ -19,6 +20,7 @@ const {
   addAnggotaController,
   resetTimController,
 } = require("../controllers/tim.controller");
+
 const { 
   createProposalController, 
   updateProposalController, 
@@ -26,16 +28,23 @@ const {
   getProposalStatusController, 
   getProposalDetailController 
 } = require("../controllers/proposal.controller");
+
 const { 
   listDosenPembimbingController, 
   ajukanPembimbingController, 
   getStatusPembimbingController 
 } = require("../controllers/pembimbing.controller");
+
 const { 
   listBimbinganController, 
   detailBimbinganController, 
   ajukanBimbinganController 
 } = require("../controllers/bimbingan.controller");
+
+const { 
+  getLuaranMahasiswaController, 
+  submitLuaranController 
+} = require("../controllers/monev.controller");
 
 router.use(roleMiddleware([ROLE.MAHASISWA]));
 
@@ -73,4 +82,6 @@ router.get("/bimbingan", listBimbinganController);
 router.get("/bimbingan/:id_bimbingan", detailBimbinganController);
 router.post("/bimbingan/ajukan", ajukanBimbinganController);
 
+router.get("/monev/luaran", getLuaranMahasiswaController);
+router.post("/monev/luaran/:id_luaran/submit", uploadLuaran.single("file_luaran"), submitLuaranController);
 module.exports = router;
