@@ -187,6 +187,17 @@ const resetTimController = async (req, res, next) => {
   }
 };
 
+const cekEligibleInbisController = async (req, res, next) => {
+  try {
+    const result = await timService.cekEligibleInbis(req.user.id_user);
+    return res.status(200).json({
+      success: true,
+      message: "Cek eligibilitas berhasil",
+      data: result,
+    });
+  } catch (err) { next(err); }
+};
+
 module.exports = {
   createTimController,
   searchMahasiswaController,
@@ -196,4 +207,5 @@ module.exports = {
   getTimDetailController,
   addAnggotaController,
   resetTimController,
+  cekEligibleInbisController,
 };

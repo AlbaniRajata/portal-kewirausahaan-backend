@@ -1,4 +1,5 @@
 const pool = require("../../../config/db");
+const PROGRAM = require("../../../constants/program");
 
 const getTimMahasiswaDb = async (id_user) => {
   const q = `
@@ -93,10 +94,26 @@ const upsertLuaranTimDb = async (id_tim, id_luaran, data) => {
   return rows[0];
 };
 
+const getCekMonevLulusDb = async (id_user) => {
+  const q = `
+    SELECT
+      COUNT(ml.id_luaran) AS total_luaran,
+      COUNT(lt.id_luaran_tim) FILTER (WHERE lt.status = 2) AS total_disetujui
+    FROM t_peserta_program pp
+    JOIN t_tim t ON t.id_tim = pp.id_tim
+    JOIN m_luaran ml ON ml.id_program = pp.id_program
+    LEFT JOIN t_luaran_tim lt ON lt.id_tim = t.id_tim AND lt.id_luaran = ml.id_luaran
+    WHERE pp.id_user = $1 AND pp.id_program = $2
+  `;
+  const { rows } = await pool.query(q, [id_user, PROGRAM.PMW]);
+  return rows[0] || null;
+};
+
 module.exports = {
   getTimMahasiswaDb,
   getLuaranByIdDb,
   getLuaranMahasiswaDb,
   getLuaranTimByTimAndLuaranDb,
   upsertLuaranTimDb,
+  getCekMonevLulusDb,
 };

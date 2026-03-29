@@ -357,6 +357,31 @@ const getAllAnggotaTim = async (id_tim) => {
   return r.rows.map((row) => row.id_user);
 };
 
+const getProgramTimeline = async (id_program) => {
+  const q = `
+    SELECT pendaftaran_mulai, pendaftaran_selesai
+    FROM m_program
+    WHERE id_program = $1
+  `;
+  const r = await db.query(q, [id_program]);
+  return r.rows[0] || null;
+};
+
+const cekMonevTimPMWSelesai = async (id_user, id_program_pmw) => {
+  const q = `
+    SELECT
+      COUNT(ml.id_luaran) AS total_luaran,
+      COUNT(lt.id_luaran_tim) FILTER (WHERE lt.status = 2) AS total_disetujui
+    FROM t_peserta_program pp
+    JOIN t_tim t ON t.id_tim = pp.id_tim
+    JOIN m_luaran ml ON ml.id_program = pp.id_program
+    LEFT JOIN t_luaran_tim lt ON lt.id_tim = t.id_tim AND lt.id_luaran = ml.id_luaran
+    WHERE pp.id_user = $1 AND pp.id_program = $2
+  `;
+  const r = await db.query(q, [id_user, id_program_pmw]);
+  return r.rows[0] || null;
+};
+
 module.exports = {
   getMahasiswaByUserId,
   cekUserPunyaTim,
@@ -383,4 +408,6 @@ module.exports = {
   deleteTimFull,
   getIdProgramByIdTim,
   getAllAnggotaTim,
+  getProgramTimeline,
+  cekMonevTimPMWSelesai,
 };

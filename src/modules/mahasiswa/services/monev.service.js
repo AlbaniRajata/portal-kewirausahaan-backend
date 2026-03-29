@@ -7,6 +7,9 @@ const {
   upsertLuaranTimDb,
 } = require("../db/monev.db");
 
+const { getProgramTimeline } = require("../db/tim.db");
+const PROGRAM = require("../../../constants/program");
+
 const getLuaranMahasiswa = async (id_user) => {
   const tim = await getTimMahasiswaDb(id_user);
   if (!tim) return { error: true, message: "Anda belum terdaftar dalam tim", data: null };
@@ -98,7 +101,76 @@ const submitLuaran = async (id_user, id_luaran, payload, file) => {
   return { error: false, message: "Luaran berhasil dikumpulkan", data: result, file: null };
 };
 
+const cekEligibilitasInbis = async (id_user) => {
+  const timeline = await getProgramTimeline(PROGRAM.INBIS);
+  const now = new Date();
+  const timelineOpen = timeline?.pendaftaran_mulai && timeline?.pendaftaran_selesai
+    && now >= new Date(timeline.pendaftaran_mulai)
+    && now <= new Date(timeline.pendaftaran_selesai);
+
+  if (!timelineOpen) {
+    return {
+      error: false,
+      data: {
+        eligible: false,
+        alasan: "Timeline pendaftaran INBIS belum dibuka atau sudah ditutup",
+        timeline_open: false,
+        lolos_pmw: null,
+        monev_selesai: null,
+      },
+    };
+  }
+
+  const pmwStatus = await timDb.cekLolosPMW(id_user, PROGRAM.PMW);
+  const lolosPmw = pmwStatus?.status_lolos === 1;
+
+  if (!lolosPmw) {
+    return {
+      error: false,
+      data: {
+        eligible: false,
+        alasan: "Anda belum dinyatakan lolos program PMW",
+        timeline_open: true,
+        lolos_pmw: false,
+        monev_selesai: null,
+      },
+    };
+  }
+
+  const monev = await getCekMonevLulusDb(id_user);
+  const total = parseInt(monev?.total_luaran || 0);
+  const disetujui = parseInt(monev?.total_disetujui || 0);
+  const monevSelesai = total > 0 && total === disetujui;
+
+  if (!monevSelesai) {
+    return {
+      error: false,
+      data: {
+        eligible: false,
+        alasan: `Progress monev PMW belum 100% (${disetujui}/${total} luaran disetujui)`,
+        timeline_open: true,
+        lolos_pmw: true,
+        monev_selesai: false,
+        monev_progress: { total, disetujui },
+      },
+    };
+  }
+
+  return {
+    error: false,
+    data: {
+      eligible: true,
+      alasan: null,
+      timeline_open: true,
+      lolos_pmw: true,
+      monev_selesai: true,
+      monev_progress: { total, disetujui },
+    },
+  };
+};
+
 module.exports = {
   getLuaranMahasiswa,
   submitLuaran,
+  cekEligibilitasInbis,
 };

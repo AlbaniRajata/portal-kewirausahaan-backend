@@ -2,6 +2,54 @@ const db = require("../../../config/db");
 const timDb = require("../db/tim.db");
 const PROGRAM = require("../../../constants/program");
 
+const isTimelineOpen = (timeline) => {
+  if (!timeline?.pendaftaran_mulai || !timeline?.pendaftaran_selesai) return false;
+  const now = new Date();
+  return now >= new Date(timeline.pendaftaran_mulai) && now <= new Date(timeline.pendaftaran_selesai);
+};
+
+const cekEligibleInbis = async (id_user) => {
+  const mahasiswa = await timDb.getMahasiswaByUserId(id_user);
+  if (!mahasiswa || mahasiswa.status_verifikasi !== 1 || mahasiswa.status_mahasiswa !== 1) {
+    return { eligible: false, alasan: "Akun mahasiswa Anda belum memenuhi syarat." };
+  }
+
+  const timeline = await timDb.getProgramTimeline(PROGRAM.INBIS);
+  if (!isTimelineOpen(timeline)) {
+    return { eligible: false, alasan: "Timeline pendaftaran INBIS belum dibuka atau sudah ditutup.", timeline_open: false };
+  }
+
+  const pmwStatus = await timDb.cekLolosPMW(id_user, PROGRAM.PMW);
+  if (!pmwStatus || pmwStatus.status_lolos !== 1) {
+    return { eligible: false, alasan: "Anda belum dinyatakan lolos program PMW.", timeline_open: true, lolos_pmw: false };
+  }
+
+  const monev = await timDb.cekMonevTimPMWSelesai(id_user, PROGRAM.PMW);
+  const total = parseInt(monev?.total_luaran || 0);
+  const disetujui = parseInt(monev?.total_disetujui || 0);
+  const monevSelesai = total > 0 && total === disetujui;
+
+  if (!monevSelesai) {
+    return {
+      eligible: false,
+      alasan: `Progress monev PMW tim Anda belum 100% (${disetujui}/${total} luaran disetujui).`,
+      timeline_open: true,
+      lolos_pmw: true,
+      monev_selesai: false,
+      monev_progress: { total, disetujui },
+    };
+  }
+
+  return {
+    eligible: true,
+    alasan: null,
+    timeline_open: true,
+    lolos_pmw: true,
+    monev_selesai: true,
+    monev_progress: { total, disetujui },
+  };
+};
+
 const createTim = async (user, payload) => {
   const mahasiswa = await timDb.getMahasiswaByUserId(user.id_user);
   if (!mahasiswa || mahasiswa.status_verifikasi !== 1 || mahasiswa.status_mahasiswa !== 1) {
@@ -18,10 +66,22 @@ const createTim = async (user, payload) => {
     return { error: "Program tidak valid.", field: "id_program" };
   }
 
+  const timeline = await timDb.getProgramTimeline(id_program);
+  if (!isTimelineOpen(timeline)) {
+    return { error: "Pendaftaran program ini belum dibuka atau sudah ditutup.", field: "id_program" };
+  }
+
   if (id_program === PROGRAM.INBIS) {
-    const pmwStatus = await timDb.cekLolosPMW(user.id_user);
+    const pmwStatus = await timDb.cekLolosPMW(user.id_user, PROGRAM.PMW);
     if (!pmwStatus || pmwStatus.status_lolos !== 1) {
-      return { error: "Untuk mendaftar program INBIS, Anda harus lolos program PMW terlebih dahulu.", field: "id_program" };
+      return { error: "Anda tidak eligible untuk mendaftar program ini. Silahkan cek persyaratan pada informasi yang telah diberikan.", field: "id_program" };
+    }
+
+    const monev = await timDb.cekMonevTimPMWSelesai(user.id_user, PROGRAM.PMW);
+    const total = parseInt(monev?.total_luaran || 0);
+    const disetujui = parseInt(monev?.total_disetujui || 0);
+    if (total === 0 || total !== disetujui) {
+      return { error: "Anda tidak eligible untuk mendaftar program ini. Silahkan cek persyaratan pada informasi yang telah diberikan.", field: "id_program" };
     }
   }
 
@@ -47,7 +107,6 @@ const createTim = async (user, payload) => {
     await client.query("BEGIN");
 
     const tim = await timDb.createTim(client, id_program, payload.nama_tim.trim());
-
     await timDb.insertAnggotaTim(client, tim.id_tim, user.id_user, 1, 1);
 
     const currentYear = new Date().getFullYear();
@@ -77,10 +136,18 @@ const createTim = async (user, payload) => {
       }
 
       if (id_program === PROGRAM.INBIS) {
-        const pmwStatus = await timDb.cekLolosPMW(target.id_user);
+        const pmwStatus = await timDb.cekLolosPMW(target.id_user, PROGRAM.PMW);
         if (!pmwStatus || pmwStatus.status_lolos !== 1) {
           await client.query("ROLLBACK");
-          return { error: `Mahasiswa dengan NIM ${item.nim} belum lolos program PMW dan tidak dapat bergabung di program INBIS.`, field: "anggota" };
+          return { error: `Mahasiswa dengan NIM ${item.nim} tidak eligible untuk mendaftar program ini. Silahkan cek persyaratan pada informasi yang telah diberikan.`, field: "anggota" };
+        }
+
+        const monev = await timDb.cekMonevTimPMWSelesai(target.id_user, PROGRAM.PMW);
+        const total = parseInt(monev?.total_luaran || 0);
+        const disetujui = parseInt(monev?.total_disetujui || 0);
+        if (total === 0 || total !== disetujui) {
+          await client.query("ROLLBACK");
+          return { error: `Mahasiswa dengan NIM ${item.nim} tidak eligible untuk mendaftar program ini. Silahkan cek persyaratan pada informasi yang telah diberikan.`, field: "anggota" };
         }
       }
 
@@ -88,7 +155,6 @@ const createTim = async (user, payload) => {
     }
 
     await client.query("COMMIT");
-
     const detailTim = await timDb.getTimDetail(tim.id_tim);
     return { data: detailTim };
   } catch (err) {
@@ -125,10 +191,27 @@ const acceptInvite = async (user, id_tim) => {
     return { error: "Program tim tidak ditemukan.", field: "tim" };
   }
 
+  const timeline = await timDb.getProgramTimeline(id_program);
+  if (!isTimelineOpen(timeline)) {
+    return { error: "Pendaftaran program ini belum dibuka atau sudah ditutup.", field: "tim" };
+  }
+
   if (id_program === PROGRAM.INBIS) {
-    const pmwStatus = await timDb.cekLolosPMW(user.id_user);
+    const mahasiswa = await timDb.getMahasiswaByUserId(user.id_user);
+    if (!mahasiswa || mahasiswa.status_verifikasi !== 1 || mahasiswa.status_mahasiswa !== 1) {
+      return { error: "Akun mahasiswa Anda belum memenuhi syarat.", field: "tim" };
+    }
+
+    const pmwStatus = await timDb.cekLolosPMW(user.id_user, PROGRAM.PMW);
     if (!pmwStatus || pmwStatus.status_lolos !== 1) {
-      return { error: "Anda belum lolos program PMW dan tidak dapat bergabung di program INBIS.", field: "tim" };
+      return { error: "Anda tidak eligible untuk mendaftar program ini. Silahkan cek persyaratan pada informasi yang telah diberikan.", field: "tim" };
+    }
+
+    const monev = await timDb.cekMonevTimPMWSelesai(user.id_user, PROGRAM.PMW);
+    const total = parseInt(monev?.total_luaran || 0);
+    const disetujui = parseInt(monev?.total_disetujui || 0);
+    if (total === 0 || total !== disetujui) {
+      return { error: "Anda tidak eligible untuk mendaftar program ini. Silahkan cek persyaratan pada informasi yang telah diberikan.", field: "tim" };
     }
   }
 
@@ -201,6 +284,11 @@ const addAnggotaToTim = async (user, nim) => {
     return { error: "Anda bukan ketua tim.", field: "tim" };
   }
 
+  const timeline = await timDb.getProgramTimeline(tim.id_program);
+  if (!isTimelineOpen(timeline)) {
+    return { error: "Pendaftaran program ini belum dibuka atau sudah ditutup.", field: "tim" };
+  }
+
   const hasRejected = await timDb.cekAdaAnggotaDitolak(tim.id_tim);
   if (!hasRejected) {
     return { error: "Tidak ada anggota yang ditolak. Penambahan anggota baru hanya bisa dilakukan jika ada undangan yang ditolak.", field: "tim" };
@@ -236,9 +324,16 @@ const addAnggotaToTim = async (user, nim) => {
 
   const id_program = await timDb.getIdProgramByIdTim(tim.id_tim);
   if (id_program === PROGRAM.INBIS) {
-    const pmwStatus = await timDb.cekLolosPMW(target.id_user);
+    const pmwStatus = await timDb.cekLolosPMW(target.id_user, PROGRAM.PMW);
     if (!pmwStatus || pmwStatus.status_lolos !== 1) {
-      return { error: `Mahasiswa dengan NIM ${nim} belum lolos program PMW dan tidak dapat bergabung di program INBIS.`, field: "nim" };
+      return { error: `Mahasiswa dengan NIM ${nim} tidak eligible untuk mendaftar program ini. Silahkan cek persyaratan pada informasi yang telah diberikan.`, field: "nim" };
+    }
+
+    const monev = await timDb.cekMonevTimPMWSelesai(target.id_user, PROGRAM.PMW);
+    const total = parseInt(monev?.total_luaran || 0);
+    const disetujui = parseInt(monev?.total_disetujui || 0);
+    if (total === 0 || total !== disetujui) {
+      return { error: `Mahasiswa dengan NIM ${nim} tidak eligible untuk mendaftar program ini. Silahkan cek persyaratan pada informasi yang telah diberikan.`, field: "nim" };
     }
   }
 
@@ -273,6 +368,7 @@ const resetTim = async (user) => {
 };
 
 module.exports = {
+  cekEligibleInbis,
   createTim,
   searchMahasiswa,
   acceptInvite,

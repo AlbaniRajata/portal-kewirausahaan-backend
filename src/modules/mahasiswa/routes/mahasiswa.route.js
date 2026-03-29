@@ -19,6 +19,7 @@ const {
   getTimDetailController,
   addAnggotaController,
   resetTimController,
+  cekEligibleInbisController,
 } = require("../controllers/tim.controller");
 
 const { 
@@ -43,7 +44,8 @@ const {
 
 const { 
   getLuaranMahasiswaController, 
-  submitLuaranController 
+  submitLuaranController,
+  cekEligibilitasInbisController, 
 } = require("../controllers/monev.controller");
 
 router.use(roleMiddleware([ROLE.MAHASISWA]));
@@ -67,6 +69,7 @@ router.delete("/tim", resetTimController);
 router.get("/search-mahasiswa", searchMahasiswaController);
 router.post("/tim/:id_tim/accept", acceptInviteController);
 router.post("/tim/:id_tim/reject", rejectInviteController);
+router.get("/tim/eligibilitas-inbis", cekEligibleInbisController);
 
 router.get("/proposal/status", getProposalStatusController);
 router.get("/proposal/:id_proposal", getProposalDetailController);
@@ -84,4 +87,6 @@ router.post("/bimbingan/ajukan", ajukanBimbinganController);
 
 router.get("/monev/luaran", getLuaranMahasiswaController);
 router.post("/monev/luaran/:id_luaran/submit", uploadLuaran.single("file_luaran"), submitLuaranController);
+router.get("/monev/eligibilitas-inbis", cekEligibilitasInbisController);
+
 module.exports = router;
