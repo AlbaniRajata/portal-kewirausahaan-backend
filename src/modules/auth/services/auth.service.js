@@ -46,14 +46,14 @@ const login = async ({ email, password }) => {
 
   if (!user.email_verified_at) {
     return {
-      error: "Email Anda belum diverifikasi. Silakan cek inbox email Anda.",
+      error: "Email Anda belum diverifikasi. Silahkan cek inbox email Anda.",
       field: "email_verified",
     };
   }
 
   if (user.is_active !== true) {
     return {
-      error: "Akun Anda belum aktif. Silakan tunggu verifikasi admin.",
+      error: "Akun Anda belum aktif. Silahkan tunggu verifikasi admin.",
       field: "is_active",
     };
   }
@@ -104,7 +104,7 @@ const refresh = async (refreshToken) => {
 
   if (new Date(stored.expires_at) < new Date()) {
     await deleteRefreshTokenDb(refreshToken);
-    return { error: "Refresh token telah kedaluwarsa. Silakan login kembali.", code: 401 };
+    return { error: "Refresh token telah kedaluwarsa. Silahkan login kembali.", code: 401 };
   }
 
   if (stored.is_active !== true) {

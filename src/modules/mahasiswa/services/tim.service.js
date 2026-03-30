@@ -160,7 +160,7 @@ const createTim = async (user, payload) => {
   } catch (err) {
     await client.query("ROLLBACK");
     if (err.code === "23505" && err.constraint === "unique_tim_per_program") {
-      return { error: "Nama tim sudah digunakan untuk program ini. Silakan gunakan nama tim yang lain.", field: "nama_tim" };
+      return { error: "Nama tim sudah digunakan untuk program ini. Silahkan gunakan nama tim yang lain.", field: "nama_tim" };
     }
     throw err;
   } finally {

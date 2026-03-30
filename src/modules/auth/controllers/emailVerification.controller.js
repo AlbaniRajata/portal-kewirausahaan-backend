@@ -1,42 +1,42 @@
-const { verifyEmail } = require("../services/emailVerification.service");
+const {
+  verifyEmail,
+  resendVerification,
+  cancelRegistrasi,
+} = require("../services/emailVerification.service");
 
 const verifyEmailController = async (req, res, next) => {
   try {
-    const { token } = req.query;
+    const { id_user, kode } = req.body;
 
-    if (!token) {
+    if (!id_user || !kode) {
       return res.status(400).json({
         success: false,
-        message:
-          "Token verifikasi tidak ditemukan. Silakan gunakan link verifikasi yang valid dari email Anda.",
+        message: "ID user dan kode verifikasi wajib diisi.",
         data: null,
       });
     }
 
-    if (token.length !== 64 || !/^[a-f0-9]+$/.test(token)) {
+    if (!/^\d{6}$/.test(kode)) {
       return res.status(400).json({
         success: false,
-        message:
-          "Token verifikasi tidak valid. Silakan gunakan link dari email Anda.",
+        message: "Format kode verifikasi tidak valid. Kode harus 6 digit angka.",
         data: null,
       });
     }
 
-    const result = await verifyEmail(token);
+    const result = await verifyEmail(parseInt(id_user), kode);
 
     if (result.error) {
       return res.status(400).json({
         success: false,
-        message:
-          "Token verifikasi tidak valid atau sudah kadaluarsa. Silakan registrasi ulang atau hubungi administrator.",
+        message: result.error,
         data: null,
       });
     }
 
     return res.status(200).json({
       success: true,
-      message:
-        "Email berhasil diverifikasi. Anda sekarang dapat melakukan login ke sistem.",
+      message: "Email berhasil diverifikasi. Silahkan tunggu verifikasi dari admin.",
       data: null,
     });
   } catch (err) {
@@ -44,4 +44,72 @@ const verifyEmailController = async (req, res, next) => {
   }
 };
 
-module.exports = { verifyEmailController };
+const resendVerificationController = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email wajib diisi.",
+        data: null,
+      });
+    }
+
+    const result = await resendVerification(email);
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.error,
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Kode verifikasi baru telah dikirim ke email Anda.",
+      data: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const cancelRegistrasiController = async (req, res, next) => {
+  try {
+    const { id_user } = req.body;
+
+    if (!id_user) {
+      return res.status(400).json({
+        success: false,
+        message: "ID user wajib diisi.",
+        data: null,
+      });
+    }
+
+    const result = await cancelRegistrasi(parseInt(id_user));
+
+    if (result.error) {
+      return res.status(400).json({
+        success: false,
+        message: result.error,
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Registrasi berhasil dibatalkan.",
+      data: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = {
+  verifyEmailController,
+  resendVerificationController,
+  cancelRegistrasiController,
+};

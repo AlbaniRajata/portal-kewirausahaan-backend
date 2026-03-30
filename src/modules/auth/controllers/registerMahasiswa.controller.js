@@ -100,7 +100,7 @@ const registerMahasiswaHandler = async (req, res, next) => {
 
     return res.status(201).json({
       success: true,
-      message: "Registrasi mahasiswa berhasil. Silakan cek email untuk verifikasi.",
+      message: "Registrasi mahasiswa berhasil. Kode verifikasi telah dikirim ke email Anda.",
       data: {
         user: {
           id_user: user.id_user,
@@ -108,7 +108,6 @@ const registerMahasiswaHandler = async (req, res, next) => {
           email: user.email,
           id_role: user.id_role,
         },
-        ...(process.env.NODE_ENV === "development" && { verification_link: verificationLink }),
       },
     });
   } catch (err) {

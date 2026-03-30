@@ -115,10 +115,10 @@ const rejectPenugasanController = async (req, res, next) => {
 
     const { catatan } = req.body || {};
 
-    if (!catatan || typeof catatan !== "string" || catatan.trim().length < 10) {
+    if (!catatan || typeof catatan !== "string" || catatan.trim().length < 5) {
       return res.status(400).json({
         success: false,
-        message: "Catatan penolakan wajib diisi minimal 10 karakter",
+        message: "Catatan penolakan wajib diisi minimal 5 karakter",
         data: null,
       });
     }

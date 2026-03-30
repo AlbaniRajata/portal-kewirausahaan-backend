@@ -29,7 +29,7 @@ module.exports = (req, res, next) => {
     if (err.name === "TokenExpiredError") {
       return res.status(401).json({
         success: false,
-        message: "Sesi Anda telah berakhir. Silakan login kembali.",
+        message: "Sesi Anda telah berakhir. Silahkan login kembali.",
         data: { code: "TOKEN_EXPIRED" },
       });
     }

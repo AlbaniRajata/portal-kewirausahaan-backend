@@ -8,16 +8,31 @@ const createEmailTokenDb = async ({ id_user, token, expired_at }) => {
   );
 };
 
-const getValidTokenDb = async (token) => {
+const getValidTokenDb = async (id_user, token) => {
   const { rows } = await pool.query(
     `SELECT *
      FROM t_email_verification
-     WHERE token = $1
+     WHERE id_user = $1
+       AND token = $2
        AND used = false
-       AND expired_at > NOW()`,
-    [token]
+       AND expired_at > NOW()
+     ORDER BY created_at DESC
+     LIMIT 1`,
+    [id_user, token]
   );
-  return rows[0];
+  return rows[0] || null;
+};
+
+const getLastTokenDb = async (id_user) => {
+  const { rows } = await pool.query(
+    `SELECT created_at
+     FROM t_email_verification
+     WHERE id_user = $1
+     ORDER BY created_at DESC
+     LIMIT 1`,
+    [id_user]
+  );
+  return rows[0] || null;
 };
 
 const markTokenUsedDb = async (id) => {
@@ -41,10 +56,37 @@ const deleteOldTokensDb = async (id_user) => {
   );
 };
 
+const getUserByEmailDb = async (email) => {
+  const { rows } = await pool.query(
+    `SELECT id_user, email_verified_at FROM m_user WHERE email = $1`,
+    [email]
+  );
+  return rows[0] || null;
+};
+
+const getUserByIdDb = async (id_user) => {
+  const { rows } = await pool.query(
+    `SELECT id_user, email_verified_at FROM m_user WHERE id_user = $1`,
+    [id_user]
+  );
+  return rows[0] || null;
+};
+
+const cancelRegistrasiDb = async (id_user) => {
+  await pool.query(
+    `DELETE FROM m_user WHERE id_user = $1 AND email_verified_at IS NULL`,
+    [id_user]
+  );
+};
+
 module.exports = {
   createEmailTokenDb,
   getValidTokenDb,
+  getLastTokenDb,
   markTokenUsedDb,
   verifyEmailUserDb,
   deleteOldTokensDb,
+  getUserByEmailDb,
+  getUserByIdDb,
+  cancelRegistrasiDb,
 };

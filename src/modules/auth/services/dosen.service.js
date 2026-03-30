@@ -36,9 +36,9 @@ const registerDosen = async (data) => {
 
     await client.query("COMMIT");
 
-    const token = await createVerificationToken(user.id_user);
+    await createVerificationToken(user.id_user, data.email);
 
-    return { user, token };
+    return { user };
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;

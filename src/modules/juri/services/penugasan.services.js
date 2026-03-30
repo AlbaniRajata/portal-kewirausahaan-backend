@@ -88,8 +88,8 @@ const rejectPenugasan = async (id_user, id_distribusi, catatan) => {
     return { error: true, message: "ID distribusi tidak valid", data: null };
   }
 
-  if (!catatan || typeof catatan !== "string" || catatan.trim().length < 10) {
-    return { error: true, message: "Catatan penolakan wajib diisi minimal 10 karakter", data: null };
+  if (!catatan || typeof catatan !== "string" || catatan.trim().length < 5) {
+    return { error: true, message: "Catatan penolakan wajib diisi minimal 5 karakter", data: null };
   }
 
   const detail = await getDetailPenugasanDb(id_distribusi, id_user);
