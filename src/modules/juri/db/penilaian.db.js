@@ -124,6 +124,85 @@ const markDistribusiSubmittedDb = async (id_distribusi) => {
   return rows[0] || null;
 };
 
+const getPasanganReviewerByProposalDb = async (id_proposal, tahap) => {
+  const q = `
+    SELECT
+      dr.id_distribusi,
+      dr.id_reviewer,
+      dr.status
+    FROM t_distribusi_reviewer dr
+    WHERE dr.id_proposal = $1
+      AND dr.tahap = $2
+      AND dr.status NOT IN (2, 5)
+  `;
+  const { rows } = await pool.query(q, [id_proposal, tahap]);
+  return rows[0] || null;
+};
+
+const getOrCreatePenilaianReviewerDb = async (id_distribusi, id_tahap) => {
+  await pool.query(
+    `INSERT INTO t_penilaian_reviewer (id_distribusi, id_tahap)
+     VALUES ($1, $2)
+     ON CONFLICT (id_distribusi) DO NOTHING`,
+    [id_distribusi, id_tahap]
+  );
+  const { rows } = await pool.query(
+    `SELECT * FROM t_penilaian_reviewer WHERE id_distribusi = $1`,
+    [id_distribusi]
+  );
+  return rows[0] || null;
+};
+
+const upsertNilaiReviewerDb = async (id_penilaian, id_kriteria, skor, nilai, catatan) => {
+  const q = `
+    INSERT INTO t_penilaian_reviewer_detail
+      (id_penilaian, id_kriteria, skor, nilai, catatan)
+    VALUES ($1, $2, $3, $4, $5)
+    ON CONFLICT (id_penilaian, id_kriteria)
+    DO UPDATE SET
+      skor = EXCLUDED.skor,
+      nilai = EXCLUDED.nilai,
+      catatan = EXCLUDED.catatan,
+      updated_at = now()
+    RETURNING *
+  `;
+  const { rows } = await pool.query(q, [id_penilaian, id_kriteria, skor, nilai, catatan]);
+  return rows[0] || null;
+};
+
+const submitPenilaianReviewerDb = async (id_penilaian) => {
+  const q = `
+    UPDATE t_penilaian_reviewer
+    SET status = 1, submitted_at = now()
+    WHERE id_penilaian = $1 AND status = 0
+    RETURNING *
+  `;
+  const { rows } = await pool.query(q, [id_penilaian]);
+  return rows[0] || null;
+};
+
+const markDistribusiReviewerDraftDb = async (id_distribusi) => {
+  const q = `
+    UPDATE t_distribusi_reviewer
+    SET status = 3
+    WHERE id_distribusi = $1 AND status IN (1, 3)
+    RETURNING *
+  `;
+  const { rows } = await pool.query(q, [id_distribusi]);
+  return rows[0] || null;
+};
+
+const markDistribusiReviewerSubmittedDb = async (id_distribusi) => {
+  const q = `
+    UPDATE t_distribusi_reviewer
+    SET status = 4, responded_at = now()
+    WHERE id_distribusi = $1 AND status IN (1, 3)
+    RETURNING *
+  `;
+  const { rows } = await pool.query(q, [id_distribusi]);
+  return rows[0] || null;
+};
+
 module.exports = {
   getDistribusiForPenilaianDb,
   getKriteriaByTahapDb,
@@ -133,4 +212,10 @@ module.exports = {
   submitPenilaianDb,
   markDistribusiDraftDb,
   markDistribusiSubmittedDb,
+  getPasanganReviewerByProposalDb,
+  getOrCreatePenilaianReviewerDb,
+  upsertNilaiReviewerDb,
+  submitPenilaianReviewerDb,
+  markDistribusiReviewerDraftDb,
+  markDistribusiReviewerSubmittedDb,
 };

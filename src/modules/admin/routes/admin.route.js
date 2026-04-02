@@ -56,8 +56,7 @@ const {
   manualDistribusiTahap2Controller,
   reassignReviewerTahap2Controller,
   reassignJuriTahap2Controller,
-  getDistribusiReviewerHistoryTahap2Controller,
-  getDistribusiJuriHistoryTahap2Controller,
+  getPanelTahap2HistoryController,
 } = require("../controllers/distribusiTahap2.controller");
 
 const {
@@ -192,8 +191,7 @@ router.post("/program/:id_program/proposal/finalisasi-wawancara-batch", finalisa
 router.get("/program/:id_program/panel/tahap2/preview", previewDistribusiTahap2Controller);
 router.post("/program/:id_program/panel/tahap2/auto", autoDistribusiTahap2Controller);
 router.post("/program/:id_program/panel/tahap2/manual", manualDistribusiTahap2Controller);
-router.get("/program/:id_program/distribusi/reviewer/tahap/2/history", getDistribusiReviewerHistoryTahap2Controller);
-router.get("/program/:id_program/distribusi/juri/tahap/2/history", getDistribusiJuriHistoryTahap2Controller);
+router.get("/program/:id_program/panel/tahap2/history", getPanelTahap2HistoryController);
 router.post("/program/:id_program/panel/tahap2/reviewer/:id_distribusi/reassign", reassignReviewerTahap2Controller);
 router.post("/program/:id_program/panel/tahap2/juri/:id_distribusi/reassign", reassignJuriTahap2Controller);
 

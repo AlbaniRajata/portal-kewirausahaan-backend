@@ -4,8 +4,7 @@ const {
   manualDistribusiTahap2,
   reassignReviewerTahap2,
   reassignJuriTahap2,
-  getDistribusiReviewerHistoryTahap2,
-  getDistribusiJuriHistoryTahap2,
+  getPanelTahap2History,
 } = require("../services/distribusiTahap2.service");
 
 const previewDistribusiTahap2Controller = async (req, res, next) => {
@@ -38,31 +37,17 @@ const manualDistribusiTahap2Controller = async (req, res, next) => {
     if (isNaN(id_program) || id_program <= 0) {
       return res.status(400).json({ success: false, message: "ID program tidak valid", data: null });
     }
-    const result = await manualDistribusiTahap2(req.user.id_user, id_program, req.body);
+    const { id_proposal, id_reviewer, id_juri } = req.body;
+    if (!id_proposal || !id_reviewer || !id_juri) {
+      return res.status(400).json({ success: false, message: "id_proposal, id_reviewer, dan id_juri wajib diisi", data: null });
+    }
+    const result = await manualDistribusiTahap2(req.user.id_user, id_program, {
+      id_proposal: parseInt(id_proposal),
+      id_reviewer: parseInt(id_reviewer),
+      id_juri: parseInt(id_juri),
+    });
     if (result.error) return res.status(400).json({ success: false, message: result.message, data: result.data });
     return res.status(201).json({ success: true, message: result.message, data: result.data });
-  } catch (err) { next(err); }
-};
-
-const getDistribusiReviewerHistoryTahap2Controller = async (req, res, next) => {
-  try {
-    const id_program = parseInt(req.params.id_program);
-    if (isNaN(id_program) || id_program <= 0) {
-      return res.status(400).json({ success: false, message: "ID program tidak valid", data: null });
-    }
-    const result = await getDistribusiReviewerHistoryTahap2(id_program);
-    return res.status(200).json({ success: true, message: result.message, data: result.data });
-  } catch (err) { next(err); }
-};
-
-const getDistribusiJuriHistoryTahap2Controller = async (req, res, next) => {
-  try {
-    const id_program = parseInt(req.params.id_program);
-    if (isNaN(id_program) || id_program <= 0) {
-      return res.status(400).json({ success: false, message: "ID program tidak valid", data: null });
-    }
-    const result = await getDistribusiJuriHistoryTahap2(id_program);
-    return res.status(200).json({ success: true, message: result.message, data: result.data });
   } catch (err) { next(err); }
 };
 
@@ -104,12 +89,22 @@ const reassignJuriTahap2Controller = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+const getPanelTahap2HistoryController = async (req, res, next) => {
+  try {
+    const id_program = parseInt(req.params.id_program);
+    if (isNaN(id_program) || id_program <= 0) {
+      return res.status(400).json({ success: false, message: "ID program tidak valid", data: null });
+    }
+    const result = await getPanelTahap2History(id_program);
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
+
 module.exports = {
   previewDistribusiTahap2Controller,
   autoDistribusiTahap2Controller,
   manualDistribusiTahap2Controller,
   reassignReviewerTahap2Controller,
   reassignJuriTahap2Controller,
-  getDistribusiReviewerHistoryTahap2Controller,
-  getDistribusiJuriHistoryTahap2Controller,
+  getPanelTahap2HistoryController,
 };
