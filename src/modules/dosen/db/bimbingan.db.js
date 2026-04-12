@@ -17,7 +17,7 @@ const getBimbinganMasukDb = async (id_dosen) => {
     FROM t_bimbingan b
     JOIN t_tim t ON t.id_tim = b.id_tim
     JOIN m_user u ON u.id_user = b.diajukan_oleh
-    JOIN t_proposal p ON p.id_proposal = b.id_proposal
+    LEFT JOIN t_proposal p ON p.id_proposal = b.id_proposal
     WHERE b.id_dosen = $1
     ORDER BY b.created_at DESC
   `;
@@ -45,7 +45,7 @@ const getDetailBimbinganDb = async (id_bimbingan, id_dosen) => {
     FROM t_bimbingan b
     JOIN t_tim t ON t.id_tim = b.id_tim
     JOIN m_user u ON u.id_user = b.diajukan_oleh
-    JOIN t_proposal p ON p.id_proposal = b.id_proposal
+    LEFT JOIN t_proposal p ON p.id_proposal = b.id_proposal
     WHERE b.id_bimbingan = $1
       AND b.id_dosen = $2
   `;

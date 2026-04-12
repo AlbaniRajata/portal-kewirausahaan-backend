@@ -57,15 +57,24 @@ const getPengajuanMasukDb = async (id_dosen) => {
       pg.id_pengajuan,
       pg.status,
       pg.created_at,
+      pg.responded_at,
+      pg.catatan_dosen,
+      CASE
+        WHEN pg.catatan_dosen = '[REASSIGN_ADMIN]' THEN true
+        WHEN pg.catatan_dosen ILIKE '%reassign%' THEN true
+        WHEN pg.status = 1 AND pg.responded_at IS NOT NULL AND pg.created_at < (now() - INTERVAL '1 day') THEN true
+        ELSE false
+      END AS is_reassigned,
       t.id_tim,
       t.nama_tim,
       pr.id_program,
       pr.keterangan,
-      u.nama_lengkap AS mahasiswa_pengaju
+      COALESCE(u.nama_lengkap, '-') AS mahasiswa_pengaju,
+      to_jsonb(pg) AS pengajuan_raw
     FROM t_pengajuan_pembimbing pg
     JOIN t_tim t ON t.id_tim = pg.id_tim
     JOIN m_program pr ON pr.id_program = pg.id_program
-    JOIN m_user u ON u.id_user = pg.diajukan_oleh
+    LEFT JOIN m_user u ON u.id_user = pg.diajukan_oleh
     WHERE pg.id_dosen = $1
     ORDER BY pg.created_at DESC
   `;
@@ -84,11 +93,17 @@ const getDetailPengajuanDb = async (id_pengajuan, id_dosen) => {
       pg.catatan_dosen,
       pg.created_at,
       pg.responded_at,
+      CASE
+        WHEN pg.catatan_dosen = '[REASSIGN_ADMIN]' THEN true
+        WHEN pg.catatan_dosen ILIKE '%reassign%' THEN true
+        WHEN pg.status = 1 AND pg.responded_at IS NOT NULL AND pg.created_at < (now() - INTERVAL '1 day') THEN true
+        ELSE false
+      END AS is_reassigned,
       t.nama_tim,
-      u.nama_lengkap AS mahasiswa_pengaju
+      COALESCE(u.nama_lengkap, '-') AS mahasiswa_pengaju
     FROM t_pengajuan_pembimbing pg
     JOIN t_tim t ON t.id_tim = pg.id_tim
-    JOIN m_user u ON u.id_user = pg.diajukan_oleh
+    LEFT JOIN m_user u ON u.id_user = pg.diajukan_oleh
     WHERE pg.id_pengajuan = $1
       AND pg.id_dosen = $2
   `;

@@ -111,7 +111,7 @@ const getListBimbinganDb = async (id_program, status_filter = null) => {
      JOIN m_dosen d ON d.id_user = b.id_dosen
      JOIN m_user dosen ON dosen.id_user = d.id_user
      JOIN m_user mhs ON mhs.id_user = b.diajukan_oleh
-     JOIN t_proposal p ON p.id_proposal = b.id_proposal
+     LEFT JOIN t_proposal p ON p.id_proposal = b.id_proposal
      WHERE t.id_program = $1 ${statusClause}
      ORDER BY b.tanggal_bimbingan DESC, b.created_at DESC`,
     values

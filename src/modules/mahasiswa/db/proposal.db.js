@@ -235,6 +235,25 @@ const getProposalByUserDb = async (id_user) => {
   return rows[0] || null;
 };
 
+const getPengajuanPembimbingByTimDb = async (id_tim) => {
+  const q = `
+    SELECT
+      p.id_pengajuan,
+      p.id_dosen,
+      p.status,
+      p.catatan_dosen,
+      p.created_at,
+      p.responded_at,
+      u.nama_lengkap AS nama_dosen
+    FROM t_pengajuan_pembimbing p
+    JOIN m_user u ON u.id_user = p.id_dosen
+    WHERE p.id_tim = $1
+    LIMIT 1
+  `;
+  const { rows } = await pool.query(q, [id_tim]);
+  return rows[0] || null;
+};
+
 module.exports = {
   getTimKetuaDb,
   getAnggotaTimDetailDb,
@@ -247,4 +266,5 @@ module.exports = {
   getProposalByTimDb,
   getTimByUserDb,
   getProposalByUserDb,
+  getPengajuanPembimbingByTimDb,
 };

@@ -93,8 +93,8 @@ const createTim = async (user, payload) => {
     return { error: "Data anggota tim tidak valid.", field: "anggota" };
   }
 
-  if (payload.anggota.length < 2 || payload.anggota.length > 4) {
-    return { error: "Jumlah anggota tim harus minimal 2 dan maksimal 4 orang (total 3-5 termasuk ketua).", field: "anggota" };
+  if (payload.anggota.length < 2) {
+    return { error: "Jumlah anggota tim minimal 2 orang (total minimal 3 termasuk ketua).", field: "anggota" };
   }
 
   const nimList = payload.anggota.map((a) => a.nim);
@@ -292,11 +292,6 @@ const addAnggotaToTim = async (user, nim) => {
   const hasRejected = await timDb.cekAdaAnggotaDitolak(tim.id_tim);
   if (!hasRejected) {
     return { error: "Tidak ada anggota yang ditolak. Penambahan anggota baru hanya bisa dilakukan jika ada undangan yang ditolak.", field: "tim" };
-  }
-
-  const activeCount = await timDb.countActiveAnggota(tim.id_tim);
-  if (activeCount >= 5) {
-    return { error: "Tim sudah penuh (maksimal 4 anggota).", field: "anggota" };
   }
 
   if (!nim || typeof nim !== "string" || !nim.trim()) {

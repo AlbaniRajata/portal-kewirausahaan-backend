@@ -1,18 +1,11 @@
 const {
-  getPesertaAktifDb,
-  getProposalLolosDb,
+  getTimByUserDb,
+  getTimKetuaByUserDb,
   listDosenDb,
   getDosenByIdDb,
   getPengajuanTimDb,
   upsertPengajuanDb,
-  updateStatusProposalDb,
 } = require("../db/pembimbing.db");
-
-const PROPOSAL_STATUS = {
-  LOLOS_WAWANCARA: 7,
-  MENUNGGU_PEMBIMBING: 8,
-  PEMBIMBING_DITERIMA: 9,
-};
 
 const listDosenPembimbing = async () => {
   const dosen = await listDosenDb();
@@ -24,31 +17,22 @@ const listDosenPembimbing = async () => {
 };
 
 const getStatusPembimbing = async (id_user) => {
-  const peserta = await getPesertaAktifDb(id_user);
-  if (!peserta) {
-    return { error: true, message: "Anda belum terdaftar sebagai peserta program yang lolos", data: null };
+  const tim = await getTimByUserDb(id_user);
+  if (!tim) {
+    return { error: true, message: "Anda belum terdaftar dalam tim", data: null };
   }
 
-  const proposal = await getProposalLolosDb(peserta.id_tim);
-  if (!proposal) {
-    return { error: true, message: "Proposal belum lolos tahap wawancara", data: null };
-  }
-
-  const pengajuan = await getPengajuanTimDb(peserta.id_tim);
-  const bisa_ajukan = peserta.peran === 1 && (!pengajuan || pengajuan.status === 2);
+  const pengajuan = await getPengajuanTimDb(tim.id_tim);
+  const bisa_ajukan = tim.peran === 1 && (!pengajuan || pengajuan.status === 2);
 
   return {
     error: false,
     message: "Status pengajuan pembimbing berhasil diambil",
     data: {
-      proposal: {
-        id_proposal: proposal.id_proposal,
-        judul: proposal.judul,
-        status: proposal.status,
-      },
+      tim,
       pengajuan: pengajuan || null,
       bisa_ajukan,
-      is_ketua: peserta.peran === 1,
+      is_ketua: tim.peran === 1,
     },
   };
 };
@@ -59,23 +43,18 @@ const ajukanPembimbing = async (id_user, payload) => {
     return { error: true, message: "ID dosen tidak valid", data: null };
   }
 
-  const peserta = await getPesertaAktifDb(id_user);
-  if (!peserta) {
-    return { error: true, message: "Anda belum terdaftar sebagai peserta program yang lolos", data: null };
-  }
-
-  if (peserta.peran !== 1) {
+  const tim = await getTimKetuaByUserDb(id_user);
+  if (!tim) {
     return { error: true, message: "Hanya ketua tim yang dapat mengajukan dosen pembimbing", data: null };
   }
 
-  const proposal = await getProposalLolosDb(peserta.id_tim);
-  if (!proposal || proposal.status !== PROPOSAL_STATUS.LOLOS_WAWANCARA) {
-    return { error: true, message: "Pengajuan hanya bisa dilakukan saat proposal berstatus lolos wawancara", data: null };
+  const pengajuan = await getPengajuanTimDb(tim.id_tim);
+  if (pengajuan && pengajuan.status === 0) {
+    return { error: true, message: "Masih ada pengajuan pembimbing aktif yang belum direspon", data: null };
   }
 
-  const pengajuan = await getPengajuanTimDb(peserta.id_tim);
-  if (pengajuan && pengajuan.status !== 2) {
-    return { error: true, message: "Pengajuan pembimbing sudah ada dan masih dalam proses", data: null };
+  if (pengajuan && pengajuan.status === 1) {
+    return { error: true, message: "Dosen pembimbing sudah disetujui. Tidak dapat mengajukan ulang", data: null };
   }
 
   const dosen = await getDosenByIdDb(id_dosen);
@@ -83,8 +62,7 @@ const ajukanPembimbing = async (id_user, payload) => {
     return { error: true, message: "Dosen tidak ditemukan atau belum terverifikasi", data: null };
   }
 
-  const result = await upsertPengajuanDb(peserta.id_tim, peserta.id_program, id_dosen, id_user);
-  await updateStatusProposalDb(proposal.id_proposal, PROPOSAL_STATUS.MENUNGGU_PEMBIMBING);
+  const result = await upsertPengajuanDb(tim.id_tim, tim.id_program, id_dosen, id_user);
 
   return {
     error: false,

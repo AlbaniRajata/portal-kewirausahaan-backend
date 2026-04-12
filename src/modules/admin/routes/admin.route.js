@@ -6,10 +6,6 @@ const {
   getDetailMahasiswaController,
   approveMahasiswaController,
   rejectMahasiswaController,
-  getPendingDosenController,
-  getDetailDosenController,
-  approveDosenController,
-  rejectDosenController,
 } = require("../controllers/verification.controller");
 
 const {
@@ -30,6 +26,14 @@ const {
   getProposalDetailAdminController,
   getMonitoringDistribusiController,
 } = require("../controllers/proposal.controller");
+
+const {
+  getProposalListPembimbingController,
+  updatePembimbingController,
+  updateBatchPembimbingController,
+  getDosenController,
+  getDosenBebanController,
+} = require("../controllers/pembimbing.controller");
 
 const {
   previewDistribusiTahap1Controller,
@@ -142,21 +146,33 @@ const {
 
 const { getDashboardAdminController } = require("../controllers/dashboard.controller");
 
-const { uploadBerita } = require("../../../middlewares/upload.middleware");
+const {
+  getProfileController,
+  updateProfileController,
+  updatePasswordController,
+} = require("../controllers/profile.controller");
+
+const { uploadBerita, uploadFotoProfil } = require("../../../middlewares/upload.middleware");
 const roleMiddleware = require("../../../middlewares/role.middleware");
 const { ROLE } = require("../../../constants/role");
 
 router.use(roleMiddleware([ROLE.ADMIN, ROLE.SUPER_ADMIN]));
 
+const uploadFotoOptional = (req, res, next) => {
+  uploadFotoProfil.single("foto")(req, res, (err) => {
+    if (err) return next(err);
+    next();
+  });
+};
+
+router.get("/profile", getProfileController);
+router.patch("/profile", uploadFotoOptional, updateProfileController);
+router.put("/password", updatePasswordController);
+
 router.get("/verifikasi/mahasiswa", getPendingMahasiswaController);
 router.get("/verifikasi/mahasiswa/:id", getDetailMahasiswaController);
 router.post("/verifikasi/mahasiswa/:id/approve", approveMahasiswaController);
 router.post("/verifikasi/mahasiswa/:id/reject", rejectMahasiswaController);
-
-router.get("/verifikasi/dosen", getPendingDosenController);
-router.get("/verifikasi/dosen/:id", getDetailDosenController);
-router.post("/verifikasi/dosen/:id/approve", approveDosenController);
-router.post("/verifikasi/dosen/:id/reject", rejectDosenController);
 
 router.get("/program/my", getProgramAdminController);
 router.patch("/program/:id_program/timeline", setProgramTimelineController);
@@ -172,6 +188,13 @@ router.delete("/kriteria/:id_kriteria", deleteKriteriaPenilaianController);
 router.get("/proposal", getProposalListController);
 router.get("/proposal/monitoring", getMonitoringDistribusiController);
 router.get("/proposal/:id_proposal", getProposalDetailAdminController);
+
+router.get("/pemerataan-pembimbing/proposal", getProposalListPembimbingController);
+router.get("/pemerataan-pembimbing/dosen", getDosenController);
+router.get("/pemerataan-pembimbing/dosen/beban", getDosenBebanController);
+router.patch("/pemerataan-pembimbing/tim/:id_tim", updatePembimbingController);
+router.post("/pemerataan-pembimbing/tim/batch", updateBatchPembimbingController);
+router.post("/pemerataan-pembimbing/batch-update", updateBatchPembimbingController);
 
 router.get("/program/:id_program/distribusi/reviewer/tahap/:tahap/preview", previewDistribusiTahap1Controller);
 router.post("/program/:id_program/distribusi/reviewer/tahap/:tahap/auto", autoDistribusiTahap1Controller);

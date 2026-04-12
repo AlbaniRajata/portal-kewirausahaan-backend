@@ -1,6 +1,6 @@
 const {
   getPesertaAktifDb,
-  getProposalLolosDb,
+  getProposalTimDb,
   getPembimbingTimDb,
   listBimbinganTimDb,
   getDetailBimbinganDb,
@@ -12,7 +12,7 @@ const METODE_VALID = [1, 2, 3];
 const listBimbingan = async (id_user) => {
   const peserta = await getPesertaAktifDb(id_user);
   if (!peserta) {
-    return { error: true, message: "Anda belum terdaftar sebagai peserta program yang lolos", data: null };
+    return { error: true, message: "Anda belum terdaftar dalam tim", data: null };
   }
 
   const bimbingan = await listBimbinganTimDb(peserta.id_tim);
@@ -32,7 +32,7 @@ const detailBimbingan = async (id_user, id_bimbingan) => {
 
   const peserta = await getPesertaAktifDb(id_user);
   if (!peserta) {
-    return { error: true, message: "Anda belum terdaftar sebagai peserta program yang lolos", data: null };
+    return { error: true, message: "Anda belum terdaftar dalam tim", data: null };
   }
 
   const bimbingan = await getDetailBimbinganDb(id, peserta.id_tim);
@@ -80,13 +80,10 @@ const ajukanBimbingan = async (id_user, payload) => {
 
   const peserta = await getPesertaAktifDb(id_user);
   if (!peserta) {
-    return { error: true, message: "Anda belum terdaftar sebagai peserta program yang lolos", data: null };
+    return { error: true, message: "Anda belum terdaftar dalam tim", data: null };
   }
 
-  const proposal = await getProposalLolosDb(peserta.id_tim);
-  if (!proposal) {
-    return { error: true, message: "Proposal belum berstatus disetujui pembimbing", data: null };
-  }
+  const proposal = await getProposalTimDb(peserta.id_tim);
 
   const pembimbing = await getPembimbingTimDb(peserta.id_tim);
   if (!pembimbing) {
@@ -95,7 +92,7 @@ const ajukanBimbingan = async (id_user, payload) => {
 
   const bimbingan = await createBimbinganDb({
     id_tim: peserta.id_tim,
-    id_proposal: proposal.id_proposal,
+    id_proposal: proposal?.id_proposal || null,
     id_dosen: pembimbing.id_dosen,
     diajukan_oleh: id_user,
     tanggal_bimbingan,

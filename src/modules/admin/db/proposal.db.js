@@ -25,14 +25,36 @@ const getProposalListDb = async ({ id_program, status } = {}) => {
       json_build_object(
         'id_user', u.id_user,
         'nama_lengkap', u.nama_lengkap,
-        'username', u.username
-      ) AS ketua
+        'username', u.username,
+        'no_hp', u.no_hp,
+        'jurusan', prod.nama_prodi
+      ) AS ketua,
+      (
+        SELECT json_build_object(
+          'id_pengajuan', pg.id_pengajuan,
+          'id_dosen', pg.id_dosen,
+          'status', pg.status,
+          'catatan_dosen', pg.catatan_dosen,
+          'created_at', pg.created_at,
+          'responded_at', pg.responded_at,
+          'nama_dosen', du.nama_lengkap,
+          'nip', d.nip,
+          'bidang_keahlian', d.bidang_keahlian
+        )
+        FROM t_pengajuan_pembimbing pg
+        JOIN m_dosen d ON d.id_user = pg.id_dosen
+        JOIN m_user du ON du.id_user = d.id_user
+        WHERE pg.id_tim = t.id_tim
+        LIMIT 1
+      ) AS pembimbing
     FROM t_proposal p
     JOIN m_program pr ON pr.id_program = p.id_program
     JOIN t_tim t ON t.id_tim = p.id_tim
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
     JOIN t_anggota_tim a ON a.id_tim = t.id_tim AND a.peran = 1
     JOIN m_user u ON u.id_user = a.id_user
+    LEFT JOIN m_mahasiswa mhs ON mhs.id_user = u.id_user
+    LEFT JOIN m_prodi prod ON prod.id_prodi = mhs.id_prodi
     ${where}
     ORDER BY p.tanggal_submit DESC
   `;
@@ -62,6 +84,24 @@ const getProposalDetailAdminDb = async (id_proposal) => {
         'nama_lengkap', u.nama_lengkap,
         'nim', mhs_ketua.nim
       ) AS ketua,
+      (
+        SELECT json_build_object(
+          'id_pengajuan', pg.id_pengajuan,
+          'id_dosen', pg.id_dosen,
+          'status', pg.status,
+          'catatan_dosen', pg.catatan_dosen,
+          'created_at', pg.created_at,
+          'responded_at', pg.responded_at,
+          'nama_dosen', du.nama_lengkap,
+          'nip', d.nip,
+          'bidang_keahlian', d.bidang_keahlian
+        )
+        FROM t_pengajuan_pembimbing pg
+        JOIN m_dosen d ON d.id_user = pg.id_dosen
+        JOIN m_user du ON du.id_user = d.id_user
+        WHERE pg.id_tim = t.id_tim
+        LIMIT 1
+      ) AS pembimbing,
       (
         SELECT json_agg(
           json_build_object(

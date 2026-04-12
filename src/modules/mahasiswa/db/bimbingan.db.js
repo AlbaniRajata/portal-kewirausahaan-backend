@@ -3,28 +3,26 @@ const pool = require("../../../config/db");
 const getPesertaAktifDb = async (id_user) => {
   const q = `
     SELECT
-      pp.id_user,
-      pp.id_program,
-      pp.id_tim,
-      pp.tahun,
-      pp.status_lolos,
+      a.id_user,
+      t.id_program,
+      a.id_tim,
       a.peran
-    FROM t_peserta_program pp
-    JOIN t_anggota_tim a ON a.id_tim = pp.id_tim AND a.id_user = pp.id_user
-    WHERE pp.id_user = $1
-      AND pp.status_lolos = 1
+    FROM t_anggota_tim a
+    JOIN t_tim t ON t.id_tim = a.id_tim
+    WHERE a.id_user = $1
+      AND a.status = 1
     LIMIT 1
   `;
   const { rows } = await pool.query(q, [id_user]);
   return rows[0] || null;
 };
 
-const getProposalLolosDb = async (id_tim) => {
+const getProposalTimDb = async (id_tim) => {
   const q = `
     SELECT id_proposal, judul, status
     FROM t_proposal
     WHERE id_tim = $1
-      AND status = 9
+    ORDER BY id_proposal DESC
     LIMIT 1
   `;
   const { rows } = await pool.query(q, [id_tim]);
@@ -98,7 +96,7 @@ const getDetailBimbinganDb = async (id_bimbingan, id_tim) => {
     JOIN m_user u ON u.id_user = b.id_dosen
     JOIN m_dosen d ON d.id_user = b.id_dosen
     JOIN m_user mhs ON mhs.id_user = b.diajukan_oleh
-    JOIN t_proposal p ON p.id_proposal = b.id_proposal
+    LEFT JOIN t_proposal p ON p.id_proposal = b.id_proposal
     WHERE b.id_bimbingan = $1
       AND b.id_tim = $2
     LIMIT 1
@@ -140,7 +138,7 @@ const createBimbinganDb = async (payload) => {
 
 module.exports = {
   getPesertaAktifDb,
-  getProposalLolosDb,
+  getProposalTimDb,
   getPembimbingTimDb,
   getBimbinganPendingDb,
   listBimbinganTimDb,

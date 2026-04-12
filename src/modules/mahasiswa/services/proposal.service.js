@@ -10,6 +10,7 @@ const {
   getProposalByTimDb,
   getTimByUserDb,
   getProposalByUserDb,
+  getPengajuanPembimbingByTimDb,
 } = require("../db/proposal.db");
 const PROGRAM = require("../../../constants/program");
 
@@ -18,6 +19,8 @@ const isTimelineOpen = (timeline) => {
   const now = new Date();
   return now >= new Date(timeline.pendaftaran_mulai) && now <= new Date(timeline.pendaftaran_selesai);
 };
+
+const isPembimbingAccepted = (pengajuan) => pengajuan?.status === 1;
 
 const getProposalStatus = async (id_user) => {
   const tim = await getTimByUserDb(id_user);
@@ -38,6 +41,7 @@ const getProposalStatus = async (id_user) => {
   const anggota = await getAnggotaTimDetailDb(tim.id_tim);
   const timeline = await getProgramTimelineDb(tim.id_program);
   const timelineOpen = isTimelineOpen(timeline);
+  const pengajuanPembimbing = await getPengajuanPembimbingByTimDb(tim.id_tim);
   const proposal = isKetua
     ? await getProposalByTimDb(tim.id_tim)
     : await getProposalByUserDb(id_user);
@@ -46,10 +50,10 @@ const getProposalStatus = async (id_user) => {
     hasTim: true,
     isKetua,
     isAnggota: !isKetua,
-    canSubmit: isKetua && anggota.all_accepted && timelineOpen,
+    canSubmit: isKetua && anggota.all_accepted && isPembimbingAccepted(pengajuanPembimbing) && timelineOpen,
     timelineOpen,
     message: "Status proposal berhasil diambil",
-    data: { tim, anggota, timeline, proposal: proposal || null },
+    data: { tim, anggota, timeline, pembimbing: pengajuanPembimbing || null, proposal: proposal || null },
   };
 };
 
@@ -80,6 +84,11 @@ const createProposal = async (id_user, data) => {
 
   if (!anggota.all_accepted) {
     return { error: true, message: "Masih ada anggota tim yang belum memberikan keputusan", data: { anggota_pending: anggota.pending_members } };
+  }
+
+  const pengajuanPembimbing = await getPengajuanPembimbingByTimDb(tim.id_tim);
+  if (!isPembimbingAccepted(pengajuanPembimbing)) {
+    return { error: true, message: "Proposal hanya dapat didaftarkan setelah dosen pembimbing menyetujui pengajuan", data: { pembimbing: pengajuanPembimbing || null } };
   }
 
   const timeline = await getProgramTimelineDb(id_program);
@@ -155,6 +164,16 @@ const submitProposal = async (id_user, id_proposal) => {
 
   if (!proposal.file_proposal) {
     return { error: true, message: "File proposal belum diunggah", data: null };
+  }
+
+  const anggota = await getAnggotaTimDetailDb(proposal.id_tim);
+  if (!anggota.all_accepted) {
+    return { error: true, message: "Proposal hanya dapat diajukan setelah semua anggota tim menyetujui undangan", data: { anggota_pending: anggota.pending_members } };
+  }
+
+  const pengajuanPembimbing = await getPengajuanPembimbingByTimDb(proposal.id_tim);
+  if (!isPembimbingAccepted(pengajuanPembimbing)) {
+    return { error: true, message: "Proposal hanya dapat diajukan setelah dosen pembimbing menyetujui pengajuan", data: { pembimbing: pengajuanPembimbing || null } };
   }
 
   const timeline = await getProgramTimelineDb(proposal.id_program);

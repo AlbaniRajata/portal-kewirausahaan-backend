@@ -1,33 +1,38 @@
 const pool = require("../../../config/db");
 
-const getPesertaAktifDb = async (id_user) => {
+const getTimByUserDb = async (id_user) => {
   const q = `
     SELECT
-      pp.id_user,
-      pp.id_program,
-      pp.id_tim,
-      pp.tahun,
-      pp.status_lolos,
+      t.id_tim,
+      t.nama_tim,
+      t.id_program,
       a.peran
-    FROM t_peserta_program pp
-    JOIN t_anggota_tim a ON a.id_tim = pp.id_tim AND a.id_user = pp.id_user
-    WHERE pp.id_user = $1
-      AND pp.status_lolos = 1
+    FROM t_anggota_tim a
+    JOIN t_tim t ON t.id_tim = a.id_tim
+    WHERE a.id_user = $1
+      AND a.status = 1
     LIMIT 1
   `;
   const { rows } = await pool.query(q, [id_user]);
   return rows[0] || null;
 };
 
-const getProposalLolosDb = async (id_tim) => {
+const getTimKetuaByUserDb = async (id_user) => {
   const q = `
-    SELECT id_proposal, judul, status, file_proposal
-    FROM t_proposal
-    WHERE id_tim = $1
-      AND status IN (7, 8, 9)
+    SELECT
+      t.id_tim,
+      t.nama_tim,
+      t.id_program,
+      a.id_user,
+      a.peran
+    FROM t_anggota_tim a
+    JOIN t_tim t ON t.id_tim = a.id_tim
+    WHERE a.id_user = $1
+      AND a.peran = 1
+      AND a.status = 1
     LIMIT 1
   `;
-  const { rows } = await pool.query(q, [id_tim]);
+  const { rows } = await pool.query(q, [id_user]);
   return rows[0] || null;
 };
 
@@ -68,6 +73,15 @@ const getPengajuanTimDb = async (id_tim) => {
       p.id_dosen,
       p.status,
       p.catatan_dosen,
+      CASE
+        WHEN p.catatan_dosen = '[REASSIGN_ADMIN]' THEN true
+        WHEN p.catatan_dosen ILIKE '%reassign%' THEN true
+        ELSE false
+      END AS is_reassigned,
+      CASE
+        WHEN p.catatan_dosen = '[REASSIGN_ADMIN]' THEN NULL
+        ELSE p.catatan_dosen
+      END AS catatan_dosen_display,
       p.created_at,
       p.responded_at,
       u.nama_lengkap AS nama_dosen,
@@ -102,22 +116,11 @@ const upsertPengajuanDb = async (id_tim, id_program, id_dosen, diajukan_oleh) =>
   return rows[0];
 };
 
-const updateStatusProposalDb = async (id_proposal, status) => {
-  const q = `
-    UPDATE t_proposal SET status = $2
-    WHERE id_proposal = $1
-    RETURNING id_proposal, status
-  `;
-  const { rows } = await pool.query(q, [id_proposal, status]);
-  return rows[0] || null;
-};
-
 module.exports = {
-  getPesertaAktifDb,
-  getProposalLolosDb,
+  getTimByUserDb,
+  getTimKetuaByUserDb,
   listDosenDb,
   getDosenByIdDb,
   getPengajuanTimDb,
   upsertPengajuanDb,
-  updateStatusProposalDb,
 };

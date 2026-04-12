@@ -18,6 +18,24 @@ const getTimListDb = async (filters = {}) => {
       pr.status AS status_proposal,
       pr.modal_diajukan,
       pr.tanggal_submit,
+      (
+        SELECT json_build_object(
+          'id_pengajuan', pg.id_pengajuan,
+          'id_dosen', pg.id_dosen,
+          'status', pg.status,
+          'catatan_dosen', pg.catatan_dosen,
+          'created_at', pg.created_at,
+          'responded_at', pg.responded_at,
+          'nama_dosen', du.nama_lengkap,
+          'nip', d.nip,
+          'bidang_keahlian', d.bidang_keahlian
+        )
+        FROM t_pengajuan_pembimbing pg
+        JOIN m_dosen d ON d.id_user = pg.id_dosen
+        JOIN m_user du ON du.id_user = d.id_user
+        WHERE pg.id_tim = t.id_tim
+        LIMIT 1
+      ) AS pembimbing,
       COUNT(at.id_user) AS jumlah_anggota,
       MAX(CASE WHEN at.peran = 1 THEN u.nama_lengkap END) AS nama_ketua
     FROM t_tim t
@@ -46,6 +64,24 @@ const getTimDetailDb = async (id_tim) => {
     `SELECT
       t.id_tim, t.nama_tim, t.status, t.created_at,
       p.id_program, p.nama_program, p.pendaftaran_mulai, p.pendaftaran_selesai
+      ,(
+        SELECT json_build_object(
+          'id_pengajuan', pg.id_pengajuan,
+          'id_dosen', pg.id_dosen,
+          'status', pg.status,
+          'catatan_dosen', pg.catatan_dosen,
+          'created_at', pg.created_at,
+          'responded_at', pg.responded_at,
+          'nama_dosen', du.nama_lengkap,
+          'nip', d.nip,
+          'bidang_keahlian', d.bidang_keahlian
+        )
+        FROM t_pengajuan_pembimbing pg
+        JOIN m_dosen d ON d.id_user = pg.id_dosen
+        JOIN m_user du ON du.id_user = d.id_user
+        WHERE pg.id_tim = t.id_tim
+        LIMIT 1
+      ) AS pembimbing
     FROM t_tim t
     JOIN m_program p ON p.id_program = t.id_program
     WHERE t.id_tim = $1`,
@@ -106,6 +142,24 @@ const getPesertaListDb = async (filters = {}) => {
       j.nama_jurusan, k.nama_kampus,
       p.nama_program,
       t.nama_tim,
+      (
+        SELECT json_build_object(
+          'id_pengajuan', pg.id_pengajuan,
+          'id_dosen', pg.id_dosen,
+          'status', pg.status,
+          'catatan_dosen', pg.catatan_dosen,
+          'created_at', pg.created_at,
+          'responded_at', pg.responded_at,
+          'nama_dosen', du.nama_lengkap,
+          'nip', d.nip,
+          'bidang_keahlian', d.bidang_keahlian
+        )
+        FROM t_pengajuan_pembimbing pg
+        JOIN m_dosen d ON d.id_user = pg.id_dosen
+        JOIN m_user du ON du.id_user = d.id_user
+        WHERE pg.id_tim = pp.id_tim
+        LIMIT 1
+      ) AS pembimbing,
       at.peran
     FROM t_peserta_program pp
     JOIN m_user u ON u.id_user = pp.id_user
@@ -142,6 +196,24 @@ const getPesertaDetailDb = async (id_user, id_program) => {
       j.nama_jurusan, k.nama_kampus,
       p.nama_program,
       t.nama_tim, t.status AS status_tim,
+      (
+        SELECT json_build_object(
+          'id_pengajuan', pg.id_pengajuan,
+          'id_dosen', pg.id_dosen,
+          'status', pg.status,
+          'catatan_dosen', pg.catatan_dosen,
+          'created_at', pg.created_at,
+          'responded_at', pg.responded_at,
+          'nama_dosen', du.nama_lengkap,
+          'nip', d.nip,
+          'bidang_keahlian', d.bidang_keahlian
+        )
+        FROM t_pengajuan_pembimbing pg
+        JOIN m_dosen d ON d.id_user = pg.id_dosen
+        JOIN m_user du ON du.id_user = d.id_user
+        WHERE pg.id_tim = pp.id_tim
+        LIMIT 1
+      ) AS pembimbing,
       at.peran, at.status AS status_anggota, at.catatan AS catatan_anggota
     FROM t_peserta_program pp
     JOIN m_user u ON u.id_user = pp.id_user
