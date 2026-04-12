@@ -189,12 +189,18 @@ const getPanelTahap2HistoryDb = async (id_program) => {
       dr.id_distribusi AS id_distribusi_reviewer,
       dr.id_reviewer AS id_reviewer,
       ur.nama_lengkap AS nama_reviewer,
-      dr.status AS status_reviewer,
+      CASE
+        WHEN COALESCE(dr.status, 0) = 4 OR COALESCE(dj.status, 0) = 4 THEN 4
+        ELSE COALESCE(dr.status, 0)
+      END AS status_reviewer,
       dr.assigned_at AS assigned_at_reviewer,
       dj.id_distribusi AS id_distribusi_juri,
       dj.id_juri AS id_juri,
       uj.nama_lengkap AS nama_juri,
-      dj.status AS status_juri,
+      CASE
+        WHEN COALESCE(dr.status, 0) = 4 OR COALESCE(dj.status, 0) = 4 THEN 4
+        ELSE COALESCE(dj.status, 0)
+      END AS status_juri,
       dj.assigned_at AS assigned_at_juri
      FROM t_proposal p
      JOIN t_tim t ON t.id_tim = p.id_tim

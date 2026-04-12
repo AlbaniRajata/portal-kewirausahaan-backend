@@ -202,14 +202,11 @@ const reassignReviewer = async (admin_id, id_distribusi, id_reviewer_baru, id_pr
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    await updateDistribusiStatusDb(client, id_distribusi, 5); // status 5 = diarsipkan/diganti
+    await updateDistribusiStatusDb(client, id_distribusi, 5);
 
-    // Cek apakah reviewer baru pernah punya record untuk proposal+tahap ini
     const existingDistribusi = await getDistribusiByProposalReviewerDb(client, distribusi.id_proposal, id_reviewer_baru, distribusi.tahap);
     let distribusiBaru;
     if (existingDistribusi) {
-      // Reaktifkan record lama daripada insert baru (hindari duplicate key)
-      // Hanya jika record tersebut merupakan arsip (status 5)
       distribusiBaru = await reaktifkanDistribusiDb(client, existingDistribusi.id_distribusi, admin_id);
     }
     if (!distribusiBaru) {

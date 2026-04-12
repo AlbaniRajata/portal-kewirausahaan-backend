@@ -53,7 +53,7 @@ const getHistoryPenilaianTahap2Db = async (id_program) => {
       p.id_proposal,
       p.judul,
       p.status AS status_proposal,
-      p.wawancara_at AS tanggal_finalisasi,
+        COALESCE(p.wawancara_at, p.tanggal_submit) AS tanggal_finalisasi,
       t.nama_tim,
       k.nama_kategori,
       (
@@ -120,7 +120,7 @@ const getHistoryPenilaianTahap2Db = async (id_program) => {
           AND tp3.urutan     = 2
          WHERE dj3.id_proposal = p.id_proposal AND pj3.status = 1
        )
-     ORDER BY p.wawancara_at DESC NULLS LAST`,
+     ORDER BY COALESCE(p.wawancara_at, p.tanggal_submit) DESC NULLS LAST`,
     [id_program]
   );
   return rows;

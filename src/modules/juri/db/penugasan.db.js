@@ -25,10 +25,13 @@ const getPenugasanDb = async (id_juri, urutan, status_filter = null) => {
     SELECT
       d.id_distribusi,
       d.status,
+      d.status AS status_juri,
+      dr.status AS status_reviewer,
       d.tahap AS id_tahap,
       d.assigned_at,
       d.responded_at,
       d.catatan_juri,
+      dr.id_distribusi AS id_distribusi_reviewer,
       p.id_program,
       p.id_proposal,
       p.judul,
@@ -48,6 +51,10 @@ const getPenugasanDb = async (id_juri, urutan, status_filter = null) => {
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
     JOIN m_program pr ON pr.id_program = p.id_program
     LEFT JOIN m_tahap_penilaian tp ON tp.id_tahap = d.tahap
+    LEFT JOIN t_distribusi_reviewer dr
+      ON dr.id_proposal = d.id_proposal
+      AND dr.tahap = d.tahap
+      AND dr.status != 5
     WHERE d.id_juri = $1
       AND tp.urutan = $2
       AND d.status != 5
@@ -65,10 +72,13 @@ const getDetailPenugasanDb = async (id_distribusi, id_juri) => {
       d.id_proposal,
       d.id_juri,
       d.status,
+      d.status AS status_juri,
+      dr.status AS status_reviewer,
       d.tahap AS id_tahap,
       d.assigned_at,
       d.responded_at,
       d.catatan_juri,
+      dr.id_distribusi AS id_distribusi_reviewer,
       p.id_program,
       p.judul,
       p.file_proposal,
@@ -88,6 +98,10 @@ const getDetailPenugasanDb = async (id_distribusi, id_juri) => {
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
     JOIN m_program pr ON pr.id_program = p.id_program
     LEFT JOIN m_tahap_penilaian tp ON tp.id_tahap = d.tahap
+    LEFT JOIN t_distribusi_reviewer dr
+      ON dr.id_proposal = d.id_proposal
+      AND dr.tahap = d.tahap
+      AND dr.status != 5
     WHERE d.id_distribusi = $1
       AND d.id_juri = $2
       AND d.status != 5
