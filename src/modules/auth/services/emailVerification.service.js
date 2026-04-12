@@ -4,6 +4,7 @@ const {
   getLastTokenDb,
   markTokenUsedDb,
   verifyEmailUserDb,
+  approveDosenAfterEmailVerificationDb,
   deleteOldTokensDb,
   getUserByEmailDb,
   getUserByIdDb,
@@ -39,9 +40,14 @@ const verifyEmail = async (id_user, kode) => {
   if (!record) return { error: "Kode verifikasi tidak valid atau sudah kadaluarsa. Silahkan coba lagi atauminta kode baru." };
 
   await verifyEmailUserDb(id_user);
+
+  if (user.nama_role === "dosen") {
+    await approveDosenAfterEmailVerificationDb(id_user);
+  }
+
   await markTokenUsedDb(record.id);
 
-  return { success: true };
+  return { success: true, role: user.nama_role };
 };
 
 const resendVerification = async (email) => {

@@ -49,6 +49,13 @@ const verifyEmailUserDb = async (id_user) => {
   );
 };
 
+const approveDosenAfterEmailVerificationDb = async (id_user) => {
+  await pool.query(
+    `UPDATE m_dosen SET status_verifikasi = 1 WHERE id_user = $1`,
+    [id_user]
+  );
+};
+
 const deleteOldTokensDb = async (id_user) => {
   await pool.query(
     `DELETE FROM t_email_verification WHERE id_user = $1`,
@@ -66,7 +73,10 @@ const getUserByEmailDb = async (email) => {
 
 const getUserByIdDb = async (id_user) => {
   const { rows } = await pool.query(
-    `SELECT id_user, email_verified_at FROM m_user WHERE id_user = $1`,
+    `SELECT u.id_user, u.email_verified_at, r.nama_role
+     FROM m_user u
+     JOIN m_role r ON r.id_role = u.id_role
+     WHERE u.id_user = $1`,
     [id_user]
   );
   return rows[0] || null;
@@ -85,6 +95,7 @@ module.exports = {
   getLastTokenDb,
   markTokenUsedDb,
   verifyEmailUserDb,
+  approveDosenAfterEmailVerificationDb,
   deleteOldTokensDb,
   getUserByEmailDb,
   getUserByIdDb,

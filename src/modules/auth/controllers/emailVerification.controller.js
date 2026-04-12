@@ -34,9 +34,14 @@ const verifyEmailController = async (req, res, next) => {
       });
     }
 
+    const successMessage =
+      result.role === "dosen"
+        ? "Email berhasil diverifikasi. Akun dosen Anda sudah aktif dan dapat langsung login."
+        : "Email berhasil diverifikasi. Silahkan tunggu verifikasi dari admin.";
+
     return res.status(200).json({
       success: true,
-      message: "Email berhasil diverifikasi. Silahkan tunggu verifikasi dari admin.",
+      message: successMessage,
       data: null,
     });
   } catch (err) {
