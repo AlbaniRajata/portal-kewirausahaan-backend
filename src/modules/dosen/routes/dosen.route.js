@@ -21,6 +21,10 @@ const {
   approveBimbinganController, 
   rejectBimbinganController 
 } = require("../controllers/bimbingan.controller");
+const {
+  getMonevTimBimbinganController,
+  getMonevDetailTimController,
+} = require("../controllers/monev.controller");
 
 router.use(roleMiddleware([ROLE.DOSEN]));
 
@@ -44,5 +48,8 @@ router.get("/bimbingan/pengajuan", getBimbinganMasukController);
 router.get("/bimbingan/pengajuan/:id_bimbingan", getDetailBimbinganController);
 router.patch("/bimbingan/pengajuan/:id_bimbingan/approve", approveBimbinganController);
 router.patch("/bimbingan/pengajuan/:id_bimbingan/reject", rejectBimbinganController);
+
+router.get("/monev/tim", getMonevTimBimbinganController);
+router.get("/monev/tim/:id_tim", getMonevDetailTimController);
 
 module.exports = router;
