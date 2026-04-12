@@ -48,7 +48,25 @@ const getRecentProposalDb = async (id_program) => {
   const { rows } = await pool.query(
     `SELECT
       p.id_proposal, p.judul, p.status, p.tanggal_submit,
-      t.nama_tim, k.nama_kategori
+      t.nama_tim, k.nama_kategori,
+      (
+        SELECT json_build_object(
+          'id_pengajuan', pg.id_pengajuan,
+          'id_dosen', pg.id_dosen,
+          'status', pg.status,
+          'catatan_dosen', pg.catatan_dosen,
+          'created_at', pg.created_at,
+          'responded_at', pg.responded_at,
+          'nama_dosen', du.nama_lengkap,
+          'nip', d.nip,
+          'bidang_keahlian', d.bidang_keahlian
+        )
+        FROM t_pengajuan_pembimbing pg
+        JOIN m_dosen d ON d.id_user = pg.id_dosen
+        JOIN m_user du ON du.id_user = d.id_user
+        WHERE pg.id_tim = p.id_tim
+        LIMIT 1
+      ) AS pembimbing
      FROM t_proposal p
      JOIN t_tim t ON t.id_tim = p.id_tim
      JOIN m_kategori k ON k.id_kategori = p.id_kategori
