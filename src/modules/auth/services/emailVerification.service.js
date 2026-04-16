@@ -19,13 +19,13 @@ const generateKode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-const createVerificationToken = async (id_user, email) => {
-  await deleteOldTokensDb(id_user);
+const createVerificationToken = async (id_user, email, client) => {
+  await deleteOldTokensDb(id_user, client);
 
   const kode = generateKode();
   const expired_at = new Date(Date.now() + KODE_EXPIRY_MINUTES * 60 * 1000);
 
-  await createEmailTokenDb({ id_user, token: kode, expired_at });
+  await createEmailTokenDb({ id_user, token: kode, expired_at }, client);
   await sendVerificationEmail(email, kode);
 
   return kode;

@@ -18,6 +18,30 @@ const getUserForLoginDb = async (email) => {
   return result.rows[0] || null;
 };
 
+const getUserByEmailForResetDb = async (email) => {
+  const query = `
+    SELECT
+      u.id_user, u.email, u.username, u.password_hash, u.is_active, u.email_verified_at
+    FROM m_user u
+    WHERE u.email = $1
+    LIMIT 1
+  `;
+  const result = await pool.query(query, [email]);
+  return result.rows[0] || null;
+};
+
+const getUserByIdForResetDb = async (id_user) => {
+  const query = `
+    SELECT
+      u.id_user, u.email, u.username, u.password_hash, u.is_active, u.email_verified_at
+    FROM m_user u
+    WHERE u.id_user = $1
+    LIMIT 1
+  `;
+  const result = await pool.query(query, [id_user]);
+  return result.rows[0] || null;
+};
+
 const createUserDb = async (data, client) => {
   const db = client || pool;
   const query = `
@@ -69,6 +93,17 @@ const deleteAllRefreshTokensByUserDb = async (id_user) => {
   await pool.query(query, [id_user]);
 };
 
+const updateUserPasswordHashDb = async (id_user, password_hash) => {
+  const query = `
+    UPDATE m_user
+    SET password_hash = $1
+    WHERE id_user = $2
+    RETURNING id_user
+  `;
+  const result = await pool.query(query, [password_hash, id_user]);
+  return result.rows[0] || null;
+};
+
 const deleteExpiredRefreshTokensDb = async () => {
   const query = `DELETE FROM t_refresh_token WHERE expires_at < NOW()`;
   await pool.query(query);
@@ -76,10 +111,13 @@ const deleteExpiredRefreshTokensDb = async () => {
 
 module.exports = {
   getUserForLoginDb,
+  getUserByEmailForResetDb,
+  getUserByIdForResetDb,
   createUserDb,
   saveRefreshTokenDb,
   getRefreshTokenDb,
   deleteRefreshTokenDb,
   deleteAllRefreshTokensByUserDb,
+  updateUserPasswordHashDb,
   deleteExpiredRefreshTokensDb,
 };

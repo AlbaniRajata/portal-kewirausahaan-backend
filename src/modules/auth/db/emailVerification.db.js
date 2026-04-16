@@ -1,7 +1,8 @@
 const pool = require("../../../config/db");
 
-const createEmailTokenDb = async ({ id_user, token, expired_at }) => {
-  await pool.query(
+const createEmailTokenDb = async ({ id_user, token, expired_at }, client) => {
+  const db = client || pool;
+  await db.query(
     `INSERT INTO t_email_verification (id_user, token, expired_at)
      VALUES ($1, $2, $3)`,
     [id_user, token, expired_at]
@@ -56,8 +57,9 @@ const approveDosenAfterEmailVerificationDb = async (id_user) => {
   );
 };
 
-const deleteOldTokensDb = async (id_user) => {
-  await pool.query(
+const deleteOldTokensDb = async (id_user, client) => {
+  const db = client || pool;
+  await db.query(
     `DELETE FROM t_email_verification WHERE id_user = $1`,
     [id_user]
   );

@@ -1,6 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { loginHandler, refreshHandler, logoutHandler } = require("../controllers/auth.controller");
+const {
+  loginHandler,
+  refreshHandler,
+  logoutHandler,
+  forgotPasswordHandler,
+  resetPasswordHandler,
+} = require("../controllers/auth.controller");
 const registerMahasiswa = require("../controllers/registerMahasiswa.controller");
 const registerDosen = require("../controllers/registerDosen.controller");
 const {
@@ -14,11 +20,14 @@ const {
   loginLimiter,
   registerLimiter,
   verifyEmailLimiter,
+  forgotPasswordLimiter,
 } = require("../../../middlewares/rateLimit.middleware");
 
 router.post("/register/mahasiswa", registerLimiter, uploadKTM.single("foto_ktm"), registerMahasiswa);
 router.post("/register/dosen", registerLimiter, express.json(), registerDosen);
 router.post("/login", loginLimiter, express.json(), loginHandler);
+router.post("/forgot-password", forgotPasswordLimiter, express.json(), forgotPasswordHandler);
+router.post("/reset-password", forgotPasswordLimiter, express.json(), resetPasswordHandler);
 router.post("/verify-email", verifyEmailLimiter, verifyEmailController);
 router.post("/resend-verification", verifyEmailLimiter, resendVerificationController);
 router.post("/cancel-registration", verifyEmailLimiter, cancelRegistrasiController);

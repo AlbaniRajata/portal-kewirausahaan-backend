@@ -41,8 +41,22 @@ const verifyEmailLimiter = rateLimit({
   },
 });
 
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message:
+      "Terlalu banyak permintaan reset password. Silahkan coba lagi setelah 15 menit.",
+    data: null,
+  },
+});
+
 module.exports = {
   loginLimiter,
   registerLimiter,
   verifyEmailLimiter,
+  forgotPasswordLimiter,
 };

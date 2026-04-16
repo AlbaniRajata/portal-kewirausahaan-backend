@@ -4,13 +4,18 @@ const { hashPassword, comparePassword } = require("../../../helpers/password.hel
 const {
   createUserDb,
   getUserForLoginDb,
+  getUserByEmailForResetDb,
+  getUserByIdForResetDb,
   saveRefreshTokenDb,
   getRefreshTokenDb,
   deleteRefreshTokenDb,
   deleteAllRefreshTokensByUserDb,
+  updateUserPasswordHashDb,
 } = require("../db/auth.db");
+const { sendResetPasswordEmail } = require("../../../helpers/email.helper");
 
 const REFRESH_TOKEN_EXPIRES_DAYS = 7;
+const RESET_PASSWORD_EXPIRES_MINUTES = 15;
 
 const generateAccessToken = (user) => {
   return jwt.sign(
@@ -124,4 +129,83 @@ const logout = async (refreshToken, id_user) => {
   }
 };
 
-module.exports = { createBaseUser, login, refresh, logout };
+const requestPasswordReset = async (email) => {
+  const user = await getUserByEmailForResetDb(email);
+
+  if (!user || user.is_active !== true || !user.email_verified_at) {
+    return {
+      ok: true,
+      message:
+        "Jika email terdaftar, kami akan mengirimkan link reset password ke inbox Anda.",
+    };
+  }
+
+  const resetSecret = `${process.env.JWT_SECRET}${user.password_hash}`;
+  const token = jwt.sign(
+    { sub: user.id_user, purpose: "reset_password" },
+    resetSecret,
+    { expiresIn: `${RESET_PASSWORD_EXPIRES_MINUTES}m` }
+  );
+
+  const frontendBaseUrl =
+    process.env.FRONTEND_URL ||
+    process.env.CLIENT_URL ||
+    (process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS.split(",")[0]
+      : "http://localhost:5173");
+
+  const resetLink = `${frontendBaseUrl.replace(/\/$/, "")}/reset-password?token=${encodeURIComponent(token)}`;
+
+  await sendResetPasswordEmail(user.email, resetLink);
+
+  return {
+    ok: true,
+    message:
+      "Jika email terdaftar, kami akan mengirimkan link reset password ke inbox Anda.",
+  };
+};
+
+const resetPassword = async ({ token, newPassword }) => {
+  let decoded;
+
+  try {
+    const unsafeDecoded = jwt.decode(token);
+
+    if (!unsafeDecoded?.sub || unsafeDecoded?.purpose !== "reset_password") {
+      return { error: "Token reset password tidak valid." };
+    }
+
+    const user = await getUserByIdForResetDb(unsafeDecoded.sub);
+    if (!user || user.is_active !== true || !user.email_verified_at) {
+      return { error: "Token reset password tidak valid." };
+    }
+
+    const resetSecret = `${process.env.JWT_SECRET}${user.password_hash}`;
+    decoded = jwt.verify(token, resetSecret);
+
+    if (!decoded?.sub || decoded?.purpose !== "reset_password") {
+      return { error: "Token reset password tidak valid." };
+    }
+
+    const newHash = await hashPassword(newPassword);
+    await updateUserPasswordHashDb(user.id_user, newHash);
+    await deleteAllRefreshTokensByUserDb(user.id_user);
+
+    return { ok: true };
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return { error: "Token reset password sudah kedaluwarsa." };
+    }
+
+    return { error: "Token reset password tidak valid." };
+  }
+};
+
+module.exports = {
+  createBaseUser,
+  login,
+  refresh,
+  logout,
+  requestPasswordReset,
+  resetPassword,
+};

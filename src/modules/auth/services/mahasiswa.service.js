@@ -35,9 +35,9 @@ const registerMahasiswa = async (data) => {
       client
     );
 
-    await client.query("COMMIT");
+    await createVerificationToken(user.id_user, data.email, client);
 
-    await createVerificationToken(user.id_user, data.email);
+    await client.query("COMMIT");
 
     return { user };
   } catch (err) {
