@@ -1,5 +1,6 @@
 const {
   getAllProgramList,
+  getProgramListForNavbar,
   getProgramAdmin,
   setProgramTimeline,
   getTahapProgram,
@@ -16,6 +17,18 @@ const getAllProgramListController = async (req, res, next) => {
   try {
     const result = await getAllProgramList();
     return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
+
+const getProgramListForNavbarController = async (req, res, next) => {
+  try {
+    const result = await getProgramListForNavbar(req.user.id_user);
+    if (result.error) return res.status(403).json({ success: false, message: result.message, data: null });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data
+    });
   } catch (err) { next(err); }
 };
 
@@ -161,6 +174,7 @@ const deleteKriteriaPenilaianController = async (req, res, next) => {
 
 module.exports = {
   getAllProgramListController,
+  getProgramListForNavbarController,
   getProgramAdminController,
   setProgramTimelineController,
   getTahapProgramController,

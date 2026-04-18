@@ -1,0 +1,127 @@
+const sanitizeHtml = require("sanitize-html");
+
+const sanitizeInput = (input) => {
+  if (typeof input === "string") {
+    return sanitizeHtml(input, {
+      allowedTags: [],
+      allowedAttributes: {},
+      allowedSchemes: []
+    });
+  }
+  if (typeof input === "object" && input !== null) {
+    const sanitized = {};
+    for (const key in input) {
+      sanitized[key] = sanitizeInput(input[key]);
+    }
+    return sanitized;
+  }
+  return input;
+};
+
+const inputValidationMiddleware = (req, res, next) => {
+  const sanitize = (obj) => {
+    for (const key in obj) {
+      if (typeof obj[key] === "string") {
+        const original = obj[key];
+        const sanitized = sanitizeHtml(obj[key], {
+          allowedTags: [],
+          allowedAttributes: {},
+          allowedSchemes: []
+        });
+        if (original !== sanitized) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  if (sanitize(req.body) || sanitize(req.query)) {
+    return res.status(400).json({
+      success: false,
+      message: "Input tidak valid atau mengandung karakter terlarang",
+      data: { code: "INVALID_INPUT" }
+    });
+  }
+
+  next();
+};
+
+const noCacheMiddleware = (req, res, next) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  next();
+};
+
+const securityHeadersMiddleware = (req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+  next();
+};
+
+const requestSizeLimiter = (maxSize = 1024 * 1024) => {
+  return (req, res, next) => {
+    const contentLength = parseInt(req.headers["content-length"] || 0);
+    if (contentLength > maxSize) {
+      return res.status(413).json({
+        success: false,
+        message: "Request terlalu besar. Maksimal 1MB.",
+        data: { code: "PAYLOAD_TOO_LARGE" }
+      });
+    }
+    next();
+  };
+};
+
+const detectSqlInjection = (input) => {
+  if (typeof input !== "string") return false;
+
+  const patterns = [
+    /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE)\b)/i,
+    /(--|#|\/\*|\*\/)/,
+    /(\bUNION\b|\bOR\b.*=.*|\bAND\b.*=.*)/i,
+    /(execute|exec|sp_executesql)/i,
+    /(0x[0-9a-fA-F]+)/,
+  ];
+
+  for (const pattern of patterns) {
+    if (pattern.test(input)) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const sqlInjectionProtectionMiddleware = (req, res, next) => {
+  const check = (obj) => {
+    for (const key in obj) {
+      if (detectSqlInjection(obj[key])) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  if (check(req.body) || check(req.query)) {
+    return res.status(400).json({
+      success: false,
+      message: "Request detected as potentially malicious",
+      data: { code: "SUSPICIOUS_REQUEST" }
+    });
+  }
+
+  next();
+};
+
+module.exports = {
+  sanitizeInput,
+  inputValidationMiddleware,
+  noCacheMiddleware,
+  securityHeadersMiddleware,
+  requestSizeLimiter,
+  sqlInjectionProtectionMiddleware,
+};

@@ -8,13 +8,28 @@ const getAllProgramListDb = async () => {
       p.keterangan,
       p.pendaftaran_mulai,
       p.pendaftaran_selesai,
-      p.created_at,
-      CASE WHEN ap.id_user IS NOT NULL THEN true ELSE false END as is assigned
+      p.created_at
     FROM m_program p
-    LEFT JOIN t_admin_program ap ON ap.id_program = p.id_program AND ap.is_active = true
     ORDER BY p.id_program DESC
   `;
   const { rows } = await pool.query(q);
+  return rows;
+};
+
+const getProgramListForNavbarDb = async (id_user) => {
+  const q = `
+    SELECT
+      p.id_program,
+      p.nama_program,
+      p.keterangan,
+      p.pendaftaran_mulai,
+      p.pendaftaran_selesai
+    FROM m_program p
+    JOIN t_admin_program ap ON ap.id_program = p.id_program
+    WHERE ap.id_user = $1 AND ap.is_active = true
+    ORDER BY p.id_program DESC
+  `;
+  const { rows } = await pool.query(q, [id_user]);
   return rows;
 };
 
@@ -245,6 +260,7 @@ const deleteKriteriaDb = async (id_kriteria) => {
 
 module.exports = {
   getAllProgramListDb,
+  getProgramListForNavbarDb,
   getProgramByAdminDb,
   getProgramByIdAndAdminDb,
   updateProgramTimelineDb,

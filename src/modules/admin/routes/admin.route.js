@@ -10,6 +10,7 @@ const {
 
 const {
   getAllProgramListController,
+  getProgramListForNavbarController,
   getProgramAdminController,
   setProgramTimelineController,
   getTahapProgramController,
@@ -177,6 +178,7 @@ router.post("/verifikasi/mahasiswa/:id/reject", rejectMahasiswaController);
 
 router.get("/program", getAllProgramListController);
 router.get("/program/my", getProgramAdminController);
+router.get("/program/navbar", getProgramListForNavbarController);
 router.patch("/program/:id_program/timeline", setProgramTimelineController);
 router.get("/program/:id_program/tahap", getTahapProgramController);
 router.post("/program/:id_program/tahap", createTahapProgramController);

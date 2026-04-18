@@ -6,6 +6,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const routes = require("./routes");
 const pool = require("./config/db");
+const { securityHeadersMiddleware, requestSizeLimiter, sqlInjectionProtectionMiddleware } = require("./middlewares/security.middleware");
 
 if (!process.env.JWT_SECRET) {
   throw new Error("JWT_SECRET tidak terdefinisi di environment variables!");
@@ -42,10 +43,13 @@ app.use(
   })
 );
 
+app.use(securityHeadersMiddleware);
+app.use(sqlInjectionProtectionMiddleware);
 app.use(morgan("dev"));
 
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
+app.use(requestSizeLimiter(2 * 1024 * 1024));
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 

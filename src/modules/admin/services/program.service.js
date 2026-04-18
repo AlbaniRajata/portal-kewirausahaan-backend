@@ -1,5 +1,6 @@
 const {
   getAllProgramListDb,
+  getProgramListForNavbarDb,
   getProgramByAdminDb,
   getProgramByIdAndAdminDb,
   updateProgramTimelineDb,
@@ -21,6 +22,11 @@ const isValidDate = (val) => !isNaN(new Date(val).getTime());
 
 const getAllProgramList = async () => {
   const data = await getAllProgramListDb();
+  return { error: false, message: "Daftar program berhasil diambil", data };
+};
+
+const getProgramListForNavbar = async (id_user) => {
+  const data = await getProgramListForNavbarDb(id_user);
   return { error: false, message: "Daftar program berhasil diambil", data };
 };
 
