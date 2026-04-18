@@ -9,6 +9,7 @@ const {
 } = require("../controllers/verification.controller");
 
 const {
+  getAllProgramListController,
   getProgramAdminController,
   setProgramTimelineController,
   getTahapProgramController,
@@ -174,6 +175,7 @@ router.get("/verifikasi/mahasiswa/:id", getDetailMahasiswaController);
 router.post("/verifikasi/mahasiswa/:id/approve", approveMahasiswaController);
 router.post("/verifikasi/mahasiswa/:id/reject", rejectMahasiswaController);
 
+router.get("/program", getAllProgramListController);
 router.get("/program/my", getProgramAdminController);
 router.patch("/program/:id_program/timeline", setProgramTimelineController);
 router.get("/program/:id_program/tahap", getTahapProgramController);

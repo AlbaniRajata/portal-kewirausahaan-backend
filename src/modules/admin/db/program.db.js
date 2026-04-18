@@ -1,5 +1,23 @@
 const pool = require("../../../config/db");
 
+const getAllProgramListDb = async () => {
+  const q = `
+    SELECT
+      p.id_program,
+      p.nama_program,
+      p.keterangan,
+      p.pendaftaran_mulai,
+      p.pendaftaran_selesai,
+      p.created_at,
+      CASE WHEN ap.id_user IS NOT NULL THEN true ELSE false END as is assigned
+    FROM m_program p
+    LEFT JOIN t_admin_program ap ON ap.id_program = p.id_program AND ap.is_active = true
+    ORDER BY p.id_program DESC
+  `;
+  const { rows } = await pool.query(q);
+  return rows;
+};
+
 const getProgramByAdminDb = async (id_user) => {
   const q = `
     SELECT
@@ -226,6 +244,7 @@ const deleteKriteriaDb = async (id_kriteria) => {
 };
 
 module.exports = {
+  getAllProgramListDb,
   getProgramByAdminDb,
   getProgramByIdAndAdminDb,
   updateProgramTimelineDb,

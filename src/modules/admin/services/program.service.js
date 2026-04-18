@@ -1,4 +1,5 @@
 const {
+  getAllProgramListDb,
   getProgramByAdminDb,
   getProgramByIdAndAdminDb,
   updateProgramTimelineDb,
@@ -17,6 +18,11 @@ const {
 } = require("../db/program.db");
 
 const isValidDate = (val) => !isNaN(new Date(val).getTime());
+
+const getAllProgramList = async () => {
+  const data = await getAllProgramListDb();
+  return { error: false, message: "Daftar program berhasil diambil", data };
+};
 
 const getProgramAdmin = async (id_user) => {
   const program = await getProgramByAdminDb(id_user);

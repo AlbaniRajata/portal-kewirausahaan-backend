@@ -1,4 +1,5 @@
 const {
+  getAllProgramList,
   getProgramAdmin,
   setProgramTimeline,
   getTahapProgram,
@@ -10,6 +11,13 @@ const {
   updateKriteriaPenilaian,
   deleteKriteriaPenilaian,
 } = require("../services/program.service");
+
+const getAllProgramListController = async (req, res, next) => {
+  try {
+    const result = await getAllProgramList();
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
 
 const getProgramAdminController = async (req, res, next) => {
   try {
@@ -152,6 +160,7 @@ const deleteKriteriaPenilaianController = async (req, res, next) => {
 };
 
 module.exports = {
+  getAllProgramListController,
   getProgramAdminController,
   setProgramTimelineController,
   getTahapProgramController,
