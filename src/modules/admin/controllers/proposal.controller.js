@@ -6,12 +6,19 @@ const {
 
 const getProposalListController = async (req, res, next) => {
   try {
-    const { id_program, status } = req.query;
+    const { id_program, status, page, limit } = req.query;
     const result = await getProposalList({
       id_program: id_program ? parseInt(id_program) : undefined,
       status: status !== undefined ? parseInt(status) : undefined,
+      page: page ? parseInt(page) : undefined,
+      limit: limit ? parseInt(limit) : undefined,
     });
-    return res.status(200).json({ success: true, message: result.message, data: result.data });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+      pagination: result.pagination
+    });
   } catch (err) { next(err); }
 };
 
@@ -29,13 +36,20 @@ const getProposalDetailAdminController = async (req, res, next) => {
 
 const getMonitoringDistribusiController = async (req, res, next) => {
   try {
-    const { id_program, tahap, status } = req.query;
+    const { id_program, tahap, status, page, limit } = req.query;
     const result = await getMonitoringDistribusi({
       id_program: id_program ? parseInt(id_program) : undefined,
       tahap: tahap !== undefined ? parseInt(tahap) : undefined,
       status: status !== undefined ? parseInt(status) : undefined,
+      page: page ? parseInt(page) : undefined,
+      limit: limit ? parseInt(limit) : undefined,
     });
-    return res.status(200).json({ success: true, message: result.message, data: result.data });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+      pagination: result.pagination
+    });
   } catch (err) { next(err); }
 };
 

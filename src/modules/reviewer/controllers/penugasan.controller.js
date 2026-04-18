@@ -7,9 +7,10 @@ const {
 
 const getPenugasanController = async (req, res, next) => {
   try {
-    const tahap = parseInt(req.query.tahap);
+    const { tahap, status, page, limit } = req.query;
+    const tahapNum = parseInt(tahap);
 
-    if (![1, 2].includes(tahap)) {
+    if (![1, 2].includes(tahapNum)) {
       return res.status(400).json({
         success: false,
         message: "Tahap wajib diisi dengan nilai 1 atau 2",
@@ -17,7 +18,10 @@ const getPenugasanController = async (req, res, next) => {
       });
     }
 
-    const result = await getPenugasan(req.user.id_user, tahap, req.query.status);
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 10;
+
+    const result = await getPenugasan(req.user.id_user, tahapNum, status, pageNum, limitNum);
 
     if (result.error) {
       return res.status(400).json({
@@ -31,6 +35,7 @@ const getPenugasanController = async (req, res, next) => {
       success: true,
       message: result.message,
       data: result.data,
+      pagination: result.pagination
     });
   } catch (err) {
     next(err);

@@ -1,5 +1,8 @@
 const {
-  getMahasiswaListDb, getDosenListDb, getReviewerListDb, getJuriListDb,
+  getMahasiswaListDb, getMahasiswaCountDb,
+  getDosenListDb, getDosenCountDb,
+  getReviewerListDb, getReviewerCountDb,
+  getJuriListDb, getJuriCountDb,
   getUserByIdDb,
   checkEmailExistsDb, checkUsernameExistsDb, checkNimExistsDb, checkNipExistsDb,
   insertMahasiswaDb, insertDosenDb, insertReviewerDb, insertJuriDb,
@@ -7,25 +10,66 @@ const {
   toggleUserActiveDb, resetPasswordDb, getPoolClient,
 } = require("../db/pengguna.db");
 const { hashPassword } = require("../../../helpers/password.helper");
+const { parsePaginationParams } = require("../../../utils/pagination");
 
 const getMahasiswaList = async (filters) => {
-  const data = await getMahasiswaListDb(filters);
-  return { error: false, message: "Daftar mahasiswa berhasil diambil", data };
+  const { page, limit } = parsePaginationParams(filters);
+  const [data, total] = await Promise.all([
+    getMahasiswaListDb({ ...filters, page, limit }),
+    getMahasiswaCountDb(filters)
+  ]);
+  const totalPages = Math.ceil(total / limit);
+  return {
+    error: false,
+    message: "Daftar mahasiswa berhasil diambil",
+    data: data,
+    pagination: { page, limit, total, total_pages: totalPages, has_next: page < totalPages, has_prev: page > 1 }
+  };
 };
 
 const getDosenList = async (filters) => {
-  const data = await getDosenListDb(filters);
-  return { error: false, message: "Daftar dosen berhasil diambil", data };
+  const { page, limit } = parsePaginationParams(filters);
+  const [data, total] = await Promise.all([
+    getDosenListDb({ ...filters, page, limit }),
+    getDosenCountDb(filters)
+  ]);
+  const totalPages = Math.ceil(total / limit);
+  return {
+    error: false,
+    message: "Daftar dosen berhasil diambil",
+    data: data,
+    pagination: { page, limit, total, total_pages: totalPages, has_next: page < totalPages, has_prev: page > 1 }
+  };
 };
 
 const getReviewerList = async (filters) => {
-  const data = await getReviewerListDb(filters);
-  return { error: false, message: "Daftar reviewer berhasil diambil", data };
+  const { page, limit } = parsePaginationParams(filters);
+  const [data, total] = await Promise.all([
+    getReviewerListDb({ ...filters, page, limit }),
+    getReviewerCountDb(filters)
+  ]);
+  const totalPages = Math.ceil(total / limit);
+  return {
+    error: false,
+    message: "Daftar reviewer berhasil diambil",
+    data: data,
+    pagination: { page, limit, total, total_pages: totalPages, has_next: page < totalPages, has_prev: page > 1 }
+  };
 };
 
 const getJuriList = async (filters) => {
-  const data = await getJuriListDb(filters);
-  return { error: false, message: "Daftar juri berhasil diambil", data };
+  const { page, limit } = parsePaginationParams(filters);
+  const [data, total] = await Promise.all([
+    getJuriListDb({ ...filters, page, limit }),
+    getJuriCountDb(filters)
+  ]);
+  const totalPages = Math.ceil(total / limit);
+  return {
+    error: false,
+    message: "Daftar juri berhasil diambil",
+    data: data,
+    pagination: { page, limit, total, total_pages: totalPages, has_next: page < totalPages, has_prev: page > 1 }
+  };
 };
 
 const createMahasiswa = async (payload) => {

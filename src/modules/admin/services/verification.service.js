@@ -1,16 +1,23 @@
 const {
-  getPendingMahasiswaDb,
+  getPendingMahasiswaDb, getPendingMahasiswaCountDb,
   getDetailMahasiswaDb,
   approveMahasiswaDb,
   rejectMahasiswaDb,
 } = require("../db/verification.db");
+const { parsePaginationParams } = require("../../../utils/pagination");
 
 const listPendingMahasiswa = async (filters) => {
-  const data = await getPendingMahasiswaDb(filters);
+  const { page, limit } = parsePaginationParams(filters);
+  const [data, total] = await Promise.all([
+    getPendingMahasiswaDb({ ...filters, page, limit }),
+    getPendingMahasiswaCountDb(filters)
+  ]);
+  const totalPages = Math.ceil(total / limit);
   return {
     error: false,
     message: "Daftar mahasiswa berhasil diambil",
-    data: { total: data.length, mahasiswa: data },
+    data: data,
+    pagination: { page, limit, total, total_pages: totalPages, has_next: page < totalPages, has_prev: page > 1 }
   };
 };
 

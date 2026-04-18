@@ -1,9 +1,10 @@
 const pool = require("../../../config/db");
 
 const getTimListDb = async (filters = {}) => {
-  const { id_program, status, search } = filters;
+  const { id_program, status, search, page, limit } = filters;
   const values = [];
   let idx = 1;
+  const offset = (page - 1) * limit;
 
   let q = `
     SELECT
@@ -55,8 +56,32 @@ const getTimListDb = async (filters = {}) => {
 
   q += ` GROUP BY t.id_tim, p.id_program, p.nama_program, pr.id_proposal, pr.judul, pr.status, pr.modal_diajukan, pr.tanggal_submit ORDER BY t.created_at DESC`;
 
-  const { rows } = await pool.query(q, values);
+  let finalQuery = q;
+  if (page && limit) {
+    finalQuery = q + ` LIMIT $${idx++} OFFSET $${idx++}`;
+    values.push(limit, offset);
+  }
+
+  const { rows } = await pool.query(finalQuery, values);
   return rows;
+};
+
+const getTimCountDb = async (filters = {}) => {
+  const { id_program, status, search } = filters;
+  const values = [];
+  let idx = 1;
+
+  let q = `SELECT COUNT(*) as total FROM t_tim t LEFT JOIN t_proposal pr ON pr.id_tim = t.id_tim WHERE 1=1`;
+
+  if (id_program !== undefined && id_program !== null) { q += ` AND t.id_program = $${idx++}`; values.push(id_program); }
+  if (status !== undefined && status !== null) { q += ` AND t.status = $${idx++}`; values.push(status); }
+  if (search) {
+    q += ` AND (t.nama_tim ILIKE $${idx} OR pr.judul ILIKE $${idx})`;
+    values.push(`%${search}%`); idx++;
+  }
+
+  const { rows } = await pool.query(q, values);
+  return parseInt(rows[0].total);
 };
 
 const getTimDetailDb = async (id_tim) => {
@@ -230,4 +255,8 @@ const getPesertaDetailDb = async (id_user, id_program) => {
   return rows[0] || null;
 };
 
-module.exports = { getTimListDb, getTimDetailDb, getPesertaListDb, getPesertaDetailDb };
+module.exports = {
+  getTimListDb, getTimCountDb,
+  getTimDetailDb,
+  getPesertaListDb, getPesertaDetailDb
+};

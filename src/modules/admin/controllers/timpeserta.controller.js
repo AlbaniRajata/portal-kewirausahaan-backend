@@ -7,13 +7,20 @@ const {
 
 const getTimListController = async (req, res, next) => {
   try {
-    const { id_program, status, search } = req.query;
+    const { id_program, status, search, page, limit } = req.query;
     const result = await getTimList({
       id_program: id_program ? parseInt(id_program) : undefined,
       status: status !== undefined ? parseInt(status) : undefined,
       search: search || undefined,
+      page: page ? parseInt(page) : undefined,
+      limit: limit ? parseInt(limit) : undefined,
     });
-    return res.status(200).json({ success: true, message: result.message, data: result.data });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+      pagination: result.pagination
+    });
   } catch (err) { next(err); }
 };
 
@@ -31,14 +38,21 @@ const getTimDetailController = async (req, res, next) => {
 
 const getPesertaListController = async (req, res, next) => {
   try {
-    const { id_program, status_lolos, status_peserta, search } = req.query;
+    const { id_program, status_lolos, status_peserta, search, page, limit } = req.query;
     const result = await getPesertaList({
       id_program: id_program ? parseInt(id_program) : undefined,
       status_lolos: status_lolos !== undefined ? parseInt(status_lolos) : undefined,
       status_peserta: status_peserta !== undefined ? parseInt(status_peserta) : undefined,
       search: search || undefined,
+      page: page ? parseInt(page) : undefined,
+      limit: limit ? parseInt(limit) : undefined,
     });
-    return res.status(200).json({ success: true, message: result.message, data: result.data });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+      pagination: result.pagination
+    });
   } catch (err) { next(err); }
 };
 

@@ -1,19 +1,22 @@
 const {
   getTahapAktifDb,
-  getPenugasanDb,
+  getPenugasanDb, getPenugasanCountDb,
   getDetailPenugasanDb,
   acceptDistribusiDb,
   rejectDistribusiDb,
 } = require("../db/penugasan.db");
+const { parsePaginationParams } = require("../../../utils/pagination");
 
-const getPenugasan = async (id_user, urutan, status_filter) => {
-  const data = await getPenugasanDb(id_user, urutan, status_filter);
+const getPenugasan = async (id_user, urutan, status_filter, page, limit) => {
+  const data = await getPenugasanDb(id_user, urutan, status_filter, page, limit);
+  const total = await getPenugasanCountDb(id_user, urutan, status_filter);
 
   if (!data.length) {
     return {
       error: false,
       message: "Daftar penugasan reviewer kosong",
       data: { tahap: urutan, total: 0, penugasan: [] },
+      pagination: { page: page || 1, limit: limit || 10, total, total_pages: 0, has_next: false, has_prev: false }
     };
   }
 
@@ -28,10 +31,12 @@ const getPenugasan = async (id_user, urutan, status_filter) => {
     };
   }
 
+  const totalPages = Math.ceil(total / (limit || 10));
   return {
     error: false,
     message: "Daftar penugasan reviewer berhasil diambil",
     data: { tahap: urutan, total: data.length, penugasan: data },
+    pagination: { page: page || 1, limit: limit || 10, total, total_pages: totalPages, has_next: page < totalPages, has_prev: page > 1 }
   };
 };
 

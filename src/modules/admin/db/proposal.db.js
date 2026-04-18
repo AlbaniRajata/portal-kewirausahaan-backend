@@ -1,9 +1,10 @@
 const pool = require("../../../config/db");
 
-const getProposalListDb = async ({ id_program, status } = {}) => {
+const getProposalListDb = async ({ id_program, status, page, limit } = {}) => {
   const values = [];
   let idx = 1;
   let where = "WHERE 1=1";
+  const offset = (page - 1) * limit;
 
   if (id_program !== undefined && id_program !== null) { where += ` AND p.id_program = $${idx++}`; values.push(id_program); }
   if (status !== undefined && status !== null) { where += ` AND p.status = $${idx++}`; values.push(status); }
@@ -59,8 +60,27 @@ const getProposalListDb = async ({ id_program, status } = {}) => {
     ORDER BY p.tanggal_submit DESC
   `;
 
-  const { rows } = await pool.query(q, values);
+  let finalQuery = q;
+  if (page && limit) {
+    finalQuery = q + ` LIMIT $${idx++} OFFSET $${idx++}`;
+    values.push(limit, offset);
+  }
+
+  const { rows } = await pool.query(finalQuery, values);
   return rows;
+};
+
+const getProposalCountDb = async ({ id_program, status } = {}) => {
+  const values = [];
+  let idx = 1;
+  let where = "WHERE 1=1";
+
+  if (id_program !== undefined && id_program !== null) { where += ` AND p.id_program = $${idx++}`; values.push(id_program); }
+  if (status !== undefined && status !== null) { where += ` AND p.status = $${idx++}`; values.push(status); }
+
+  const q = `SELECT COUNT(*) as total FROM t_proposal p ${where}`;
+  const { rows } = await pool.query(q, values);
+  return parseInt(rows[0].total);
 };
 
 const getProposalDetailAdminDb = async (id_proposal) => {
@@ -134,10 +154,11 @@ const getProposalDetailAdminDb = async (id_proposal) => {
   return rows[0] || null;
 };
 
-const getMonitoringDistribusiDb = async ({ id_program, tahap, status } = {}) => {
+const getMonitoringDistribusiDb = async ({ id_program, tahap, status, page, limit } = {}) => {
   const values = [];
   let idx = 1;
   let where = "WHERE 1=1";
+  const offset = (page - 1) * limit;
 
   if (id_program !== undefined && id_program !== null) { where += ` AND p.id_program = $${idx++}`; values.push(id_program); }
   if (tahap !== undefined && tahap !== null) { where += ` AND d.tahap = $${idx++}`; values.push(tahap); }
@@ -167,8 +188,28 @@ const getMonitoringDistribusiDb = async ({ id_program, tahap, status } = {}) => 
     ORDER BY d.assigned_at DESC
   `;
 
-  const { rows } = await pool.query(q, values);
+  let finalQuery = q;
+  if (page && limit) {
+    finalQuery = q + ` LIMIT $${idx++} OFFSET $${idx++}`;
+    values.push(limit, offset);
+  }
+
+  const { rows } = await pool.query(finalQuery, values);
   return rows;
 };
 
-module.exports = { getProposalListDb, getProposalDetailAdminDb, getMonitoringDistribusiDb };
+const getMonitoringDistribusiCountDb = async ({ id_program, tahap, status } = {}) => {
+  const values = [];
+  let idx = 1;
+  let where = "WHERE 1=1";
+
+  if (id_program !== undefined && id_program !== null) { where += ` AND p.id_program = $${idx++}`; values.push(id_program); }
+  if (tahap !== undefined && tahap !== null) { where += ` AND d.tahap = $${idx++}`; values.push(tahap); }
+  if (status !== undefined && status !== null) { where += ` AND d.status = $${idx++}`; values.push(status); }
+
+  const q = `SELECT COUNT(*) as total FROM t_distribusi_reviewer d JOIN t_proposal p ON p.id_proposal = d.id_proposal ${where}`;
+  const { rows } = await pool.query(q, values);
+  return parseInt(rows[0].total);
+};
+
+module.exports = { getProposalListDb, getProposalCountDb, getProposalDetailAdminDb, getMonitoringDistribusiDb, getMonitoringDistribusiCountDb };

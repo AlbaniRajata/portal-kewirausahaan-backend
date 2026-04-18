@@ -7,16 +7,24 @@ const {
 
 const getPendingMahasiswaController = async (req, res, next) => {
   try {
+    const { page, limit, status_verifikasi, email_verified, id_prodi, tanggal_dari, tanggal_sampai } = req.query;
     const filters = {
-      status_verifikasi: req.query.status_verifikasi !== undefined ? parseInt(req.query.status_verifikasi) : undefined,
-      email_verified: req.query.email_verified !== undefined ? req.query.email_verified === "true" : undefined,
-      id_prodi: req.query.id_prodi ? parseInt(req.query.id_prodi) : undefined,
-      tanggal_dari: req.query.tanggal_dari || undefined,
-      tanggal_sampai: req.query.tanggal_sampai || undefined,
+      status_verifikasi: status_verifikasi !== undefined ? parseInt(status_verifikasi) : undefined,
+      email_verified: email_verified !== undefined ? email_verified === "true" : undefined,
+      id_prodi: id_prodi ? parseInt(id_prodi) : undefined,
+      tanggal_dari: tanggal_dari || undefined,
+      tanggal_sampai: tanggal_sampai || undefined,
+      page: page ? parseInt(page) : undefined,
+      limit: limit ? parseInt(limit) : undefined,
     };
 
     const result = await listPendingMahasiswa(filters);
-    return res.status(200).json({ success: true, message: result.message, data: result.data });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+      pagination: result.pagination
+    });
   } catch (err) { next(err); }
 };
 

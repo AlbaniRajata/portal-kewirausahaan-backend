@@ -12,16 +12,18 @@ const getTahapAktifDb = async (id_program, urutan) => {
   return rows[0] || null;
 };
 
-const getPenugasanDb = async (id_reviewer, urutan, status_filter = null) => {
+const getPenugasanDb = async (id_reviewer, urutan, status_filter = null, page, limit) => {
   const values = [id_reviewer, urutan];
+  let idx = 3;
   let statusClause = "";
+  const offset = (page - 1) * limit;
 
   if (status_filter !== null && status_filter !== "") {
-    statusClause = "AND d.status = $3";
+    statusClause = `AND d.status = $${idx++}`;
     values.push(Number(status_filter));
   }
 
-  const q = `
+  let q = `
     SELECT
       d.id_distribusi,
       d.status,
@@ -60,8 +62,29 @@ const getPenugasanDb = async (id_reviewer, urutan, status_filter = null) => {
       ${statusClause}
     ORDER BY d.assigned_at DESC
   `;
+
+  if (page && limit) {
+    q += ` LIMIT $${idx++} OFFSET $${idx++}`;
+    values.push(limit, offset);
+  }
+
   const { rows } = await pool.query(q, values);
   return rows;
+};
+
+const getPenugasanCountDb = async (id_reviewer, urutan, status_filter = null) => {
+  const values = [id_reviewer, urutan];
+  let idx = 3;
+  let statusClause = "";
+
+  if (status_filter !== null && status_filter !== "") {
+    statusClause = `AND d.status = $${idx++}`;
+    values.push(Number(status_filter));
+  }
+
+  const q = `SELECT COUNT(*) as total FROM t_distribusi_reviewer d JOIN m_tahap_penilaian tp ON tp.id_tahap = d.tahap WHERE d.id_reviewer = $1 AND tp.urutan = $2 AND d.status != 5 ${statusClause}`;
+  const { rows } = await pool.query(q, values);
+  return parseInt(rows[0].total);
 };
 
 const getDetailPenugasanDb = async (id_distribusi, id_reviewer) => {
@@ -140,6 +163,7 @@ const rejectDistribusiDb = async (id_distribusi, id_reviewer, catatan) => {
 module.exports = {
   getTahapAktifDb,
   getPenugasanDb,
+  getPenugasanCountDb,
   getDetailPenugasanDb,
   acceptDistribusiDb,
   rejectDistribusiDb,

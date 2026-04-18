@@ -3,9 +3,10 @@ const { hashPassword } = require("../../../helpers/password.helper");
 const { ROLE } = require("../../../constants/role");
 
 const getMahasiswaListDb = async (filters = {}) => {
-  const { is_active, id_prodi, id_jurusan, search } = filters;
+  const { is_active, id_prodi, id_jurusan, search, page, limit } = filters;
   const values = [];
   let idx = 1;
+  const offset = (page - 1) * limit;
 
   let q = `
     SELECT
@@ -31,14 +32,37 @@ const getMahasiswaListDb = async (filters = {}) => {
     values.push(`%${search}%`); idx++;
   }
   q += ` ORDER BY u.created_at DESC`;
+  if (page && limit) {
+    q += ` LIMIT $${idx++} OFFSET $${idx++}`;
+    values.push(limit, offset);
+  }
   const { rows } = await pool.query(q, values);
   return rows;
 };
 
-const getDosenListDb = async (filters = {}) => {
-  const { is_active, id_prodi, search } = filters;
+const getMahasiswaCountDb = async (filters = {}) => {
+  const { is_active, id_prodi, id_jurusan, search } = filters;
   const values = [];
   let idx = 1;
+
+  let q = `SELECT COUNT(*) as total FROM m_user u JOIN m_mahasiswa m ON m.id_user = u.id_user JOIN m_prodi p ON p.id_prodi = m.id_prodi JOIN m_jurusan j ON j.id_jurusan = p.id_jurusan WHERE 1=1`;
+
+  if (is_active !== undefined && is_active !== null) { q += ` AND u.is_active = $${idx++}`; values.push(is_active); }
+  if (id_prodi) { q += ` AND m.id_prodi = $${idx++}`; values.push(id_prodi); }
+  if (id_jurusan) { q += ` AND j.id_jurusan = $${idx++}`; values.push(id_jurusan); }
+  if (search) {
+    q += ` AND (u.username ILIKE $${idx} OR u.email ILIKE $${idx} OR u.nama_lengkap ILIKE $${idx} OR m.nim ILIKE $${idx})`;
+    values.push(`%${search}%`); idx++;
+  }
+  const { rows } = await pool.query(q, values);
+  return parseInt(rows[0].total);
+};
+
+const getDosenListDb = async (filters = {}) => {
+  const { is_active, id_prodi, search, page, limit } = filters;
+  const values = [];
+  let idx = 1;
+  const offset = (page - 1) * limit;
 
   let q = `
     SELECT
@@ -63,14 +87,36 @@ const getDosenListDb = async (filters = {}) => {
     values.push(`%${search}%`); idx++;
   }
   q += ` ORDER BY u.created_at DESC`;
+  if (page && limit) {
+    q += ` LIMIT $${idx++} OFFSET $${idx++}`;
+    values.push(limit, offset);
+  }
   const { rows } = await pool.query(q, values);
   return rows;
 };
 
-const getReviewerListDb = async (filters = {}) => {
-  const { is_active, search } = filters;
+const getDosenCountDb = async (filters = {}) => {
+  const { is_active, id_prodi, search } = filters;
   const values = [];
   let idx = 1;
+
+  let q = `SELECT COUNT(*) as total FROM m_user u JOIN m_dosen d ON d.id_user = u.id_user JOIN m_prodi p ON p.id_prodi = d.id_prodi WHERE 1=1`;
+
+  if (is_active !== undefined && is_active !== null) { q += ` AND u.is_active = $${idx++}`; values.push(is_active); }
+  if (id_prodi) { q += ` AND d.id_prodi = $${idx++}`; values.push(id_prodi); }
+  if (search) {
+    q += ` AND (u.username ILIKE $${idx} OR u.email ILIKE $${idx} OR u.nama_lengkap ILIKE $${idx} OR d.nip ILIKE $${idx})`;
+    values.push(`%${search}%`); idx++;
+  }
+  const { rows } = await pool.query(q, values);
+  return parseInt(rows[0].total);
+};
+
+const getReviewerListDb = async (filters = {}) => {
+  const { is_active, search, page, limit } = filters;
+  const values = [];
+  let idx = 1;
+  const offset = (page - 1) * limit;
 
   let q = `
     SELECT
@@ -88,14 +134,35 @@ const getReviewerListDb = async (filters = {}) => {
     values.push(`%${search}%`); idx++;
   }
   q += ` ORDER BY u.created_at DESC`;
+  if (page && limit) {
+    q += ` LIMIT $${idx++} OFFSET $${idx++}`;
+    values.push(limit, offset);
+  }
   const { rows } = await pool.query(q, values);
   return rows;
 };
 
-const getJuriListDb = async (filters = {}) => {
+const getReviewerCountDb = async (filters = {}) => {
   const { is_active, search } = filters;
   const values = [];
   let idx = 1;
+
+  let q = `SELECT COUNT(*) as total FROM m_user u JOIN m_reviewer rv ON rv.id_user = u.id_user WHERE 1=1`;
+
+  if (is_active !== undefined && is_active !== null) { q += ` AND u.is_active = $${idx++}`; values.push(is_active); }
+  if (search) {
+    q += ` AND (u.username ILIKE $${idx} OR u.email ILIKE $${idx} OR u.nama_lengkap ILIKE $${idx})`;
+    values.push(`%${search}%`); idx++;
+  }
+  const { rows } = await pool.query(q, values);
+  return parseInt(rows[0].total);
+};
+
+const getJuriListDb = async (filters = {}) => {
+  const { is_active, search, page, limit } = filters;
+  const values = [];
+  let idx = 1;
+  const offset = (page - 1) * limit;
 
   let q = `
     SELECT
@@ -113,8 +180,28 @@ const getJuriListDb = async (filters = {}) => {
     values.push(`%${search}%`); idx++;
   }
   q += ` ORDER BY u.created_at DESC`;
+  if (page && limit) {
+    q += ` LIMIT $${idx++} OFFSET $${idx++}`;
+    values.push(limit, offset);
+  }
   const { rows } = await pool.query(q, values);
   return rows;
+};
+
+const getJuriCountDb = async (filters = {}) => {
+  const { is_active, search } = filters;
+  const values = [];
+  let idx = 1;
+
+  let q = `SELECT COUNT(*) as total FROM m_user u JOIN m_juri jr ON jr.id_user = u.id_user WHERE 1=1`;
+
+  if (is_active !== undefined && is_active !== null) { q += ` AND u.is_active = $${idx++}`; values.push(is_active); }
+  if (search) {
+    q += ` AND (u.username ILIKE $${idx} OR u.email ILIKE $${idx} OR u.nama_lengkap ILIKE $${idx})`;
+    values.push(`%${search}%`); idx++;
+  }
+  const { rows } = await pool.query(q, values);
+  return parseInt(rows[0].total);
 };
 
 const getUserByIdDb = async (id_user) => {
@@ -296,7 +383,10 @@ const resetPasswordDb = async (id_user, password_hash) => {
 const getPoolClient = () => pool.connect();
 
 module.exports = {
-  getMahasiswaListDb, getDosenListDb, getReviewerListDb, getJuriListDb,
+  getMahasiswaListDb, getMahasiswaCountDb,
+  getDosenListDb, getDosenCountDb,
+  getReviewerListDb, getReviewerCountDb,
+  getJuriListDb, getJuriCountDb,
   getUserByIdDb,
   checkEmailExistsDb, checkUsernameExistsDb, checkNimExistsDb, checkNipExistsDb,
   insertMahasiswaDb, insertDosenDb, insertReviewerDb, insertJuriDb,

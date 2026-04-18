@@ -7,48 +7,76 @@ const {
 
 const getMahasiswaListController = async (req, res, next) => {
   try {
-    const { is_active, id_prodi, id_jurusan, search } = req.query;
+    const { is_active, id_prodi, id_jurusan, search, page, limit } = req.query;
     const result = await getMahasiswaList({
       is_active: is_active !== undefined ? is_active === "true" : undefined,
       id_prodi: id_prodi ? parseInt(id_prodi) : undefined,
       id_jurusan: id_jurusan ? parseInt(id_jurusan) : undefined,
       search: search || undefined,
+      page: page ? parseInt(page) : undefined,
+      limit: limit ? parseInt(limit) : undefined,
     });
-    return res.status(200).json({ success: true, message: result.message, data: result.data });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+      pagination: result.pagination
+    });
   } catch (err) { next(err); }
 };
 
 const getDosenListController = async (req, res, next) => {
   try {
-    const { is_active, id_prodi, search } = req.query;
+    const { is_active, id_prodi, search, page, limit } = req.query;
     const result = await getDosenList({
       is_active: is_active !== undefined ? is_active === "true" : undefined,
       id_prodi: id_prodi ? parseInt(id_prodi) : undefined,
       search: search || undefined,
+      page: page ? parseInt(page) : undefined,
+      limit: limit ? parseInt(limit) : undefined,
     });
-    return res.status(200).json({ success: true, message: result.message, data: result.data });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+      pagination: result.pagination
+    });
   } catch (err) { next(err); }
 };
 
 const getReviewerListController = async (req, res, next) => {
   try {
-    const { is_active, search } = req.query;
+    const { is_active, search, page, limit } = req.query;
     const result = await getReviewerList({
       is_active: is_active !== undefined ? is_active === "true" : undefined,
       search: search || undefined,
+      page: page ? parseInt(page) : undefined,
+      limit: limit ? parseInt(limit) : undefined,
     });
-    return res.status(200).json({ success: true, message: result.message, data: result.data });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+      pagination: result.pagination
+    });
   } catch (err) { next(err); }
 };
 
 const getJuriListController = async (req, res, next) => {
   try {
-    const { is_active, search } = req.query;
+    const { is_active, search, page, limit } = req.query;
     const result = await getJuriList({
       is_active: is_active !== undefined ? is_active === "true" : undefined,
       search: search || undefined,
+      page: page ? parseInt(page) : undefined,
+      limit: limit ? parseInt(limit) : undefined,
     });
-    return res.status(200).json({ success: true, message: result.message, data: result.data });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+      pagination: result.pagination
+    });
   } catch (err) { next(err); }
 };
 
