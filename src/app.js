@@ -1,12 +1,15 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const fs = require("fs");
 const path = require("path");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const routes = require("./routes");
 const pool = require("./config/db");
-const { securityHeadersMiddleware, requestSizeLimiter, sqlInjectionProtectionMiddleware } = require("./middlewares/security.middleware");
+const { requestSizeLimiter, sqlInjectionProtectionMiddleware } = require("./middlewares/security.middleware");
+const { apiVersionMiddleware, contentNegotiationMiddleware: contentNeg, requestIdMiddleware } = require("./middlewares/compatibility.middleware");
+const { formatApiInfo } = require("./utils/response");
 
 if (!process.env.JWT_SECRET) {
   throw new Error("JWT_SECRET tidak terdefinisi di environment variables!");
@@ -15,6 +18,10 @@ if (!process.env.JWT_SECRET) {
 require("./cron/proposalStatus.cron");
 
 const app = express();
+
+app.use(apiVersionMiddleware);
+app.use(contentNeg);
+app.use(requestIdMiddleware);
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
@@ -37,13 +44,12 @@ app.use(
   })
 );
 
-app.use(
-  helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-  })
-);
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: false
+}));
 
-app.use(securityHeadersMiddleware);
 app.use(sqlInjectionProtectionMiddleware);
 app.use(morgan("dev"));
 
@@ -70,6 +76,7 @@ app.get("/health", async (req, res) => {
     success: true,
     message: "API is running",
     timestamp: new Date().toISOString(),
+    version: formatApiInfo().version,
     environment: process.env.NODE_ENV || "development",
     database: {
       status: dbStatus,
