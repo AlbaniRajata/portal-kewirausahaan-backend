@@ -15,8 +15,17 @@ const {
 
 const getAllProgramListController = async (req, res, next) => {
   try {
-    const result = await getAllProgramList();
-    return res.status(200).json({ success: true, message: result.message, data: result.data });
+    const { page, limit } = req.query;
+    const result = await getAllProgramList({
+      page: page ? parseInt(page) : undefined,
+      limit: limit ? parseInt(limit) : undefined
+    });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+      pagination: result.pagination
+    });
   } catch (err) { next(err); }
 };
 

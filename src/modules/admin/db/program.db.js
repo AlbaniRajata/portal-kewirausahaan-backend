@@ -1,6 +1,10 @@
 const pool = require("../../../config/db");
 
-const getAllProgramListDb = async () => {
+const getAllProgramListDb = async (filters = {}) => {
+  const page = filters.page || 1;
+  const limit = filters.limit || 10;
+  const offset = (page - 1) * limit;
+  
   const q = `
     SELECT
       p.id_program,
@@ -11,9 +15,16 @@ const getAllProgramListDb = async () => {
       p.created_at
     FROM m_program p
     ORDER BY p.id_program DESC
+    LIMIT $1 OFFSET $2
   `;
-  const { rows } = await pool.query(q);
+  const { rows } = await pool.query(q, [limit, offset]);
   return rows;
+};
+
+const getAllProgramCountDb = async () => {
+  const q = `SELECT COUNT(*) as total FROM m_program`;
+  const { rows } = await pool.query(q);
+  return parseInt(rows[0].total);
 };
 
 const getProgramListForNavbarDb = async (id_user) => {
@@ -260,6 +271,7 @@ const deleteKriteriaDb = async (id_kriteria) => {
 
 module.exports = {
   getAllProgramListDb,
+  getAllProgramCountDb,
   getProgramListForNavbarDb,
   getProgramByAdminDb,
   getProgramByIdAndAdminDb,

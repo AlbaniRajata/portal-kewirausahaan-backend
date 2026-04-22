@@ -1,4 +1,5 @@
 const {
+  getMahasiswaListDb, getMahasiswaCountDb,
   getPendingMahasiswaDb, getPendingMahasiswaCountDb,
   getDetailMahasiswaDb,
   approveMahasiswaDb,
@@ -9,8 +10,8 @@ const { parsePaginationParams } = require("../../../utils/pagination");
 const listPendingMahasiswa = async (filters) => {
   const { page, limit } = parsePaginationParams(filters);
   const [data, total] = await Promise.all([
-    getPendingMahasiswaDb({ ...filters, page, limit }),
-    getPendingMahasiswaCountDb(filters)
+    getMahasiswaListDb({ ...filters, page, limit }),
+    getMahasiswaCountDb(filters)
   ]);
   const totalPages = Math.ceil(total / limit);
   return {

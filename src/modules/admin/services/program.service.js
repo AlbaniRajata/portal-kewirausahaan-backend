@@ -1,5 +1,6 @@
 const {
   getAllProgramListDb,
+  getAllProgramCountDb,
   getProgramListForNavbarDb,
   getProgramByAdminDb,
   getProgramByIdAndAdminDb,
@@ -17,12 +18,23 @@ const {
   updateKriteriaDb,
   deleteKriteriaDb,
 } = require("../db/program.db");
+const { parsePaginationParams } = require("../../../utils/pagination");
 
 const isValidDate = (val) => !isNaN(new Date(val).getTime());
 
-const getAllProgramList = async () => {
-  const data = await getAllProgramListDb();
-  return { error: false, message: "Daftar program berhasil diambil", data };
+const getAllProgramList = async (filters) => {
+  const { page, limit } = parsePaginationParams(filters || {});
+  const [data, total] = await Promise.all([
+    getAllProgramListDb({ page, limit }),
+    getAllProgramCountDb()
+  ]);
+  const totalPages = Math.ceil(total / limit);
+  return {
+    error: false,
+    message: "Daftar program berhasil diambil",
+    data: data,
+    pagination: { page, limit, total, total_pages: totalPages, has_next: page < totalPages, has_prev: page > 1 }
+  };
 };
 
 const getProgramListForNavbar = async (id_user) => {

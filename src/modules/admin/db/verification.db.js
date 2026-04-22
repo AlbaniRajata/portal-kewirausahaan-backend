@@ -1,22 +1,17 @@
 const pool = require("../../../config/db");
 
-const getPendingMahasiswaDb = async (filters = {}) => {
-  const { page, limit } = filters;
+const getMahasiswaListDb = async (filters = {}) => {
+  const page = filters.page || 1;
+  const limit = filters.limit || 10;
   const offset = (page - 1) * limit;
   const conditions = ["u.id_role = 1"];
   const params = [];
   let idx = 1;
 
-  if (filters.status_verifikasi !== undefined) {
-    conditions.push(`m.status_verifikasi = $${idx++}`);
-    params.push(filters.status_verifikasi);
-  }
-
-  if (filters.email_verified !== undefined) {
-    conditions.push(filters.email_verified
-      ? `u.email_verified_at IS NOT NULL`
-      : `u.email_verified_at IS NULL`
-    );
+  if (filters.search) {
+    conditions.push(`(u.nama_lengkap ILIKE $${idx} OR u.email ILIKE $${idx} OR m.nim ILIKE $${idx})`);
+    params.push(`%${filters.search}%`);
+    idx++;
   }
 
   if (filters.id_prodi) {
@@ -24,14 +19,9 @@ const getPendingMahasiswaDb = async (filters = {}) => {
     params.push(filters.id_prodi);
   }
 
-  if (filters.tanggal_dari) {
-    conditions.push(`u.created_at >= $${idx++}`);
-    params.push(filters.tanggal_dari);
-  }
-
-  if (filters.tanggal_sampai) {
-    conditions.push(`u.created_at <= $${idx++}`);
-    params.push(filters.tanggal_sampai);
+  if (filters.status_verifikasi !== undefined && filters.status_verifikasi !== null) {
+    conditions.push(`m.status_verifikasi = $${idx++}`);
+    params.push(filters.status_verifikasi);
   }
 
   let q = `
@@ -57,13 +47,31 @@ const getPendingMahasiswaDb = async (filters = {}) => {
     ORDER BY u.created_at DESC
   `;
 
-  if (page && limit) {
-    q += ` LIMIT $${idx++} OFFSET $${idx++}`;
-    params.push(limit, offset);
-  }
+  q += ` LIMIT $${idx++} OFFSET $${idx++}`;
+  params.push(limit, offset);
 
   const { rows } = await pool.query(q, params);
   return rows;
+};
+
+const getMahasiswaCountDb = async (filters = {}) => {
+  const conditions = ["u.id_role = 1"];
+  const params = [];
+  let idx = 1;
+
+  if (filters.search) {
+    conditions.push(`(u.nama_lengkap ILIKE $${idx} OR u.email ILIKE $${idx} OR m.nim ILIKE $${idx})`);
+    params.push(`%${filters.search}%`);
+    idx++;
+  }
+
+  const q = `SELECT COUNT(*) as total FROM m_user u JOIN m_mahasiswa m ON m.id_user = u.id_user WHERE ${conditions.join(" AND ")}`;
+  const { rows } = await pool.query(q, params);
+  return parseInt(rows[0].total);
+};
+
+const getPendingMahasiswaDb = async (filters = {}) => {
+  return [];
 };
 
 const getPendingMahasiswaCountDb = async (filters = {}) => {
@@ -218,6 +226,8 @@ const rejectMahasiswaDb = async (id_user, catatan) => {
 };
 
 module.exports = {
+  getMahasiswaListDb,
+  getMahasiswaCountDb,
   getPendingMahasiswaDb,
   getPendingMahasiswaCountDb,
   getDetailMahasiswaDb,
