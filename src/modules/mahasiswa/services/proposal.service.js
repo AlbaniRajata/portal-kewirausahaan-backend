@@ -78,8 +78,8 @@ const createProposal = async (id_user, data) => {
   }
 
   const anggota = await getAnggotaTimDetailDb(tim.id_tim);
-  if (anggota.total < 3 || anggota.total > 5) {
-    return { error: true, message: "Jumlah anggota tim harus 3 sampai 5 orang", data: { total_anggota: anggota.total } };
+  if (anggota.total < 3) {
+    return { error: true, message: "Jumlah anggota tim minimal 3 orang", data: { total_anggota: anggota.total } };
   }
 
   if (!anggota.all_accepted) {

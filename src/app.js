@@ -55,9 +55,19 @@ app.use(morgan("dev"));
 
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-app.use(requestSizeLimiter(2 * 1024 * 1024));
-app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+app.get("/uploads/proposal/:filename", (req, res, next) => {
+  const filePath = path.join(__dirname, "../uploads/proposal", req.params.filename);
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+    res.setHeader("Content-Disposition", `attachment; filename="${req.params.filename}"`);
+    res.setHeader("Content-Type", "application/pdf");
+    return res.sendFile(filePath);
+  }
+  next();
+});
+
+app.use(requestSizeLimiter(15 * 1024 * 1024));
+app.use(express.json({ limit: "15mb" }));
+app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 
 app.get("/health", async (req, res) => {
   let dbStatus = "unknown";

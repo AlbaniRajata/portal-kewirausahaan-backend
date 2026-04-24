@@ -118,7 +118,7 @@ const uploadBerita = multer({
     ["image/jpeg", "image/jpg", "image/png", "image/webp"],
     "Hanya file JPG, PNG, atau WebP yang diperbolehkan untuk gambar berita"
   ),
-  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+  limits: { fileSize: 7 * 1024 * 1024, files: 1 },
 });
 
 const luaranDir = "uploads/luaran";

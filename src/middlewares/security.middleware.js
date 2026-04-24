@@ -59,13 +59,13 @@ const securityHeadersMiddleware = (req, res, next) => {
   next();
 };
 
-const requestSizeLimiter = (maxSize = 1024 * 1024) => {
+const requestSizeLimiter = (maxSize = 15 * 1024 * 1024) => {
   return (req, res, next) => {
     const contentLength = parseInt(req.headers["content-length"] || 0);
     if (contentLength > maxSize) {
       return res.status(413).json({
         success: false,
-        message: "Request terlalu besar. Maksimal 1MB.",
+        message: "Request terlalu besar. Maksimal 15MB.",
         data: { code: "PAYLOAD_TOO_LARGE" }
       });
     }
