@@ -3,7 +3,6 @@ node_modules/
 
 # environment
 .env
-.env.example
 
 # build artifacts (opsional)
 dist/
