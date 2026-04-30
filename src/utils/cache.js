@@ -63,12 +63,16 @@ const getCacheStats = () => {
   };
 };
 
-setInterval(() => {
+const cleanupTimer = setInterval(() => {
   const now = Date.now();
   for (const [key, entry] of cacheStore.entries()) {
     if (now > entry.expiry) cacheStore.delete(key);
   }
 }, 60000);
+
+if (typeof cleanupTimer.unref === "function") {
+  cleanupTimer.unref();
+}
 
 module.exports = {
   get,
