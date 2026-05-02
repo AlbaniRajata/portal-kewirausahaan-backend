@@ -1,6 +1,8 @@
 const pool = require('../src/config/db');
 
 const seedKriteriaPenilaian = async () => {
+  await pool.query('DELETE FROM public.m_kriteria_penilaian');
+  
   const tahapResult = await pool.query('SELECT id_tahap, urutan, id_program FROM public.m_tahap_penilaian ORDER BY id_program, urutan');
   
   const programMap = {};
@@ -34,8 +36,7 @@ const seedKriteriaPenilaian = async () => {
     for (const k of kriteriaData.filter(k => k.id_tahap_urutan === 1)) {
       await pool.query(
         `INSERT INTO public.m_kriteria_penilaian (id_tahap, nama_kriteria, deskripsi, bobot, status, urutan) 
-         VALUES ($1, $2, $3, $4, $5, $6)
-         ON CONFLICT DO NOTHING`,
+         VALUES ($1, $2, $3, $4, $5, $6)`,
         [tahap1.id_tahap, k.nama, k.deskripsi, k.bobot, k.status, k.urutan]
       );
     }
@@ -43,8 +44,7 @@ const seedKriteriaPenilaian = async () => {
     for (const k of kriteriaData.filter(k => k.id_tahap_urutan === 2)) {
       await pool.query(
         `INSERT INTO public.m_kriteria_penilaian (id_tahap, nama_kriteria, deskripsi, bobot, status, urutan) 
-         VALUES ($1, $2, $3, $4, $5, $6)
-         ON CONFLICT DO NOTHING`,
+         VALUES ($1, $2, $3, $4, $5, $6)`,
         [tahap2.id_tahap, k.nama, k.deskripsi, k.bobot, k.status, k.urutan]
       );
     }

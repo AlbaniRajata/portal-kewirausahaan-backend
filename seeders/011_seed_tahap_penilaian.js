@@ -5,7 +5,7 @@ const seedTahapPenilaian = async () => {
   
   for (const prog of programs.rows) {
     const tahap1 = {
-      nama_tahap: 'Tahap 1 - Seleksi Proposal',
+      nama_tahap: 'Tahap 1 - Desk Evaluasi',
       urutan: 1,
       penilaian_mulai: '2026-05-01 00:00:00',
       penilaian_selesai: '2026-05-15 23:59:59',
@@ -14,7 +14,7 @@ const seedTahapPenilaian = async () => {
     };
     
     const tahap2 = {
-      nama_tahap: 'Tahap 2 - Seleksi Wawancara',
+      nama_tahap: 'Tahap 2 - Wawancara',
       urutan: 2,
       penilaian_mulai: '2026-05-16 00:00:00',
       penilaian_selesai: '2026-05-31 23:59:59',

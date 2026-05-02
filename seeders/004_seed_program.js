@@ -5,14 +5,14 @@ const seedProgram = async () => {
     { 
       nama_program: 'PMW', 
       keterangan: 'Program Mahasiswa Wirausaha',
-      pendaftaran_mulai: '2026-01-18 23:00:00',
-      pendaftaran_selesai: '2026-04-30 05:59:00'
+      pendaftaran_mulai: '2026-04-30 23:00:00',
+      pendaftaran_selesai: '2026-08-30 05:59:00'
     },
     { 
       nama_program: 'INBIS', 
       keterangan: 'Inkubator Bisnis',
-      pendaftaran_mulai: '2026-03-28 05:41:00',
-      pendaftaran_selesai: '2026-04-04 05:41:00'
+      pendaftaran_mulai: '2026-04-30 05:41:00',
+      pendaftaran_selesai: '2026-08-30 05:41:00'
     }
   ];
 
