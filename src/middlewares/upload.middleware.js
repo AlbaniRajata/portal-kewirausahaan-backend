@@ -2,9 +2,12 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
+const UPLOADS_BASE = path.join(__dirname, "../../uploads");
+
 const ensureDir = (dir) => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  const fullPath = path.isAbsolute(dir) ? dir : path.join(UPLOADS_BASE, dir);
+  if (!fs.existsSync(fullPath)) {
+    fs.mkdirSync(fullPath, { recursive: true });
   }
 };
 
@@ -51,7 +54,7 @@ const validateProposalFilename = (filename) => {
   return { valid: true };
 };
 
-const ktmDir = "uploads/ktm";
+const ktmDir = path.join(UPLOADS_BASE, "ktm");
 ensureDir(ktmDir);
 
 const uploadKTM = multer({
@@ -66,7 +69,7 @@ const uploadKTM = multer({
   limits: { fileSize: 5 * 1024 * 1024, files: 1 },
 });
 
-const profilDir = "uploads/profil";
+const profilDir = path.join(UPLOADS_BASE, "profil");
 ensureDir(profilDir);
 
 const uploadFotoProfil = multer({
@@ -81,7 +84,7 @@ const uploadFotoProfil = multer({
   limits: { fileSize: 5 * 1024 * 1024, files: 1 },
 });
 
-const proposalDir = "uploads/proposal";
+const proposalDir = path.join(UPLOADS_BASE, "proposal");
 ensureDir(proposalDir);
 
 const uploadProposal = multer({
@@ -106,7 +109,7 @@ const uploadProposal = multer({
   limits: { fileSize: 10 * 1024 * 1024, files: 1 },
 });
 
-const beritaDir = "uploads/berita";
+const beritaDir = path.join(UPLOADS_BASE, "berita");
 ensureDir(beritaDir);
 
 const uploadBerita = multer({
@@ -121,7 +124,7 @@ const uploadBerita = multer({
   limits: { fileSize: 7 * 1024 * 1024, files: 1 },
 });
 
-const luaranDir = "uploads/luaran";
+const luaranDir = path.join(UPLOADS_BASE, "luaran");
 ensureDir(luaranDir);
 
 const uploadLuaran = multer({

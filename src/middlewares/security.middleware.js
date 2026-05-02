@@ -25,7 +25,7 @@ const inputValidationMiddleware = (req, res, next) => {
         const original = obj[key];
         const sanitized = sanitizeHtml(obj[key], {
           allowedTags: [],
-          allowedAttributes: {},
+          allowedAttributes: [],
           allowedSchemes: []
         });
         if (original !== sanitized) {
@@ -41,6 +41,58 @@ const inputValidationMiddleware = (req, res, next) => {
       success: false,
       message: "Input tidak valid atau mengandung karakter terlarang",
       data: { code: "INVALID_INPUT" }
+    });
+  }
+
+  next();
+};
+
+const blockSuspiciousInput = (req, res, next) => {
+const suspiciousPatterns = [
+  /['";`]/,
+  /--/,
+  /\/\*/,
+  /\*\//,
+  /<script/i,
+  /javascript:/i,
+  /on\w+\s*=/i,
+  /OR\s+1=1/i,
+  /OR\s+.*=/i
+];
+
+  const checkValue = (value, field) => {
+    if (typeof value !== "string") return null;
+    for (const pattern of suspiciousPatterns) {
+      if (pattern.test(value)) {
+        return field;
+      }
+    }
+    return null;
+  };
+
+  const checkObject = (obj, prefix = "") => {
+    for (const key in obj) {
+      const field = prefix ? `${prefix}.${key}` : key;
+      if (typeof obj[key] === "string") {
+        const suspiciousField = checkValue(obj[key], field);
+        if (suspiciousField) {
+          return suspiciousField;
+        }
+      } else if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])) {
+        const result = checkObject(obj[key], field);
+        if (result) return result;
+      }
+    }
+    return null;
+  };
+
+  const suspiciousField = checkObject(req.body) || checkObject(req.query);
+
+  if (suspiciousField) {
+    return res.status(400).json({
+      success: false,
+      message: `Karakter tidak diizinkan pada field ${suspiciousField}`,
+      data: { code: "SUSPICIOUS_INPUT", field: suspiciousField }
     });
   }
 
@@ -105,8 +157,8 @@ const sqlInjectionProtectionMiddleware = (req, res, next) => {
   if (check(req.body) || check(req.query)) {
     return res.status(400).json({
       success: false,
-      message: "Request detected as potentially malicious",
-      data: { code: "SUSPICIOUS_REQUEST" }
+      message: "Karakter tidak diizinkan pada field email",
+      data: { code: "SUSPICIOUS_INPUT", field: "email" }
     });
   }
 
@@ -120,4 +172,5 @@ module.exports = {
   securityHeadersMiddleware,
   requestSizeLimiter,
   sqlInjectionProtectionMiddleware,
+  blockSuspiciousInput,
 };

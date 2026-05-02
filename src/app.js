@@ -5,11 +5,15 @@ const fs = require("fs");
 const path = require("path");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const compression = require("compression");
+const swaggerUi = require("swagger-ui-express");
 const routes = require("./routes");
 const pool = require("./config/db");
-const { requestSizeLimiter, sqlInjectionProtectionMiddleware } = require("./middlewares/security.middleware");
+const { requestSizeLimiter, sqlInjectionProtectionMiddleware, blockSuspiciousInput } = require("./middlewares/security.middleware");
 const { apiVersionMiddleware, contentNegotiationMiddleware: contentNeg, requestIdMiddleware } = require("./middlewares/compatibility.middleware");
 const { formatApiInfo } = require("./utils/response");
+
+const swaggerSpec = require("./config/swagger");
 
 if (!process.env.JWT_SECRET) {
   throw new Error("JWT_SECRET tidak terdefinisi di environment variables!");
@@ -19,9 +23,16 @@ require("./cron/proposalStatus.cron");
 
 const app = express();
 
+app.use(compression());
+
 app.use(apiVersionMiddleware);
 app.use(contentNeg);
 app.use(requestIdMiddleware);
+
+app.use(sqlInjectionProtectionMiddleware);
+app.use(blockSuspiciousInput);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
@@ -53,15 +64,33 @@ app.use(helmet({
 app.use(sqlInjectionProtectionMiddleware);
 app.use(morgan("dev"));
 
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+const UPLOADS_DIR = path.join(__dirname, "../uploads");
+app.use(
+  "/uploads",
+  express.static(UPLOADS_DIR, {
+    maxAge: "1d",
+    etag: true,
+  })
+);
 
 app.get("/uploads/proposal/:filename", (req, res, next) => {
-  const filePath = path.join(__dirname, "../uploads/proposal", req.params.filename);
+  const filePath = path.join(UPLOADS_DIR, "proposal", req.params.filename);
   if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
     res.setHeader("Content-Disposition", `attachment; filename="${req.params.filename}"`);
     res.setHeader("Content-Type", "application/pdf");
     return res.sendFile(filePath);
   }
+  next();
+});
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    if (!res.headersSent) {
+      const duration = Date.now() - start;
+      res.setHeader("X-Response-Time", `${duration}ms`);
+    }
+  });
   next();
 });
 
@@ -105,8 +134,16 @@ app.use((req, res) => {
   });
 });
 
+const logger = require("./utils/logger");
+
 app.use((err, req, res, next) => {
-  console.error("ERROR:", err.stack || err.message);
+  logger.error("Request error", {
+    error: err.message,
+    stack: err.stack,
+    requestId: req.requestId,
+    path: req.originalUrl,
+    method: req.method,
+  });
 
   if (err.name === "MulterError") {
     return res.status(400).json({
