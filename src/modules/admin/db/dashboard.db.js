@@ -90,17 +90,21 @@ const getPendingDistribusiDb = async (id_program) => {
 };
 
 const getDistribusiDitolakDb = async (id_program) => {
-  const { rows } = await pool.query(
-    `SELECT COUNT(*)::int AS total
-     FROM t_distribusi_reviewer dr
-     JOIN t_proposal p ON p.id_proposal = dr.id_proposal
-     WHERE p.id_program = $1 AND dr.status = 2
-       AND dr.id_distribusi IN (
-         SELECT id_distribusi FROM t_penilaian_reviewer WHERE status = 2
-       )`,
-    [id_program]
-  );
-  return rows[0].total;
+  try {
+    const { rows } = await pool.query(
+      `SELECT COUNT(*)::int AS total
+       FROM t_distribusi_reviewer dr
+       JOIN t_proposal p ON p.id_proposal = dr.id_proposal
+       WHERE p.id_program = $1 AND dr.status = 2
+         AND dr.id_distribusi IN (
+           SELECT id_distribusi FROM t_penilaian_reviewer WHERE status = 2
+         )`,
+      [id_program]
+    );
+    return rows[0]?.total || 0;
+  } catch (error) {
+    return 0;
+  }
 };
 
 const getPendingVerifikasiDb = async () => {
@@ -128,41 +132,62 @@ const getPendingPembimbingDb = async (id_program) => {
 };
 
 const getMenungguFinalisasiDb = async (id_program) => {
-  const { rows } = await pool.query(
-    `SELECT COUNT(*)::int AS total
-     FROM (
-       SELECT p.id_proposal
-       FROM t_proposal p
-       WHERE p.id_program = $1 AND p.status = 2
-         AND (
-           SELECT COUNT(*) FROM t_distribusi_reviewer dr
-           WHERE dr.id_proposal = p.id_proposal AND dr.status IN (1,3,4)
-         ) > 0
-         AND (
-           SELECT COUNT(*) FROM t_distribusi_reviewer dr
-           WHERE dr.id_proposal = p.id_proposal AND dr.status IN (1,3,4)
-         ) = (
-           SELECT COUNT(*) FROM t_penilaian_reviewer pr
-           JOIN t_distribusi_reviewer dr ON dr.id_distribusi = pr.id_distribusi
-           WHERE dr.id_proposal = p.id_proposal AND pr.status = 1
-         )
-       UNION
-       SELECT p.id_proposal
-       FROM t_proposal p
-       WHERE p.id_program = $1 AND p.status = 5
-         AND (
-           SELECT COUNT(*) FROM t_distribusi_reviewer dr
-           JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = dr.tahap AND tp.urutan = 2
-           WHERE dr.id_proposal = p.id_proposal AND dr.status IN (1,3,4)
-         ) + (
-           SELECT COUNT(*) FROM t_distribusi_juri dj
-           JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = dj.tahap AND tp.urutan = 2
-           WHERE dj.id_proposal = p.id_proposal AND dj.status IN (1,3,4)
-         ) > 0
-     ) sub`,
-    [id_program]
-  );
-  return rows[0].total;
+  try {
+    const { rows } = await pool.query(
+      `SELECT COUNT(*)::int AS total
+       FROM (
+         SELECT p.id_proposal
+         FROM t_proposal p
+         WHERE p.id_program = $1 AND p.status = 2
+           AND (
+             SELECT COUNT(*) FROM t_distribusi_reviewer dr
+             WHERE dr.id_proposal = p.id_proposal AND dr.status IN (1,3,4)
+           ) > 0
+           AND (
+             SELECT COUNT(*) FROM t_distribusi_reviewer dr
+             WHERE dr.id_proposal = p.id_proposal AND dr.status IN (1,3,4)
+           ) = (
+             SELECT COUNT(*) FROM t_penilaian_reviewer pr
+             JOIN t_distribusi_reviewer dr ON dr.id_distribusi = pr.id_distribusi
+             WHERE dr.id_proposal = p.id_proposal AND pr.status = 1
+           )
+         UNION
+         SELECT p.id_proposal
+         FROM t_proposal p
+         WHERE p.id_program = $1 AND p.status = 5
+           AND (
+             SELECT COUNT(*) FROM t_distribusi_reviewer dr
+             JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = dr.tahap AND tp.urutan = 2
+             WHERE dr.id_proposal = p.id_proposal AND dr.status IN (1,3,4)
+           ) + (
+             SELECT COUNT(*) FROM t_distribusi_juri dj
+             JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = dj.tahap AND tp.urutan = 2
+             WHERE dj.id_proposal = p.id_proposal AND dj.status IN (1,3,4)
+           ) > 0
+       ) sub`,
+      [id_program]
+    );
+    return rows[0]?.total || 0;
+  } catch (error) {
+    // Fallback saat t_penilaian_reviewer table belum ada (migration pending)
+    // Hitung proposal tahap 2 yang menunggu finalisasi dengan hitung distribusi saja
+    try {
+      const { rows: fallbackRows } = await pool.query(
+        `SELECT COUNT(DISTINCT p.id_proposal)::int AS total
+         FROM t_proposal p
+         WHERE p.id_program = $1 
+           AND p.status IN (2, 5)
+           AND EXISTS (
+             SELECT 1 FROM t_distribusi_reviewer dr
+             WHERE dr.id_proposal = p.id_proposal AND dr.status IN (1, 3, 4)
+           )`,
+        [id_program]
+      );
+      return fallbackRows[0]?.total || 0;
+    } catch {
+      return 0;
+    }
+  }
 };
 
 module.exports = {
