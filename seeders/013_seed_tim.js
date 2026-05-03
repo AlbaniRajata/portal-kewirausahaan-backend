@@ -18,7 +18,7 @@ const seedTim = async () => {
     FROM public.m_user u 
     JOIN public.m_mahasiswa m ON u.id_user = m.id_user 
     WHERE u.username LIKE 'mhs%' 
-    ORDER BY u.username 
+    ORDER BY CAST(SUBSTRING(u.username FROM 4) AS INTEGER)
     LIMIT 8
   `);
   const mahasiswaList = mahasiswaResult.rows;
@@ -41,12 +41,15 @@ const seedTim = async () => {
     const teamMembers = mahasiswaList.slice(t * 4, t * 4 + 4);
     const ketua = teamMembers[0];
     
+    await pool.query(
+      'DELETE FROM public.t_anggota_tim WHERE id_tim = $1',
+      [id_tim]
+    );
+    
     for (let i = 0; i < teamMembers.length; i++) {
       await pool.query(
         `INSERT INTO public.t_anggota_tim (id_tim, id_user, peran, status)
-         VALUES ($1, $2, $3, 1)
-         ON CONFLICT ON CONSTRAINT t_anggota_tim_pkey 
-         DO UPDATE SET peran = EXCLUDED.peran, status = EXCLUDED.status`,
+         VALUES ($1, $2, $3, 1)`,
         [id_tim, teamMembers[i].id_user, i === 0 ? 1 : 2]
       );
     }
