@@ -1,6 +1,31 @@
 const bcrypt = require('bcrypt');
 const pool = require('../src/config/db');
 
+const upsertUser = async ({ id_role, username, email, password_hash, nama_lengkap }) => {
+  try {
+    const result = await pool.query(
+      `INSERT INTO public.m_user 
+       (id_role, username, email, password_hash, nama_lengkap, is_active, email_verified_at) 
+       VALUES ($1, $2, $3, $4, $5, true, NOW()) 
+       RETURNING id_user`,
+      [id_role, username, email, password_hash, nama_lengkap]
+    );
+    return result;
+  } catch (error) {
+    if (error.code === '23505') {
+      const result = await pool.query(
+        `UPDATE public.m_user 
+         SET id_role = $1, username = $2, email = $3, password_hash = $4, nama_lengkap = $5, is_active = true, email_verified_at = NOW()
+         WHERE username = $2 OR email = $3
+         RETURNING id_user`,
+        [id_role, username, email, password_hash, nama_lengkap]
+      );
+      return result;
+    }
+    throw error;
+  }
+};
+
 const seedDosen = async () => {
   const password_hash = await bcrypt.hash('password123', 10);
   
@@ -17,17 +42,13 @@ const seedDosen = async () => {
     const nama_lengkap = `Dosen ${i}`;
     const id_prodi = prodiIds[(i - 1) % prodiIds.length];
 
-    const userResult = await pool.query(
-      `INSERT INTO public.m_user 
-       (id_role, username, email, password_hash, nama_lengkap, is_active, email_verified_at) 
-       VALUES ($1, $2, $3, $4, $5, true, NOW()) 
-       ON CONFLICT (username) DO UPDATE SET 
-         password_hash = EXCLUDED.password_hash, 
-         is_active = true, 
-         email_verified_at = NOW()
-       RETURNING id_user`,
-      [dosenRoleId, username, email, password_hash, nama_lengkap]
-    );
+    const userResult = await upsertUser({
+      id_role: dosenRoleId,
+      username: username,
+      email: email,
+      password_hash: password_hash,
+      nama_lengkap: nama_lengkap
+    });
 
     if (userResult.rows.length > 0) {
       const userId = userResult.rows[0].id_user;
