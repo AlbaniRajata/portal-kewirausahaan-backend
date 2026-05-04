@@ -31,7 +31,7 @@ const getBeritaListAdminDb = async (filters = {}) => {
 
   let q = `
     SELECT
-      b.id_berita, b.judul, b.slug, b.file_gambar,
+      b.id_berita, b.judul, b.slug, b.file_gambar, b.file_pdf,
       b.status, b.created_at, b.updated_at,
       u.id_user AS id_author, u.nama_lengkap AS nama_author
     FROM t_berita b
@@ -52,7 +52,7 @@ const getBeritaListAdminDb = async (filters = {}) => {
 const getBeritaDetailAdminDb = async (id_berita) => {
   const { rows } = await pool.query(
     `SELECT
-      b.id_berita, b.judul, b.slug, b.isi, b.file_gambar,
+      b.id_berita, b.judul, b.slug, b.isi, b.file_gambar, b.file_pdf,
       b.status, b.created_at, b.updated_at,
       u.id_user AS id_author, u.nama_lengkap AS nama_author
      FROM t_berita b
@@ -63,39 +63,39 @@ const getBeritaDetailAdminDb = async (id_berita) => {
   return rows[0] || null;
 };
 
-const createBeritaDb = async (id_author, judul, slug, isi, file_gambar, status) => {
+const createBeritaDb = async (id_author, judul, slug, isi, file_gambar, file_pdf, status) => {
   const { rows } = await pool.query(
-    `INSERT INTO t_berita (id_author, judul, slug, isi, file_gambar, status, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
-     RETURNING id_berita, judul, slug, status, created_at`,
-    [id_author, judul, slug, isi || null, file_gambar || null, status]
+    `INSERT INTO t_berita (id_author, judul, slug, isi, file_gambar, file_pdf, status, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+     RETURNING id_berita, judul, slug, status, created_at, file_gambar, file_pdf`,
+    [id_author, judul, slug, isi || null, file_gambar || null, file_pdf || null, status]
   );
   return rows[0];
 };
 
-const updateBeritaDb = async (id_berita, judul, slug, isi, file_gambar, status) => {
+const updateBeritaDb = async (id_berita, judul, slug, isi, file_gambar, file_pdf, status) => {
   const { rows } = await pool.query(
     `UPDATE t_berita
-     SET judul = $2, slug = $3, isi = $4, file_gambar = $5, status = $6, updated_at = NOW()
+     SET judul = $2, slug = $3, isi = $4, file_gambar = $5, file_pdf = $6, status = $7, updated_at = NOW()
      WHERE id_berita = $1
-     RETURNING id_berita, judul, slug, status, updated_at`,
-    [id_berita, judul, slug, isi || null, file_gambar || null, status]
+     RETURNING id_berita, judul, slug, status, updated_at, file_gambar, file_pdf`,
+    [id_berita, judul, slug, isi || null, file_gambar || null, file_pdf || null, status]
   );
   return rows[0] || null;
 };
 
-const updateFileGambarDb = async (id_berita, file_gambar) => {
+const updateFileGambarDb = async (id_berita, file_gambar, file_pdf = null) => {
   const { rows } = await pool.query(
-    `UPDATE t_berita SET file_gambar = $2, updated_at = NOW() WHERE id_berita = $1
-     RETURNING id_berita, file_gambar`,
-    [id_berita, file_gambar]
+    `UPDATE t_berita SET file_gambar = $2, file_pdf = $3, updated_at = NOW() WHERE id_berita = $1
+     RETURNING id_berita, file_gambar, file_pdf`,
+    [id_berita, file_gambar, file_pdf]
   );
   return rows[0] || null;
 };
 
 const deleteBeritaDb = async (id_berita) => {
   const { rows } = await pool.query(
-    `DELETE FROM t_berita WHERE id_berita = $1 RETURNING id_berita, file_gambar`,
+    `DELETE FROM t_berita WHERE id_berita = $1 RETURNING id_berita, file_gambar, file_pdf`,
     [id_berita]
   );
   return rows[0] || null;
@@ -108,7 +108,7 @@ const getBeritaListPublikDb = async (filters = {}) => {
 
   let q = `
     SELECT
-      b.id_berita, b.judul, b.slug, b.file_gambar,
+      b.id_berita, b.judul, b.slug, b.file_gambar, b.file_pdf,
       b.created_at, b.updated_at,
       u.nama_lengkap AS nama_author
     FROM t_berita b
@@ -136,7 +136,7 @@ const countBeritaPublikDb = async (search = null) => {
 const getBeritaBySlugDb = async (slug) => {
   const { rows } = await pool.query(
     `SELECT
-      b.id_berita, b.judul, b.slug, b.isi, b.file_gambar,
+      b.id_berita, b.judul, b.slug, b.isi, b.file_gambar, b.file_pdf,
       b.created_at, b.updated_at,
       u.nama_lengkap AS nama_author
      FROM t_berita b
@@ -147,9 +147,22 @@ const getBeritaBySlugDb = async (slug) => {
   return rows[0] || null;
 };
 
+const getBeritaAttachmentByFilenameDb = async (filename) => {
+  const { rows } = await pool.query(
+    `SELECT judul, created_at, file_gambar, file_pdf
+     FROM t_berita
+     WHERE file_gambar = $1 OR file_pdf = $1
+     ORDER BY created_at DESC
+     LIMIT 1`,
+    [filename]
+  );
+  return rows[0] || null;
+};
+
 module.exports = {
   generateSlug, makeUniqueSlugDb,
   getBeritaListAdminDb, getBeritaDetailAdminDb,
   createBeritaDb, updateBeritaDb, updateFileGambarDb, deleteBeritaDb,
   getBeritaListPublikDb, countBeritaPublikDb, getBeritaBySlugDb,
+  getBeritaAttachmentByFilenameDb,
 };

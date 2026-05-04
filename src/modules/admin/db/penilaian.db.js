@@ -1,6 +1,49 @@
 const pool = require("../../../config/db");
 
+let reviewerSchemaReady = null;
+
+const ensureReviewerPenilaianSchema = async () => {
+  if (reviewerSchemaReady) return reviewerSchemaReady;
+
+  reviewerSchemaReady = (async () => {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS public.t_penilaian_reviewer (
+          id_penilaian serial4 NOT NULL,
+          id_distribusi int4 NOT NULL,
+          id_tahap int4 NOT NULL,
+          status int4 DEFAULT 0 NOT NULL,
+          submitted_at timestamp NULL,
+          CONSTRAINT t_penilaian_reviewer_pkey PRIMARY KEY (id_penilaian),
+          CONSTRAINT uq_penilaian_reviewer_distribusi UNIQUE (id_distribusi),
+          CONSTRAINT fk_penilaian_reviewer_distribusi FOREIGN KEY (id_distribusi) REFERENCES public.t_distribusi_reviewer(id_distribusi) ON DELETE CASCADE,
+          CONSTRAINT fk_penilaian_reviewer_tahap FOREIGN KEY (id_tahap) REFERENCES public.m_tahap_penilaian(id_tahap)
+      )
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS public.t_penilaian_reviewer_detail (
+          id_detail serial4 NOT NULL,
+          id_penilaian int4 NOT NULL,
+          id_kriteria int4 NOT NULL,
+          skor int4 NOT NULL,
+          nilai int4 NOT NULL,
+          catatan text NULL,
+          created_at timestamp DEFAULT now() NULL,
+          updated_at timestamp DEFAULT now() NULL,
+          CONSTRAINT skor_check_reviewer CHECK ((skor = ANY (ARRAY[1, 2, 3, 5, 6, 7]))),
+          CONSTRAINT t_penilaian_reviewer_detail_pkey PRIMARY KEY (id_detail),
+          CONSTRAINT uq_penilaian_reviewer_kriteria UNIQUE (id_penilaian, id_kriteria),
+          CONSTRAINT fk_pd_penilaian_reviewer FOREIGN KEY (id_penilaian) REFERENCES public.t_penilaian_reviewer(id_penilaian) ON DELETE CASCADE,
+          CONSTRAINT fk_pd_reviewer_kriteria FOREIGN KEY (id_kriteria) REFERENCES public.m_kriteria_penilaian(id_kriteria)
+      )
+    `);
+  })();
+
+  return reviewerSchemaReady;
+};
+
 const getRekapReviewerTahap1Db = async (id_program, id_proposal) => {
+  await ensureReviewerPenilaianSchema();
   const { rows } = await pool.query(
     `SELECT
       pr.id_proposal, pr.judul,
@@ -35,6 +78,7 @@ const countDistribusiReviewerTahap1Db = async (id_program, id_proposal) => {
 };
 
 const countSubmittedReviewerTahap1Db = async (id_program, id_proposal) => {
+  await ensureReviewerPenilaianSchema();
   const { rows } = await pool.query(
     `SELECT COUNT(*)::int AS total
      FROM t_penilaian_reviewer pr
@@ -58,6 +102,7 @@ const updateStatusProposalTahap1Db = async (id_program, id_proposal, status) => 
 };
 
 const getListProposalRekapTahap1Db = async (id_program) => {
+  await ensureReviewerPenilaianSchema();
   const { rows } = await pool.query(
     `SELECT DISTINCT
       p.id_proposal, p.judul, p.status,
@@ -79,6 +124,7 @@ const getListProposalRekapTahap1Db = async (id_program) => {
 };
 
 const getListProposalRekapTahap2Db = async (id_program) => {
+  await ensureReviewerPenilaianSchema();
   const { rows } = await pool.query(
     `SELECT
       p.id_proposal, p.judul, p.status,
@@ -132,6 +178,7 @@ const countDistribusiPanelTahap2Db = async (id_program, id_proposal) => {
 };
 
 const countSubmittedPanelTahap2Db = async (id_program, id_proposal) => {
+  await ensureReviewerPenilaianSchema();
   const { rows } = await pool.query(
     `SELECT (
        SELECT COUNT(*) FROM t_penilaian_reviewer pr
@@ -162,6 +209,7 @@ const updateStatusProposalTahap2Db = async (client, id_program, id_proposal, sta
 };
 
 const getRekapReviewerTahap2Db = async (id_program, id_proposal) => {
+  await ensureReviewerPenilaianSchema();
   const { rows } = await pool.query(
     `SELECT
       pr.id_proposal, pr.judul,

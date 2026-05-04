@@ -117,11 +117,24 @@ const uploadBerita = multer({
     destination: (req, file, cb) => cb(null, beritaDir),
     filename: createFilename("berita"),
   }),
-  fileFilter: createFileFilter(
-    ["image/jpeg", "image/jpg", "image/png", "image/webp"],
-    "Hanya file JPG, PNG, atau WebP yang diperbolehkan untuk gambar berita"
-  ),
-  limits: { fileSize: 7 * 1024 * 1024, files: 1 },
+  fileFilter: (req, file, cb) => {
+    if (file.fieldname === "file_gambar") {
+      if (["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.mimetype)) {
+        return cb(null, true);
+      }
+      return cb(new Error("File gambar harus berupa JPG, PNG, atau WebP"));
+    }
+
+    if (file.fieldname === "file_pdf") {
+      if (file.mimetype === "application/pdf") {
+        return cb(null, true);
+      }
+      return cb(new Error("File PDF harus berupa PDF"));
+    }
+
+    return cb(new Error("Field upload berita tidak valid"));
+  },
+  limits: { fileSize: 10 * 1024 * 1024, files: 2 },
 });
 
 const luaranDir = path.join(UPLOADS_BASE, "luaran");

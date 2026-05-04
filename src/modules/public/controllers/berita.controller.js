@@ -1,4 +1,4 @@
-const { getBeritaListPublik, getBeritaBySlug } = require("../services/berita.service");
+const { getBeritaListPublik, getBeritaBySlug, downloadBeritaAttachment } = require("../services/berita.service");
 
 const getBeritaListPublikController = async (req, res, next) => {
   try {
@@ -21,4 +21,18 @@ const getBeritaBySlugController = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-module.exports = { getBeritaListPublikController, getBeritaBySlugController };
+const downloadBeritaAttachmentController = async (req, res, next) => {
+  try {
+    const { filename } = req.params;
+    if (!filename || !filename.trim()) {
+      return res.status(400).json({ success: false, message: "Filename tidak valid", data: null });
+    }
+
+    const result = await downloadBeritaAttachment(filename.trim());
+    if (result.error) return res.status(404).json({ success: false, message: result.message, data: null });
+
+    return res.download(result.data.filePath, result.data.downloadName);
+  } catch (err) { next(err); }
+};
+
+module.exports = { getBeritaListPublikController, getBeritaBySlugController, downloadBeritaAttachmentController };

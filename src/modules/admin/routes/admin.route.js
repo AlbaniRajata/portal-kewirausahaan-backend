@@ -275,9 +275,18 @@ router.get("/tim-peserta/peserta/:id_user/:id_program", getPesertaDetailControll
 
 router.get("/berita", getBeritaListAdminController);
 router.get("/berita/:id_berita", getBeritaDetailAdminController);
-router.post("/berita", uploadBerita.single("file_gambar"), createBeritaController);
-router.patch("/berita/:id_berita", uploadBerita.single("file_gambar"), updateBeritaController);
-router.patch("/berita/:id_berita/gambar", uploadBerita.single("file_gambar"), updateGambarController);
+router.post("/berita", uploadBerita.fields([
+  { name: "file_gambar", maxCount: 1 },
+  { name: "file_pdf", maxCount: 1 },
+]), createBeritaController);
+router.patch("/berita/:id_berita", uploadBerita.fields([
+  { name: "file_gambar", maxCount: 1 },
+  { name: "file_pdf", maxCount: 1 },
+]), updateBeritaController);
+router.patch("/berita/:id_berita/gambar", uploadBerita.fields([
+  { name: "file_gambar", maxCount: 1 },
+  { name: "file_pdf", maxCount: 1 },
+]), updateGambarController);
 router.delete("/berita/:id_berita", deleteBeritaController);
 
 router.get("/program/:id_program/history-penilaian/tahap1", getHistoryPenilaianTahap1Controller);
