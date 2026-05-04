@@ -3,9 +3,30 @@ const {
   createBerita, updateBerita, updateGambar, deleteBerita,
 } = require("../../public/services/berita.service");
 
+const MIME_BY_FIELD = {
+  file_gambar: ["image/jpeg", "image/jpg", "image/png", "image/webp"],
+  file_pdf: ["application/pdf"],
+};
+
 const getUploadedFilename = (req, fieldName) => {
-  const files = req.files && req.files[fieldName];
-  if (Array.isArray(files) && files[0]) return files[0].filename;
+  const filesByField = req.files && !Array.isArray(req.files) ? req.files[fieldName] : null;
+  if (Array.isArray(filesByField) && filesByField[0]) return filesByField[0].filename;
+
+  if (Array.isArray(req.files)) {
+    const byField = req.files.find((file) => file.fieldname === fieldName);
+    if (byField?.filename) return byField.filename;
+
+    const allowedMimes = MIME_BY_FIELD[fieldName] || [];
+    const byMime = req.files.find((file) => allowedMimes.includes(file.mimetype));
+    if (byMime?.filename) return byMime.filename;
+  }
+
+  if (req.file) {
+    if (req.file.fieldname === fieldName) return req.file.filename;
+    const allowedMimes = MIME_BY_FIELD[fieldName] || [];
+    if (allowedMimes.includes(req.file.mimetype)) return req.file.filename;
+  }
+
   return null;
 };
 
