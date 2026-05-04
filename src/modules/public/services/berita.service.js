@@ -71,6 +71,9 @@ const createBerita = async (id_author, payload, file_gambar = null, file_pdf = n
   if (!VALID_STATUS.includes(statusNum)) return { error: true, message: "Status tidak valid, gunakan 0 (draft) atau 1 (published)", data: null };
 
   const fileGambarFinal = file_gambar || gambar_url || null;
+  if (fileGambarFinal && file_pdf) {
+    return { error: true, message: "Sementara hanya boleh upload 1 file (gambar atau PDF)", data: null };
+  }
   const slug = await makeUniqueSlugDb(generateSlug(judul));
   const berita = await createBeritaDb(id_author, judul.trim(), slug, isi || null, fileGambarFinal, file_pdf, statusNum);
 
@@ -90,12 +93,27 @@ const updateBerita = async (id_berita, payload, file_gambar_baru = null, file_pd
   const existing = await getBeritaDetailAdminDb(id_berita);
   if (!existing) return { error: true, message: "Berita tidak ditemukan", data: null };
 
-  const slug = await makeUniqueSlugDb(generateSlug(judul), id_berita);
-  const file_gambar_final = file_gambar_baru || gambar_url || existing.file_gambar;
-  const file_pdf_final = file_pdf_baru || existing.file_pdf;
+  const hasNewImage = Boolean(file_gambar_baru || gambar_url);
+  const hasNewPdf = Boolean(file_pdf_baru);
+  if (hasNewImage && hasNewPdf) {
+    return { error: true, message: "Sementara hanya boleh upload 1 file (gambar atau PDF)", data: null };
+  }
 
-  if ((file_gambar_baru || gambar_url) && existing.file_gambar) deleteFile(existing.file_gambar);
-  if (file_pdf_baru && existing.file_pdf) deleteFile(existing.file_pdf);
+  const slug = await makeUniqueSlugDb(generateSlug(judul), id_berita);
+  let file_gambar_final = existing.file_gambar;
+  let file_pdf_final = existing.file_pdf;
+
+  if (hasNewImage) {
+    file_gambar_final = file_gambar_baru || gambar_url;
+    file_pdf_final = null;
+    if (existing.file_gambar) deleteFile(existing.file_gambar);
+    if (existing.file_pdf) deleteFile(existing.file_pdf);
+  } else if (hasNewPdf) {
+    file_gambar_final = null;
+    file_pdf_final = file_pdf_baru;
+    if (existing.file_gambar) deleteFile(existing.file_gambar);
+    if (existing.file_pdf) deleteFile(existing.file_pdf);
+  }
 
   const berita = await updateBeritaDb(id_berita, judul.trim(), slug, isi || null, file_gambar_final, file_pdf_final, statusNum);
 
@@ -109,9 +127,26 @@ const updateBerita = async (id_berita, payload, file_gambar_baru = null, file_pd
 const updateGambar = async (id_berita, file_gambar, file_pdf = null) => {
   const existing = await getBeritaDetailAdminDb(id_berita);
   if (!existing) return { error: true, message: "Berita tidak ditemukan", data: null };
-  if (file_gambar && existing.file_gambar) deleteFile(existing.file_gambar);
-  if (file_pdf && existing.file_pdf) deleteFile(existing.file_pdf);
-  const updated = await updateFileGambarDb(id_berita, file_gambar || existing.file_gambar, file_pdf || existing.file_pdf);
+  if (file_gambar && file_pdf) {
+    return { error: true, message: "Sementara hanya boleh upload 1 file (gambar atau PDF)", data: null };
+  }
+
+  let file_gambar_final = existing.file_gambar;
+  let file_pdf_final = existing.file_pdf;
+
+  if (file_gambar) {
+    file_gambar_final = file_gambar;
+    file_pdf_final = null;
+    if (existing.file_gambar) deleteFile(existing.file_gambar);
+    if (existing.file_pdf) deleteFile(existing.file_pdf);
+  } else if (file_pdf) {
+    file_gambar_final = null;
+    file_pdf_final = file_pdf;
+    if (existing.file_gambar) deleteFile(existing.file_gambar);
+    if (existing.file_pdf) deleteFile(existing.file_pdf);
+  }
+
+  const updated = await updateFileGambarDb(id_berita, file_gambar_final, file_pdf_final);
 
   cache.del(`berita:slug:${existing.slug}`);
   cache.invalidatePrefix("berita:");

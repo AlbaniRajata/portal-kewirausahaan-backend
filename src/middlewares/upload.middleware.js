@@ -134,7 +134,7 @@ const uploadBerita = multer({
 
     return cb(new Error("Field upload berita tidak valid"));
   },
-  limits: { fileSize: 10 * 1024 * 1024, files: 2 },
+  limits: { fileSize: 10 * 1024 * 1024, files: 1 },
 });
 
 const luaranDir = path.join(UPLOADS_BASE, "luaran");
