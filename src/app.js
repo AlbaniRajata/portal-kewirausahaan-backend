@@ -71,6 +71,13 @@ app.use(
   express.static(UPLOADS_DIR, {
     maxAge: "1d",
     etag: true,
+    setHeaders: (res, filePath) => {
+      const filename = path.basename(filePath);
+      try {
+        res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+      } catch (err) {
+      }
+    },
   })
 );
 
