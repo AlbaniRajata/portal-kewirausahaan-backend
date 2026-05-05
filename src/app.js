@@ -51,7 +51,7 @@ app.use(
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
-    exposedHeaders: ["Content-Length", "Content-Type"],
+    exposedHeaders: ["Content-Length", "Content-Type", "Content-Disposition"],
   })
 );
 
