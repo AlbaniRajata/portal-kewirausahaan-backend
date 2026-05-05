@@ -147,22 +147,9 @@ const getBeritaBySlugDb = async (slug) => {
   return rows[0] || null;
 };
 
-const getBeritaAttachmentByFilenameDb = async (filename) => {
-  const { rows } = await pool.query(
-    `SELECT judul, created_at, file_gambar, file_pdf
-     FROM t_berita
-     WHERE file_gambar = $1 OR file_pdf = $1
-     ORDER BY created_at DESC
-     LIMIT 1`,
-    [filename]
-  );
-  return rows[0] || null;
-};
-
 module.exports = {
   generateSlug, makeUniqueSlugDb,
   getBeritaListAdminDb, getBeritaDetailAdminDb,
   createBeritaDb, updateBeritaDb, updateFileGambarDb, deleteBeritaDb,
   getBeritaListPublikDb, countBeritaPublikDb, getBeritaBySlugDb,
-  getBeritaAttachmentByFilenameDb,
 };

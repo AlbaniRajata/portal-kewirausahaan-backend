@@ -5,7 +5,6 @@ const {
   getBeritaListAdminDb, getBeritaDetailAdminDb,
   createBeritaDb, updateBeritaDb, updateFileGambarDb, deleteBeritaDb,
   getBeritaListPublikDb, countBeritaPublikDb, getBeritaBySlugDb,
-  getBeritaAttachmentByFilenameDb,
 } = require("../db/berita.db");
 const cache = require("../../../utils/cache");
 
@@ -24,31 +23,6 @@ const deleteFiles = (...files) => {
   files.flat().filter(Boolean).forEach(deleteFile);
 };
 
-const buildBeritaDownloadName = (judul, year, prefix, ext) => {
-  const safeTitle = String(judul || "berita")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/_+/g, "_")
-    .replace(/^_+|_+$/g, "");
-  const safeYear = year || new Date().getFullYear();
-  return `${prefix}_${safeTitle}_${safeYear}${ext}`;
-};
-
-const getBeritaDownloadInfo = async (filename) => {
-  if (!filename) return null;
-
-  const row = await getBeritaAttachmentByFilenameDb(filename);
-  if (!row) return null;
-
-  const ext = path.extname(filename) || "";
-  const year = row.created_at ? new Date(row.created_at).getFullYear() : new Date().getFullYear();
-  const prefix = row.file_pdf === filename ? "file" : "gambar";
-
-  return {
-    filePath: path.join(__dirname, "../../../../uploads/berita", filename),
-    downloadName: buildBeritaDownloadName(row.judul, year, prefix, ext),
-  };
-};
 
 const getBeritaListAdmin = async (filters) => {
   const status = filters.status !== undefined && filters.status !== "" ? parseInt(filters.status) : null;
@@ -222,18 +196,8 @@ const getBeritaBySlug = async (slug) => {
   return { error: false, message: "Detail berita berhasil diambil", data };
 };
 
-const downloadBeritaAttachment = async (filename) => {
-  const info = await getBeritaDownloadInfo(filename);
-  if (!info) return { error: true, message: "File berita tidak ditemukan", data: null };
-  if (!fs.existsSync(info.filePath) || !fs.statSync(info.filePath).isFile()) {
-    return { error: true, message: "File berita tidak ditemukan", data: null };
-  }
-  return { error: false, message: "File berita berhasil disiapkan", data: info };
-};
-
 module.exports = {
   getBeritaListAdmin, getBeritaDetailAdmin,
   createBerita, updateBerita, updateGambar, deleteBerita,
   getBeritaListPublik, getBeritaBySlug,
-  downloadBeritaAttachment,
 };

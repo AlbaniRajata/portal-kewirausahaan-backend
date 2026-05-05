@@ -8,7 +8,6 @@ const morgan = require("morgan");
 const compression = require("compression");
 const swaggerUi = require("swagger-ui-express");
 const routes = require("./routes");
-const { downloadBeritaAttachmentController } = require("./modules/public/controllers/berita.controller");
 const pool = require("./config/db");
 const { requestSizeLimiter, sqlInjectionProtectionMiddleware, blockSuspiciousInput } = require("./middlewares/security.middleware");
 const { apiVersionMiddleware, contentNegotiationMiddleware: contentNeg, requestIdMiddleware } = require("./middlewares/compatibility.middleware");
@@ -66,8 +65,6 @@ app.use(sqlInjectionProtectionMiddleware);
 app.use(morgan("dev"));
 
 const UPLOADS_DIR = path.join(__dirname, "../uploads");
-
-app.get("/uploads/berita/download/:filename", downloadBeritaAttachmentController);
 
 app.use(
   "/uploads",
