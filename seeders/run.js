@@ -12,6 +12,7 @@ const seedJuri = require('./010_seed_juri');
 const seedTahapPenilaian = require('./011_seed_tahap_penilaian');
 const seedKriteriaPenilaian = require('./012_seed_kriteria_penilaian');
 const seedTim = require('./013_seed_tim');
+const seedDistribusiTahap2 = require('./014_seed_distribusi_tahap2');
 
 const runSeeders = async () => {
   try {
@@ -30,6 +31,7 @@ const runSeeders = async () => {
     await seedReviewer();
     await seedJuri();
     await seedTim();
+    await seedDistribusiTahap2();
     
     console.log('\n✅ All seeders completed successfully!');
     process.exit(0);

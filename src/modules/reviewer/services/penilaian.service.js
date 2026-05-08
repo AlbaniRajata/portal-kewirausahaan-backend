@@ -149,25 +149,9 @@ const simpanNilai = async (id_user, id_distribusi, payload) => {
 
   await markDistribusiDraftDb(id_distribusi);
 
-  if (dist.urutan_tahap === 2) {
-    const pasangan = await getPasanganJuriByProposalDb(dist.id_proposal, dist.urutan_tahap);
-    if (pasangan) {
-      const penilaianJuri = await getOrCreatePenilaianJuriDb(pasangan.id_distribusi, dist.id_tahap);
-      if (penilaianJuri.status !== 1) {
-        for (const item of payload) {
-          const ref = kriteria.find((k) => k.id_kriteria === item.id_kriteria);
-          if (!ref) continue;
-          const nilai = Number(ref.bobot) * Number(item.skor);
-          await upsertNilaiJuriDb(penilaianJuri.id_penilaian, ref.id_kriteria, item.skor, nilai, item.catatan || null);
-        }
-        await markDistribusiJuriDraftDb(pasangan.id_distribusi);
-      }
-    }
-  }
-
   return {
     error: false,
-    message: "Nilai berhasil disimpan dan disinkronkan ke pasangan",
+    message: "Nilai berhasil disimpan",
     data: hasil,
   };
 };
@@ -201,24 +185,35 @@ const submitPenilaian = async (id_user, id_distribusi) => {
 
   await markDistribusiSubmittedDb(id_distribusi);
 
-  if (dist.urutan_tahap === 2) {
-    const pasangan = await getPasanganJuriByProposalDb(dist.id_proposal, dist.urutan_tahap);
-    if (pasangan) {
-      const penilaianJuri = await getOrCreatePenilaianJuriDb(pasangan.id_distribusi, dist.id_tahap);
-      if (penilaianJuri.status !== 1) {
-        await submitPenilaianJuriDb(penilaianJuri.id_penilaian);
-        await markDistribusiJuriSubmittedDb(pasangan.id_distribusi);
-      }
+  return {
+    error: false,
+    message: "Penilaian berhasil disubmit",
+    data: submitted,
+  };
+};
+
+const bulkSubmitPenilaian = async (id_user, id_distribusi_list) => {
+  if (!Array.isArray(id_distribusi_list) || id_distribusi_list.length === 0) {
+    return { error: true, message: "Daftar distribusi kosong", data: null };
+  }
+
+  const results = [];
+  const errors = [];
+
+  for (const id_distribusi of id_distribusi_list) {
+    const res = await submitPenilaian(id_user, id_distribusi);
+    if (res.error) {
+      errors.push({ id_distribusi, message: res.message });
+    } else {
+      results.push({ id_distribusi, success: true });
     }
   }
 
   return {
     error: false,
-    message: dist.urutan_tahap === 2
-      ? "Penilaian berhasil disubmit dan disinkronkan ke pasangan"
-      : "Penilaian berhasil disubmit",
-    data: submitted,
+    message: `Selesai memproses bulk submit. Berhasil: ${results.length}, Gagal: ${errors.length}`,
+    data: { results, errors },
   };
 };
 
-module.exports = { getFormPenilaian, simpanNilai, submitPenilaian };
+module.exports = { getFormPenilaian, simpanNilai, submitPenilaian, bulkSubmitPenilaian };

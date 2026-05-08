@@ -15,12 +15,14 @@ const {
   getDetailPenugasanController,
   acceptPenugasanController,
   rejectPenugasanController,
+  getPeringkatController,
 } = require("../controllers/penugasan.controller");
 
 const {
   getFormPenilaianController,
   simpanNilaiController,
   submitPenilaianController,
+  bulkSubmitPenilaianController,
 } = require("../controllers/penilaian.controller");
 
 router.use(roleMiddleware([ROLE.JURI]));
@@ -41,8 +43,11 @@ router.get("/penugasan/:id_distribusi", getDetailPenugasanController);
 router.patch("/penugasan/:id_distribusi/accept", acceptPenugasanController);
 router.patch("/penugasan/:id_distribusi/reject", rejectPenugasanController);
 
+router.post("/penilaian/bulk-submit", bulkSubmitPenilaianController);
 router.get("/penilaian/:id_distribusi", getFormPenilaianController);
 router.post("/penilaian/:id_distribusi", simpanNilaiController);
 router.post("/penilaian/:id_distribusi/submit", submitPenilaianController);
+
+router.get("/peringkat", getPeringkatController);
 
 module.exports = router;

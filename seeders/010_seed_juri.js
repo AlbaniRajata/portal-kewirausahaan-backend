@@ -32,7 +32,7 @@ const seedJuri = async () => {
   const roleResult = await pool.query("SELECT id_role FROM public.m_role WHERE nama_role = 'Juri'");
   const juriRoleId = roleResult.rows[0].id_role;
 
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 1; i <= 8; i++) {
     const email = `juri${i}@mail.com`;
     const username = `juri${i}`;
     const nama_lengkap = `Juri ${i}`;
@@ -57,7 +57,7 @@ const seedJuri = async () => {
       );
     }
   }
-  console.log('3 Juri seeded');
+  console.log('8 Juri seeded');
 };
 
 module.exports = seedJuri;

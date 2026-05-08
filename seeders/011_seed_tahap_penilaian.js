@@ -7,8 +7,8 @@ const seedTahapPenilaian = async () => {
     const tahap1 = {
       nama_tahap: 'Tahap 1 - Desk Evaluasi',
       urutan: 1,
-      penilaian_mulai: '2026-05-01 00:00:00',
-      penilaian_selesai: '2026-05-15 23:59:59',
+      penilaian_mulai: '2026-04-30 00:00:00',
+      penilaian_selesai: '2026-08-30 23:59:59',
       status: 1,
       id_program: prog.id_program
     };
@@ -16,8 +16,8 @@ const seedTahapPenilaian = async () => {
     const tahap2 = {
       nama_tahap: 'Tahap 2 - Wawancara',
       urutan: 2,
-      penilaian_mulai: '2026-05-16 00:00:00',
-      penilaian_selesai: '2026-05-31 23:59:59',
+      penilaian_mulai: '2026-04-30 00:00:00',
+      penilaian_selesai: '2026-08-30 23:59:59',
       status: 1,
       id_program: prog.id_program
     };

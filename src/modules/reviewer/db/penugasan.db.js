@@ -168,3 +168,44 @@ module.exports = {
   acceptDistribusiDb,
   rejectDistribusiDb,
 };
+
+const getPeringkatDb = async (id_reviewer, tahap) => {
+  const q = `
+    SELECT
+      dr.id_distribusi,
+      dr.status AS status_distribusi,
+      p.id_proposal,
+      p.judul,
+      t.nama_tim,
+      k.nama_kategori,
+      pr.nama_program,
+      COALESCE(SUM(prd.nilai), 0) AS total_nilai,
+      RANK() OVER (ORDER BY COALESCE(SUM(prd.nilai), 0) DESC) AS peringkat,
+      json_agg(
+        json_build_object(
+          'id_kriteria', mk.id_kriteria,
+          'nama_kriteria', mk.nama_kriteria,
+          'bobot', mk.bobot,
+          'skor', prd.skor,
+          'nilai', prd.nilai
+        ) ORDER BY mk.urutan ASC
+      ) FILTER (WHERE prd.id_kriteria IS NOT NULL) AS detail_nilai
+    FROM t_distribusi_reviewer dr
+    JOIN t_proposal p ON p.id_proposal = dr.id_proposal
+    JOIN t_tim t ON t.id_tim = p.id_tim
+    JOIN m_kategori k ON k.id_kategori = p.id_kategori
+    JOIN m_program pr ON pr.id_program = p.id_program
+    JOIN t_penilaian_reviewer pen ON pen.id_distribusi = dr.id_distribusi
+    LEFT JOIN t_penilaian_reviewer_detail prd ON prd.id_penilaian = pen.id_penilaian
+    LEFT JOIN m_kriteria_penilaian mk ON mk.id_kriteria = prd.id_kriteria
+    WHERE dr.id_reviewer = $1 
+      AND dr.tahap = $2 
+      AND pen.status IN (0, 1)
+    GROUP BY dr.id_distribusi, dr.status, p.id_proposal, p.judul, t.nama_tim, k.nama_kategori, pr.nama_program
+    ORDER BY total_nilai DESC
+  `;
+  const { rows } = await pool.query(q, [id_reviewer, tahap]);
+  return rows;
+};
+
+module.exports.getPeringkatDb = getPeringkatDb;

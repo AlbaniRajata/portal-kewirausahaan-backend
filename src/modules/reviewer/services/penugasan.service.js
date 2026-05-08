@@ -129,3 +129,14 @@ module.exports = {
   acceptPenugasan,
   rejectPenugasan,
 };
+
+const getPeringkat = async (id_user, tahap) => {
+  const data = await require("../db/penugasan.db").getPeringkatDb(id_user, tahap);
+  return {
+    error: false,
+    message: "Hasil peringkat berhasil diambil",
+    data,
+  };
+};
+
+module.exports.getPeringkat = getPeringkat;

@@ -129,6 +129,20 @@ const getListProposalRekapTahap2Db = async (id_program) => {
     `SELECT
       p.id_proposal, p.judul, p.status,
       t.nama_tim, k.nama_kategori,
+      COALESCE((
+        SELECT SUM(prd.nilai) 
+        FROM t_penilaian_reviewer pr
+        JOIN t_distribusi_reviewer dr ON dr.id_distribusi = pr.id_distribusi
+        JOIN t_penilaian_reviewer_detail prd ON prd.id_penilaian = pr.id_penilaian
+        WHERE dr.id_proposal = p.id_proposal AND dr.tahap = 2 AND pr.status = 1
+      ), 0) AS nilai_reviewer,
+      COALESCE((
+        SELECT SUM(pjd.nilai) 
+        FROM t_penilaian_juri pj
+        JOIN t_distribusi_juri dj ON dj.id_distribusi = pj.id_distribusi
+        JOIN t_penilaian_juri_detail pjd ON pjd.id_penilaian = pj.id_penilaian
+        WHERE dj.id_proposal = p.id_proposal AND dj.tahap = 2 AND pj.status = 1
+      ), 0) AS nilai_juri,
       (
         SELECT COUNT(DISTINCT dr.id_distribusi) FROM t_distribusi_reviewer dr
         JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = dr.tahap AND tp.urutan = 2
@@ -156,7 +170,14 @@ const getListProposalRekapTahap2Db = async (id_program) => {
      ORDER BY p.id_proposal ASC`,
     [id_program]
   );
-  return rows;
+
+  // Map to include rata-rata in JavaScript to avoid division by zero or NULL issues in SQL
+  return rows.map(r => ({
+    ...r,
+    nilai_reviewer: Number(r.nilai_reviewer),
+    nilai_juri: Number(r.nilai_juri),
+    nilai_rata_rata: (Number(r.nilai_reviewer) + Number(r.nilai_juri)) / 2.0
+  }));
 };
 
 const countDistribusiPanelTahap2Db = async (id_program, id_proposal) => {

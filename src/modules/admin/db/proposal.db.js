@@ -52,9 +52,15 @@ const getProposalListDb = async ({ id_program, status, page, limit } = {}) => {
     JOIN m_program pr ON pr.id_program = p.id_program
     JOIN t_tim t ON t.id_tim = p.id_tim
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
-    JOIN t_anggota_tim a ON a.id_tim = t.id_tim AND a.peran = 1
-    JOIN m_user u ON u.id_user = a.id_user
-    LEFT JOIN m_mahasiswa mhs ON mhs.id_user = u.id_user
+    LEFT JOIN LATERAL (
+      SELECT at.id_user
+      FROM t_anggota_tim at
+      WHERE at.id_tim = t.id_tim
+      ORDER BY CASE WHEN at.peran = 1 THEN 0 ELSE 1 END, at.id_user
+      LIMIT 1
+    ) ketua ON true
+    LEFT JOIN m_user u ON u.id_user = ketua.id_user
+    LEFT JOIN m_mahasiswa mhs ON mhs.id_user = ketua.id_user
     LEFT JOIN m_prodi prod ON prod.id_prodi = mhs.id_prodi
     ${where}
     ORDER BY p.tanggal_submit DESC
@@ -144,9 +150,15 @@ const getProposalDetailAdminDb = async (id_proposal) => {
     JOIN m_program pr ON pr.id_program = p.id_program
     JOIN t_tim t ON t.id_tim = p.id_tim
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
-    JOIN t_anggota_tim a ON a.id_tim = t.id_tim AND a.peran = 1
-    JOIN m_user u ON u.id_user = a.id_user
-    LEFT JOIN m_mahasiswa mhs_ketua ON mhs_ketua.id_user = u.id_user
+    LEFT JOIN LATERAL (
+      SELECT at.id_user
+      FROM t_anggota_tim at
+      WHERE at.id_tim = t.id_tim
+      ORDER BY CASE WHEN at.peran = 1 THEN 0 ELSE 1 END, at.id_user
+      LIMIT 1
+    ) ketua ON true
+    LEFT JOIN m_user u ON u.id_user = ketua.id_user
+    LEFT JOIN m_mahasiswa mhs_ketua ON mhs_ketua.id_user = ketua.id_user
     WHERE p.id_proposal = $1
   `;
 

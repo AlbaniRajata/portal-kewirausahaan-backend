@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const pool = require('../src/config/db');
+const teams = require('./tim_data.json');
 
 const upsertUser = async ({ id_role, username, email, password_hash, nama_lengkap }) => {
   try {
@@ -15,7 +16,7 @@ const upsertUser = async ({ id_role, username, email, password_hash, nama_lengka
     if (error.code === '23505') {
       const result = await pool.query(
         `UPDATE public.m_user 
-         SET id_role = $1, username = $2, email = $3, password_hash = $4, nama_lengkap = $5, is_active = true, email_verified_at = NOW()
+         SET id_role = $1, password_hash = $4, nama_lengkap = $5, is_active = true, email_verified_at = NOW()
          WHERE username = $2 OR email = $3
          RETURNING id_user`,
         [id_role, username, email, password_hash, nama_lengkap]
@@ -32,38 +33,57 @@ const seedDosen = async () => {
   const roleResult = await pool.query("SELECT id_role FROM public.m_role WHERE nama_role = 'Dosen'");
   const dosenRoleId = roleResult.rows[0].id_role;
 
-  const prodiResult = await pool.query('SELECT id_prodi FROM public.m_prodi ORDER BY id_prodi');
-  const prodiIds = prodiResult.rows.map(r => r.id_prodi);
+  const prodiResult = await pool.query('SELECT id_prodi FROM public.m_prodi ORDER BY id_prodi LIMIT 1');
+  const defaultProdiId = prodiResult.rows[0].id_prodi;
 
-  for (let i = 1; i <= 10; i++) {
-    const nip = `NIP${String(i).padStart(6, '0')}`;
-    const email = `dosen${i}@mail.com`;
-    const username = `dosen${i}`;
-    const nama_lengkap = `Dosen ${i}`;
-    const id_prodi = prodiIds[(i - 1) % prodiIds.length];
-
-    const userResult = await upsertUser({
-      id_role: dosenRoleId,
-      username: username,
-      email: email,
-      password_hash: password_hash,
-      nama_lengkap: nama_lengkap
-    });
-
-    if (userResult.rows.length > 0) {
-      const userId = userResult.rows[0].id_user;
-      
-      await pool.query(
-        `INSERT INTO public.m_dosen 
-         (id_user, nip, id_prodi, bidang_keahlian, status_verifikasi) 
-         VALUES ($1, $2, $3, $4, 1) 
-         ON CONFLICT (id_user) DO UPDATE SET 
-           status_verifikasi = 1`,
-        [userId, nip, id_prodi, `Bidang keahlian dosen ${i}`]
-      );
+  const dosenSet = new Set();
+  for (const team of teams) {
+    if (team.dosenPembimbing) {
+      dosenSet.add(team.dosenPembimbing);
     }
   }
-  console.log('10 Dosen seeded (dosen1@mail.com - dosen10@mail.com)');
+
+  const dosenList = [...dosenSet];
+  console.log(`Total dosen pembimbing unik dari JSON: ${dosenList.length}`);
+
+  let seededCount = 0;
+
+  for (let i = 0; i < dosenList.length; i++) {
+    const namaLengkap = dosenList[i];
+    const idx = i + 1;
+    const nip = `NIP${String(idx).padStart(6, '0')}`;
+    const username = `dosen${idx}`;
+    const email = `dosen${idx}@polinema.ac.id`;
+
+    try {
+      const userResult = await upsertUser({
+        id_role: dosenRoleId,
+        username: username,
+        email: email,
+        password_hash: password_hash,
+        nama_lengkap: namaLengkap
+      });
+
+      if (userResult.rows.length > 0) {
+        const userId = userResult.rows[0].id_user;
+        
+        await pool.query(
+          `INSERT INTO public.m_dosen 
+           (id_user, nip, id_prodi, bidang_keahlian, status_verifikasi) 
+           VALUES ($1, $2, $3, $4, 1) 
+           ON CONFLICT (id_user) DO UPDATE SET 
+             nip = EXCLUDED.nip,
+             status_verifikasi = 1`,
+          [userId, nip, defaultProdiId, `Pembimbing PMW`]
+        );
+        seededCount++;
+      }
+    } catch (error) {
+      console.error(`Error seeding dosen "${namaLengkap}": ${error.message}`);
+    }
+  }
+
+  console.log(`${seededCount} Dosen pembimbing seeded dari JSON (password: password123)`);
 };
 
 module.exports = seedDosen;

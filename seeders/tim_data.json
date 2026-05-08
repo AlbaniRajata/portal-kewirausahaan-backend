@@ -1,0 +1,3602 @@
+[
+  {
+    "no": 1,
+    "judul": "“FORMIFY” Zero Waste Infinite Design",
+    "kategori": "Desain Kreatif",
+    "dosenPembimbing": "Septyana Riskitasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Stevanus Nefa Ardian",
+        "nim": "244102030010",
+        "id_prodi": 12,
+        "tahun_masuk": 2024,
+        "noHp": "085707228377"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Tegar Miftachul Ulum",
+        "nim": "254102030082",
+        "id_prodi": 12,
+        "tahun_masuk": 2025,
+        "noHp": "085730075398"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Fadly Putra Pradana",
+        "nim": "254102030059",
+        "id_prodi": 12,
+        "tahun_masuk": 2025,
+        "noHp": "081259232034"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Iqbal Yazid Nurdiansyah",
+        "nim": "254102030080",
+        "id_prodi": 12,
+        "tahun_masuk": 2025,
+        "noHp": "085749476065"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Muchammad Deni Satriyo Wardoyo",
+        "nim": "244102030064",
+        "id_prodi": 12,
+        "tahun_masuk": 2024,
+        "noHp": "081249775604"
+      }
+    ]
+  },
+  {
+    "no": 2,
+    "judul": "CapCycle Studio",
+    "kategori": "Desain Kreatif",
+    "dosenPembimbing": "Ayu Sulasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Neira Ika Wardania",
+        "nim": "253206010080",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "081515342914"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Bintang Satrio Wicaksono",
+        "nim": "243206010122",
+        "id_prodi": 18,
+        "tahun_masuk": 2024,
+        "noHp": "085190667622"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Delila Ayu Anggraini P.P",
+        "nim": "253206010052",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "082228374780"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Muhammad Brian Firdaus",
+        "nim": "253206010014",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "081234187105"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Shabrina Az-Zahrah",
+        "nim": "253206010020",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "081335835722"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Twin Shofira Putri Wali",
+        "nim": "253206010038",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "089654375000"
+      }
+    ]
+  },
+  {
+    "no": 3,
+    "judul": "FuzzyLoop (Gantungan kunci kreatif dari kawat bulu)",
+    "kategori": "Desain Kreatif",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Ataya Javier al arsya",
+        "nim": "254206020161",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081334512446"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Bevanya meta putri yesila",
+        "nim": "254206020159",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081358727893"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Febbi Novita Sari",
+        "nim": "254206020001",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085707574277"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Kautsar Karimah",
+        "nim": "254206020107",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": null
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Xabi radiya lanang muhadjir",
+        "nim": "254206020067",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": null
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ataya Javier al asyra",
+        "nim": "254206020161",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081334512446"
+      }
+    ]
+  },
+  {
+    "no": 4,
+    "judul": "HeatLoop",
+    "kategori": "Desain Kreatif",
+    "dosenPembimbing": "Noverita Wahyuningsih",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Alaina Achsanal Khuluqi",
+        "nim": "244208020050",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "081335580727"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Shahira Aziza Zahratun Nisa",
+        "nim": "244208020026",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "081317225701"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Wianda Savitri",
+        "nim": "244208020032",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "082146736883"
+      }
+    ]
+  },
+  {
+    "no": 5,
+    "judul": "MY FIRST HARVEST: MEDIA EDUKASI BERBASIS AKTIVITAS TANAM SEBAGAI BENTUK PEMBELAJARAN INTERAKTIF UNTUK MENGEMBANGKAN KREATIVITAS, MOTORIK, DAN KEPEDULIAN LINGKUNGAN PADA ANAK",
+    "kategori": "Desain Kreatif",
+    "dosenPembimbing": "Rosy Aprieza Puspita Zandra",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Salsa Diah Cahya Wardani",
+        "nim": "244205020143",
+        "id_prodi": 1,
+        "tahun_masuk": 2024,
+        "noHp": "082334713169"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Dinda Purwanti",
+        "nim": "244205020076",
+        "id_prodi": 1,
+        "tahun_masuk": 2024,
+        "noHp": "085704605342"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Elsa Nurhaini",
+        "nim": "244205020042",
+        "id_prodi": 1,
+        "tahun_masuk": 2024,
+        "noHp": "085856400091"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Mayang IkaSari Putri Karima",
+        "nim": "244205030020",
+        "id_prodi": 1,
+        "tahun_masuk": 2024,
+        "noHp": "089523995038"
+      }
+    ]
+  },
+  {
+    "no": 6,
+    "judul": "NOYA Natural Body Scrub",
+    "kategori": "Desain Kreatif",
+    "dosenPembimbing": "Wahyuni Ningsih",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Nazwa Dwi Putri Wulandari",
+        "nim": "243104010048",
+        "id_prodi": 21,
+        "tahun_masuk": 2024,
+        "noHp": "083138053240"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Dinar Khotimatus Nafilaikha",
+        "nim": "243104010002",
+        "id_prodi": 21,
+        "tahun_masuk": 2024,
+        "noHp": null
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Raditya Afreyzha Ramadhany",
+        "nim": "243104010054",
+        "id_prodi": 21,
+        "tahun_masuk": 2024,
+        "noHp": "089688180042"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Salzabilla Nasywa Lurian Putri",
+        "nim": "243104010056",
+        "id_prodi": 21,
+        "tahun_masuk": 2024,
+        "noHp": "‪'087773758050‬"
+      }
+    ]
+  },
+  {
+    "no": 7,
+    "judul": "OPTIMALISASI LIMBAH TEKSTIL (KAIN PERCA) MELALUI PRODUKSI CASE HANDPHONE “CAPU CASE” YANG ESTETIS DAN BERKELANJUTAN",
+    "kategori": "Desain Kreatif",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Galuh Ajeng Sekarsiwi",
+        "nim": "253206010093",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "085230102434"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Aufaa Mifthakul Jannah",
+        "nim": "253206010055",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": null
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Edward Rigael Dame",
+        "nim": "243206010024",
+        "id_prodi": 18,
+        "tahun_masuk": 2024,
+        "noHp": "0881081935869"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Fairin Fahrurozi",
+        "nim": "253206010095",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "082340839786"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Khairiya Rahman",
+        "nim": "253206010004",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "088235081818"
+      }
+    ]
+  },
+  {
+    "no": 8,
+    "judul": "Re-Shell",
+    "kategori": "Desain Kreatif",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Sahara Mahardhika",
+        "nim": "254206020111",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "895399157288"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Aurora Grisella Y.B.K",
+        "nim": "254206020039",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082132760778"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ayu Wulandari",
+        "nim": "254206020169",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085850633451"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Chandra Dwi Kartika M. S. A.",
+        "nim": "254206020031",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085707780760"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "M. Favian Dzaki A.",
+        "nim": "254206020174",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082300000359"
+      }
+    ]
+  },
+  {
+    "no": 9,
+    "judul": "“Velmora Cloths” Inovasi Fashion Modifikasi Berbasis Lukis Tangan sebagai Upaya menciptakan Gaya Berpakaian Kreatif dan Ramah Lingkungan",
+    "kategori": "Desain Kreatif",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Jihan Aqila Ariyanto",
+        "nim": "254206020102",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081232164090"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Dwi Anggun Lestari",
+        "nim": "254206020139",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081232581570"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Dzaki Galang Sinukerta",
+        "nim": "254206020066",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082257125036"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Naura Sa'adah",
+        "nim": "254206020571",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082334302739"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Talitha Zafirah Fairuz",
+        "nim": "254206020142",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "088996014027"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Wildan Hanugrah Ramadhan",
+        "nim": "254206020007",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "088989645648"
+      }
+    ]
+  },
+  {
+    "no": 10,
+    "judul": "(1D) W5 Creative ( Jasa Content Creator UMKM",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Pragata Yogi Andika",
+        "nim": "254206020135",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "85607675319"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Aldinorizal Seven PutraSony",
+        "nim": "254206020180",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "087731264002"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Angellique Rohcman",
+        "nim": "254206020148",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "083113167923"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Dian Putri Nurul Qomariani",
+        "nim": "254206020032",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081230556850"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Lia Nurrohmah",
+        "nim": "254206020014",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "088217133514"
+      }
+    ]
+  },
+  {
+    "no": 11,
+    "judul": "(1D)KOKOMI BODY SCRUB",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Kasanah Putri Ameliya",
+        "nim": "254206020012",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082142294932"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Dimas Aminur Rizky",
+        "nim": "254206020179",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081231089029"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Khoirun Nisa’",
+        "nim": "254206020162",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085815510830"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Mellanie Febri Rismanda Putri",
+        "nim": "254206020164",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085755331263"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Miracle Fedora Ilahi Bahri",
+        "nim": "254206020110",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": null
+      }
+    ]
+  },
+  {
+    "no": 12,
+    "judul": "“GABORTEL CRUNCH : Inovasi Telur Gabus Berbasis Wortel sebagai Camilan Sehat dan Bergizi Tinggi”",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Rizqi Khoirunisa",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Virda Hamidatul Zahro",
+        "nim": "243205060029",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "085706160835"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Anggita Eka Damayanti",
+        "nim": "243205060013",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "083140463230"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Airin",
+        "nim": "234205060009",
+        "id_prodi": 19,
+        "tahun_masuk": 2023,
+        "noHp": "085655881695"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Viola Dini Febriani",
+        "nim": "243205060015",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "081515125972"
+      }
+    ]
+  },
+  {
+    "no": 13,
+    "judul": "“RELEAF:\r\nKEMASAN DAUR ULANG LIMBAH DAUN”",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Rihanna Inhu Parawansa",
+        "nim": "254206020015",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082233602146"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Adivia Hana Anita Wardani",
+        "nim": "254206020137",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085646641898"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ajeng Putri Mardiningtyas",
+        "nim": "254206020127",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081259794336"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Cheillah Rizky Nurhidayah",
+        "nim": "254206020166",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085785245271"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Elfira Lukita Bathari",
+        "nim": "254206020043",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "083137368168"
+      }
+    ]
+  },
+  {
+    "no": 14,
+    "judul": "Arumee Skin(1D)",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Fa’izza Tachta Tsurayya",
+        "nim": "254206020080",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085740599555"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Enggar Dana Diaksa",
+        "nim": "254206020172",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085645151735‬"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Muhammad Revalino Hutama",
+        "nim": "254206020064",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085854297090"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Naila Charirotul Luthfiah",
+        "nim": "254206020016",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082337452966"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Salwa Noviantika Pratami",
+        "nim": "254206020069",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085257400331"
+      }
+    ]
+  },
+  {
+    "no": 15,
+    "judul": "Bagcharm Orchid aksesories tas estetik dengan konsep handmade dan custom order",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Nila Alia",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Miftahul Rozak",
+        "nim": "2341220077",
+        "id_prodi": 13,
+        "tahun_masuk": 2023,
+        "noHp": "081259128488"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Fadhillatus Shofi Aulia",
+        "nim": "243101030019",
+        "id_prodi": 28,
+        "tahun_masuk": 2024,
+        "noHp": "081946199987"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Askha Maulidina Amalin Mudjiono",
+        "nim": "243101030009",
+        "id_prodi": 28,
+        "tahun_masuk": 2024,
+        "noHp": "0895107996379"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Paulina Cantika Yusak",
+        "nim": "243101030065",
+        "id_prodi": 28,
+        "tahun_masuk": 2024,
+        "noHp": "085137354724"
+      }
+    ]
+  },
+  {
+    "no": 16,
+    "judul": "Bling Key Inovasi Produk Resin Kustom sebagai Peluang Wirausaha Kreativitas Mahasiswa",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Hendra Pradibta",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Khoir Karol Nurzuraidah",
+        "nim": "2341760048",
+        "id_prodi": 16,
+        "tahun_masuk": 2023,
+        "noHp": "081410100519"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Fasya Dita Nasahah",
+        "nim": "2341760077",
+        "id_prodi": 16,
+        "tahun_masuk": 2023,
+        "noHp": "087782169276"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Susilowati Syafa Adilah",
+        "nim": "2341760095",
+        "id_prodi": 16,
+        "tahun_masuk": 2023,
+        "noHp": "082139240394"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nur Tsamaroh Luthfiyyah",
+        "nim": "2342520218",
+        "id_prodi": 1,
+        "tahun_masuk": 2023,
+        "noHp": "08883078261"
+      }
+    ]
+  },
+  {
+    "no": 17,
+    "judul": "Cafflow - Paper Soap",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Achmad Isnain Rosyid",
+        "nim": "254206020112",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "0857857001316"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ashila Rahadatu Aisyi Arifin",
+        "nim": "254206020045",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082338510826"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Riki Arditya Putra",
+        "nim": "254206020096",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "089666810595"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Siska Aulia Putri",
+        "nim": "254206020054",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082231140360"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Vika Amanda Arismania",
+        "nim": "254206020105",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085736456948"
+      }
+    ]
+  },
+  {
+    "no": 18,
+    "judul": "Chikuroll",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Fardina Milata Hanifa",
+        "nim": "253206010091",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "081358517293"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Dandy Savino Firansyah",
+        "nim": "253206010060",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "0881081870329"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Fauzan Hari Saputra",
+        "nim": "253206010006",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "083854075703"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Farah Famelita",
+        "nim": "253206010018",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "082142716020"
+      }
+    ]
+  },
+  {
+    "no": 19,
+    "judul": "COCO VIBE",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Anik Kusmintarti",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Happy Azzahra Rifa'i",
+        "nim": "243103030044",
+        "id_prodi": 14,
+        "tahun_masuk": 2024,
+        "noHp": "082140306798"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Allysia Reta Ramdhani Ikhrullah",
+        "nim": "243103030025",
+        "id_prodi": 14,
+        "tahun_masuk": 2024,
+        "noHp": "081358345495"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Cleantha Novia Putri Ayu Prasetyo",
+        "nim": "244205030011",
+        "id_prodi": 3,
+        "tahun_masuk": 2024,
+        "noHp": "087802846090"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nahdatul Muariska",
+        "nim": "244205030042",
+        "id_prodi": 3,
+        "tahun_masuk": 2024,
+        "noHp": "085745500769"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Zhafira Nur Afifa",
+        "nim": "243103030020",
+        "id_prodi": 14,
+        "tahun_masuk": 2024,
+        "noHp": "081318787636"
+      }
+    ]
+  },
+  {
+    "no": 20,
+    "judul": "DIMSUM MAGER",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Riska Khoirotun Nisa Usnania",
+        "nim": "253206010103",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "0881026962150"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ahmad Nabil Wildan Attabi",
+        "nim": "253206010001",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "085816908815"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nazhira Putri Zatalini",
+        "nim": "253206010061",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "085546738277"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Muhammad Rafi Mahendra",
+        "nim": "253206010119",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "085692452223"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Edhis Syifa Ramadhani",
+        "nim": "253206010075",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "089530257955"
+      }
+    ]
+  },
+  {
+    "no": 21,
+    "judul": "E - LIBRARY EASTJ",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ita Djatmika",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Moch Falah Mairo Rajendra",
+        "nim": "244206020145",
+        "id_prodi": 4,
+        "tahun_masuk": 2024,
+        "noHp": "081235104754"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Feriska Lindira",
+        "nim": "254206020144",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "0895322347787"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Grivina Kalya",
+        "nim": "254206020063",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081331103150"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Arsheilla Azzahrani",
+        "nim": "254206020133",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085254464900"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Yuan Indra",
+        "nim": "254206020028",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "088991587349"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Moch Falah Mairo Rajendra",
+        "nim": "244206020145",
+        "id_prodi": 4,
+        "tahun_masuk": 2024,
+        "noHp": "081235104754"
+      }
+    ]
+  },
+  {
+    "no": 22,
+    "judul": "ES JELY Dan PISANG MADU",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Suselo Utoyo",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Muhammad Fikri Habibur Rohim",
+        "nim": "253103010059",
+        "id_prodi": 27,
+        "tahun_masuk": 2025,
+        "noHp": "085791771575"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Dendy Idham Kurniawan",
+        "nim": "253103010054",
+        "id_prodi": 27,
+        "tahun_masuk": 2025,
+        "noHp": "081218258880"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Zhafif Davin Akhdan",
+        "nim": "253103010026",
+        "id_prodi": 27,
+        "tahun_masuk": 2025,
+        "noHp": "085876866548"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Novrizal Risky Arsiansyah",
+        "nim": "253103010071",
+        "id_prodi": 27,
+        "tahun_masuk": 2025,
+        "noHp": "085823473928"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Azalia Tsany Cahyani Putri",
+        "nim": "253103010052",
+        "id_prodi": 27,
+        "tahun_masuk": 2025,
+        "noHp": "081559580009"
+      }
+    ]
+  },
+  {
+    "no": 23,
+    "judul": "GYORE: Inovasi Gyoza Warna Warni Berbahan Alami dengan Konsep Food-Drink Pairing",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ayu Sulasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Khoiri Mufarikhatin A.R.",
+        "nim": "2342630017",
+        "id_prodi": 6,
+        "tahun_masuk": 2023,
+        "noHp": "089508768637"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Putri Adda Wiyata Hartini",
+        "nim": "244205020043",
+        "id_prodi": 1,
+        "tahun_masuk": 2024,
+        "noHp": null
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Dwi Nur Azzahra",
+        "nim": "244205020006",
+        "id_prodi": 1,
+        "tahun_masuk": 2024,
+        "noHp": "085892000143"
+      }
+    ]
+  },
+  {
+    "no": 24,
+    "judul": "INOVASI PRODUKSI SABUN CUCI PIRING DAN SABUN CUCI TANGAN SEBAGAI PELUANG USAHA PRODUK KEBERSIHAN UNTUK BERBAGAI KEBUTUHAN MASYARAKAT.",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Reivan Juniata Batuadji",
+        "nim": "254206020193",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085236698689"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Aufa nabilah",
+        "nim": "254206020065",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085855095453"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Devi Yunita sari",
+        "nim": "254206020101",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085183038115"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Galuh waluyo",
+        "nim": "254206020006",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081335369328"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Intan Febrianty Putri",
+        "nim": "254206020126",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "087703279090"
+      }
+    ]
+  },
+  {
+    "no": 25,
+    "judul": "Justdrinking.co",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Muhammad Tri Aditya",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Bagas Zakaria",
+        "nim": "2341220042",
+        "id_prodi": 13,
+        "tahun_masuk": 2023,
+        "noHp": "081390713453"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nervalina Adzra Nora Aqilla",
+        "nim": "2341760066",
+        "id_prodi": 16,
+        "tahun_masuk": 2023,
+        "noHp": "081357971553"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Kanaya Abdielaramadhani Hidayat",
+        "nim": "2341760118",
+        "id_prodi": 16,
+        "tahun_masuk": 2023,
+        "noHp": "081809460175"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Mokhamad Rizky Ardiansyah",
+        "nim": "2341220079",
+        "id_prodi": 13,
+        "tahun_masuk": 2023,
+        "noHp": "081939570271"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Adinda Amelia Putri",
+        "nim": "2342520093",
+        "id_prodi": 4,
+        "tahun_masuk": 2023,
+        "noHp": "085850674052"
+      }
+    ]
+  },
+  {
+    "no": 26,
+    "judul": "KADOLOGY",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Muhammad Al Ghofari",
+        "nim": "253206010098",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "081953973936"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ariska Diana Maharani",
+        "nim": "253206010022",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "083839902974"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Carrera Sasabila Dwi Fasira",
+        "nim": "253206010118",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "081325487823"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Valian Bintang Rozzaqi",
+        "nim": "253206010033",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "085649454895"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Yuva Viga Fabian",
+        "nim": "253206010105",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "0859106787040"
+      }
+    ]
+  },
+  {
+    "no": 27,
+    "judul": "Keymory \"Keychain by Pipe Cleaner\"",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Witda Ula Zulfa Hasanah",
+        "nim": "2532206010068",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "082231245742"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Mohammad Ryan Ermano Darmawan",
+        "nim": "253206010059",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "085855134008"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nofa",
+        "nim": "253206010008",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "081357354895"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ranindya Ainira Ramadhani",
+        "nim": "253206010111",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "088803539979"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Renaldo Nugroho Solfit",
+        "nim": "253206010048",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "082131174731"
+      }
+    ]
+  },
+  {
+    "no": 28,
+    "judul": "LEMBAYU AROMATIC",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Zahra Mutthiya Putri Salsabilla",
+        "nim": "253206010073",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "088228594570"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Angelina Maharani",
+        "nim": "25320610096",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "081343175475"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Chelsy Artika Rahma",
+        "nim": "25320610065",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "085804196650"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Intan Mayang Sari",
+        "nim": "25320610007",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "089523991117"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nadya Amalia Putri",
+        "nim": "25320610013",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "089530101451"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Zahra Mutthiya Putri Salsabilla",
+        "nim": "253206010073",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "088228594570"
+      }
+    ]
+  },
+  {
+    "no": 29,
+    "judul": "Niljong(Kue Sus ikan Nila)",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ayu Sulasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Sekar Ayu Aji Pawestri",
+        "nim": "254206020004",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "088228446025"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Hanuva",
+        "nim": "253206010102",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "082132679769"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "M akmal mubarok",
+        "nim": "254206030025",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "085973756735"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Belqis Ravellya",
+        "nim": "253206010005",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "08597375635"
+      }
+    ]
+  },
+  {
+    "no": 30,
+    "judul": "Open Trip Coban Area Malang Raya",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ayu Sulasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Arga Aditya Putra Darien",
+        "nim": "2342840029",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "0895371060180"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Naufal Fauzani Rachman",
+        "nim": "2342840038",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "08819852366"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Hamzan Wadi",
+        "nim": "2342840010",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "085739537558"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Muhammad tauqifiy Kufiy",
+        "nim": "2342840041",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "085231052414"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Syawal Dwianto Prasetyo",
+        "nim": "2342840021",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "082140585501"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Muhammad Zidan Al Husaini",
+        "nim": "2342840003",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "087835081384"
+      }
+    ]
+  },
+  {
+    "no": 31,
+    "judul": "PROPOSAL\r\nPROGRAM MAHASISWA WIRAUSAHA\r\nLIONTIN GANTUNGAN KUNCI DAN KALUNG \r\n“LOCTUS”",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Muhammad Hisyam Osgani",
+        "nim": "254206020129",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081232169071"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Assyifa’ Intan Prasetyo",
+        "nim": "254206020170",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082243111892"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Karina Ramadhani",
+        "nim": "254206020122",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": null
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Rafi Sandria Pratama",
+        "nim": "254206020060",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "0895 3141 9299"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Sagrada Familia br Kaban",
+        "nim": "254206020056",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085260976955"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Muhammad Hisyam Osgani",
+        "nim": "254206020129",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081232169071"
+      }
+    ]
+  },
+  {
+    "no": 32,
+    "judul": "Risol Dubai",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Darrell Fawwaz Zuhayr",
+        "nim": "254206020155",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "088805033982"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Muhammad Rayyan Hanif Annuhad",
+        "nim": "254206020013",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081260792213"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Muhammad Daeswana Arvizu Putra Abadi",
+        "nim": "254206020117",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081133301234"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Fazzahro ilmi",
+        "nim": "254206020186",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085746998551"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Dedek Valena Zuan Zalasta",
+        "nim": "254206020149",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085733652721"
+      }
+    ]
+  },
+  {
+    "no": 33,
+    "judul": "TAKOGANA: Inovasi Takoyaki Nusantara",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Ayu Diah Tri Velansia",
+        "nim": "244206020110",
+        "id_prodi": 4,
+        "tahun_masuk": 2024,
+        "noHp": "082233477909"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Arruum",
+        "nim": "244206020123",
+        "id_prodi": 4,
+        "tahun_masuk": 2024,
+        "noHp": "085804820005"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Farida Khoirunisak",
+        "nim": "244206020052",
+        "id_prodi": 4,
+        "tahun_masuk": 2024,
+        "noHp": "085606602559"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Niswatun Nabila Wijayanti",
+        "nim": "244206020078",
+        "id_prodi": 4,
+        "tahun_masuk": 2024,
+        "noHp": "085161131515"
+      }
+    ]
+  },
+  {
+    "no": 34,
+    "judul": "Terrabrew",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Noverita Wahyuningsih",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Zaskia Amelia",
+        "nim": "244208020072",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "089602663682"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ramadani Panca Oktaviana",
+        "nim": "244208020018",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "082137340844"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Afifatus Zahra",
+        "nim": "244208020073",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "0895341151562"
+      }
+    ]
+  },
+  {
+    "no": 35,
+    "judul": "TMLS (Timeless)",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Radhia Jatu Noviarsita Sakti",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Muhammad Hadi Agung Wibowo",
+        "nim": "2341320019",
+        "id_prodi": 5,
+        "tahun_masuk": 2023,
+        "noHp": "089665951781"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Jeovana Erlinda",
+        "nim": "254103020066",
+        "id_prodi": 5,
+        "tahun_masuk": 2025,
+        "noHp": "085608123579"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Najwati Ramadhani",
+        "nim": "253205010033",
+        "id_prodi": 19,
+        "tahun_masuk": 2025,
+        "noHp": "085606235346"
+      }
+    ]
+  },
+  {
+    "no": 36,
+    "judul": "Veegie Dumpling: Gyoza Kaya Serat dengan Inovasi Kulit Warna Alami Dari Bahan Pangan Sebagai Solusi Camilan Praktis yang Mendukung Gaya Hidup Sehat",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ayu Sulasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Mohammad Jouhar Romadlan",
+        "nim": "244101070138",
+        "id_prodi": 8,
+        "tahun_masuk": 2024,
+        "noHp": "081345504796"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Jihan Fahriza Maulidia",
+        "nim": "244206020124",
+        "id_prodi": 4,
+        "tahun_masuk": 2024,
+        "noHp": "0895384012087"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Elvina Ananta Putri",
+        "nim": "244205020149",
+        "id_prodi": 1,
+        "tahun_masuk": 2024,
+        "noHp": "085792242232"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nabila Nurfayza",
+        "nim": "244205020062",
+        "id_prodi": 1,
+        "tahun_masuk": 2024,
+        "noHp": "085850768270"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Hera Dwi Febriani",
+        "nim": "244205020047",
+        "id_prodi": 1,
+        "tahun_masuk": 2024,
+        "noHp": "081252409904"
+      }
+    ]
+  },
+  {
+    "no": 37,
+    "judul": "Veggie Cream",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Naya Wianda Valentya",
+        "nim": "253206010085",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "08981029900"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Aqila Ghina Sakinah",
+        "nim": "253206010097",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "082244938600"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Elsa Nur Hidayah",
+        "nim": "253206010012",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "085791419603"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Melati Maria Fransisca",
+        "nim": "253206010028",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "082132387216"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nadhira Kirana Putri",
+        "nim": "253206010037",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "089528425553"
+      }
+    ]
+  },
+  {
+    "no": 38,
+    "judul": "Yo-Maca!",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Ayu Sulasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Devita Ramandharie",
+        "nim": "242840007",
+        "id_prodi": 15,
+        "tahun_masuk": 2024,
+        "noHp": "0895367136466"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Heny Alviyah",
+        "nim": "2342840024",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "085746320564"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Aura Rizka Lillah",
+        "nim": "2342840028",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "082162885752"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nabilah Elsa Putri",
+        "nim": "2342840020",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "082229901545"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Harim Azzahra L",
+        "nim": "2342840044",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "0895347340575"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Isna Farihana",
+        "nim": "2342840048",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "085236334066"
+      }
+    ]
+  },
+  {
+    "no": 39,
+    "judul": "“INOVASI PEMANFAATAN LIMBAH KAIN PERCA\r\nMENJADI TAS RAMAH LINGKUNGAN DAN\r\nGANTUNGAN KUNCI RAJUT PISANG SEBAGAI\r\nPRODUK KREATIF BERBASIS IDENTITAS LOKAL”",
+    "kategori": "Jasa dan Dagang",
+    "dosenPembimbing": "Rizqi Khoirunisa",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Nabila Cahya Isnaini",
+        "nim": "253205060020",
+        "id_prodi": 19,
+        "tahun_masuk": 2025,
+        "noHp": "085249650199"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Devianti Putri Lestari",
+        "nim": "253205060015",
+        "id_prodi": 19,
+        "tahun_masuk": 2025,
+        "noHp": "082337354996"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Silvina Putri Ramadhani Kusuma Masugianta",
+        "nim": "253205060025",
+        "id_prodi": 19,
+        "tahun_masuk": 2025,
+        "noHp": "085184654137"
+      }
+    ]
+  },
+  {
+    "no": 40,
+    "judul": "AKSA Ekosistem",
+    "kategori": "Technopreneur",
+    "dosenPembimbing": "Agung Nugroho Pramudhita",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Baskoro Seno Aji",
+        "nim": "2341720063",
+        "id_prodi": 9,
+        "tahun_masuk": 2023,
+        "noHp": "081217177528"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Aqilla Aprily Kurnia Sari",
+        "nim": "2341720068",
+        "id_prodi": 9,
+        "tahun_masuk": 2023,
+        "noHp": "082231720100"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Febrian Arka Samudra",
+        "nim": "2341720066",
+        "id_prodi": 9,
+        "tahun_masuk": 2023,
+        "noHp": "082257071031"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Khen Muhammad Cahyo",
+        "nim": "244107023002",
+        "id_prodi": 9,
+        "tahun_masuk": 2024,
+        "noHp": "08813102165"
+      }
+    ]
+  },
+  {
+    "no": 41,
+    "judul": "Be on Cloud",
+    "kategori": "Technopreneur",
+    "dosenPembimbing": "Noverita Wahyuningsih",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Aurel Desty Ayu Narariya",
+        "nim": "244208020044",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "085955206414"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Aiko Motika Nugraha",
+        "nim": "244208020048",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "081335304485"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Viola Nirmala Putri",
+        "nim": "244208020036",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "082228080095"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Intan Sari Permata",
+        "nim": "2442080200399",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "085156271175"
+      }
+    ]
+  },
+  {
+    "no": 42,
+    "judul": "KELOLA.IN PENGEMBANGAN PLATFORM DIGITAL MANAJEMEN TRANSAKSI DAN OPERASIONAL USAHA BERBASIS WEB UNTUK MENINGKATKAN EFISIENSI DAN PRODUKTIVITAS UMKM",
+    "kategori": "Technopreneur",
+    "dosenPembimbing": "Mohammad Maskan",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Dewi Faizah",
+        "nim": "2342620206",
+        "id_prodi": 4,
+        "tahun_masuk": 2023,
+        "noHp": "083846196105"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Amelia Dwi Kusuma",
+        "nim": "2342620199",
+        "id_prodi": 4,
+        "tahun_masuk": 2023,
+        "noHp": "085783827628"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Aqila Nur Azza",
+        "nim": "2341760022",
+        "id_prodi": 16,
+        "tahun_masuk": 2023,
+        "noHp": "081230382286"
+      }
+    ]
+  },
+  {
+    "no": 43,
+    "judul": "MooGlow organic soap",
+    "kategori": "Technopreneur",
+    "dosenPembimbing": "Nabila Ayu Sabrina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Sabrina Aulia Salsabila",
+        "nim": "253103060033",
+        "id_prodi": 38,
+        "tahun_masuk": 2025,
+        "noHp": "087776726897"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Anjani Dewi Aji Wulandari",
+        "nim": "253103060019",
+        "id_prodi": 38,
+        "tahun_masuk": 2025,
+        "noHp": "085784322349"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Hafis Ardinsyah",
+        "nim": "253103060015",
+        "id_prodi": 38,
+        "tahun_masuk": 2025,
+        "noHp": "082132847286"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Jingga Fatimah Azzahra",
+        "nim": "253103060008",
+        "id_prodi": 38,
+        "tahun_masuk": 2025,
+        "noHp": "085732545220"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Wildan Putra Ramadhani",
+        "nim": "253103060042",
+        "id_prodi": 38,
+        "tahun_masuk": 2025,
+        "noHp": "085150687372"
+      }
+    ]
+  },
+  {
+    "no": 44,
+    "judul": "OPTIMALISASI LIMBAH NANAS DAN TEMPURUNG KELAPA MENJADI BRIKET RAMAH LINGKUNGAN SEBAGAI SOLUSI ENERGI BERKELANJUTAN UNTUK MENDUKUNG SDGS INDONESIA 2030",
+    "kategori": "Technopreneur",
+    "dosenPembimbing": "Anik Kusmintarti",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Dygta Aulia Akbar",
+        "nim": "2341420095",
+        "id_prodi": 11,
+        "tahun_masuk": 2023,
+        "noHp": "082334966150"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nur Tsamaroh Luthfiyyah",
+        "nim": "2342520218",
+        "id_prodi": 1,
+        "tahun_masuk": 2023,
+        "noHp": "08883078261"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Sely Dwi Febianti",
+        "nim": "244104020048",
+        "id_prodi": 11,
+        "tahun_masuk": 2024,
+        "noHp": "085755781135"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Martha Bachrul Achir",
+        "nim": "244104020089",
+        "id_prodi": 11,
+        "tahun_masuk": 2024,
+        "noHp": "082257318763"
+      }
+    ]
+  },
+  {
+    "no": 45,
+    "judul": "Pengembangan Jasa Custom Furniture pada Workshop \"Kartika Putri Mebel\" melalui Digitalisasi Pemasaran Berbasis Website \"Furnity\" untuk Meningkatkan Jangkauan Pasar",
+    "kategori": "Technopreneur",
+    "dosenPembimbing": "Farida Ulfa",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Cindy Nur Khoiriyah",
+        "nim": "2341720058",
+        "id_prodi": 9,
+        "tahun_masuk": 2023,
+        "noHp": "089677820120"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Farel Maryam Laila Hajiri",
+        "nim": "2341760028",
+        "id_prodi": 9,
+        "tahun_masuk": 2023,
+        "noHp": "085394786878"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Adinda Ivanka Maysanda Putri",
+        "nim": "2341760058",
+        "id_prodi": 9,
+        "tahun_masuk": 2023,
+        "noHp": "085854387620"
+      }
+    ]
+  },
+  {
+    "no": 46,
+    "judul": "Pinbutton: Inovasi Merchandise Kreatif Sebagai\r\nMedia Ekspresi Aspirasi Melalui Pin Button Dan Keychain",
+    "kategori": "Technopreneur",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Achmad Fachri Badhawi",
+        "nim": "253206010071",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "089512292643"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Agistya Hasan Maharani",
+        "nim": "253206010032",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "085730821760"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Annisa Gendhis Al-Fatihah S.N.",
+        "nim": "253206010054",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "081334986249‬"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Aulia Farah Adibah",
+        "nim": "253206010087",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "082343071491"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Keysha Ayu Febryanti",
+        "nim": "253206010070",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "087739456750‬"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Achmad Fachri Badhawi",
+        "nim": "253206010071",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "089512292643"
+      }
+    ]
+  },
+  {
+    "no": 47,
+    "judul": "Risol Zone",
+    "kategori": "Technopreneur",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Fatimatus Putri Andayani",
+        "nim": "253206010114",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "085238770380"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Farra Adinia Pratiwi",
+        "nim": "253206010107",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "081547371237"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nur Fuad Izzudin",
+        "nim": "253206010015",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "087879947327"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Rangga Aditya Ar Rizqie",
+        "nim": "253206010031",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "089699588268"
+      }
+    ]
+  },
+  {
+    "no": 48,
+    "judul": "SIGAP (Sisa Gizi jadi Pupuk)",
+    "kategori": "Technopreneur",
+    "dosenPembimbing": "Eri Cahyani",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Hanidah Indriyani",
+        "nim": "254103020078",
+        "id_prodi": 5,
+        "tahun_masuk": 2025,
+        "noHp": "85238770380"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Agustian Budi Santoso",
+        "nim": "254103020013",
+        "id_prodi": 5,
+        "tahun_masuk": 2025,
+        "noHp": "083194283432"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Bimantara Abi Bachtiar Purnama",
+        "nim": "254103020059",
+        "id_prodi": 5,
+        "tahun_masuk": 2025,
+        "noHp": "081387974485"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Radin Rizky Maulid Pratama",
+        "nim": "254103020064",
+        "id_prodi": 5,
+        "tahun_masuk": 2025,
+        "noHp": "082131921473"
+      }
+    ]
+  },
+  {
+    "no": 49,
+    "judul": "Teafy",
+    "kategori": "Technopreneur",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Syintia Pramudita Permatasari",
+        "nim": "254206020071",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085645875730"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Arfa Arif Hariswara",
+        "nim": "254206020058",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081010856648"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Okhy Nur Amaniah",
+        "nim": "254206020134",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085815300026"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Okcha Nesya Novitasari",
+        "nim": "254206020051",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085815300026"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Zenita Isna Nabila",
+        "nim": "245206020171",
+        "id_prodi": 4,
+        "tahun_masuk": 2024,
+        "noHp": "081235848792"
+      }
+    ]
+  },
+  {
+    "no": 50,
+    "judul": "ZESTORA : INOVASI SABUN MANDI ALAMI DARI LIMBAH KULIT JERUK RAMAH LINGKUNGAN",
+    "kategori": "Technopreneur",
+    "dosenPembimbing": "Ayu Sulasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Muhammad Zam Zami",
+        "nim": "253206010086",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "08213267769"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ilham Bani Saputra",
+        "nim": "253206010023",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "081232173182"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Belqis Ravellya",
+        "nim": "253206010005",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "085973756735"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Carolin Ignatia Pasaribu",
+        "nim": "253206010041",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "082260977431"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Muhammad Alif Fawwas A",
+        "nim": "253206010117",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "089654236684"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nabila Anggita Cahyani I.R",
+        "nim": "253206010040",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "089515966493"
+      }
+    ]
+  },
+  {
+    "no": 51,
+    "judul": "HerBloom : Masker Wajah dari Ekstrak Daun Kelor dan Beras Putih",
+    "kategori": "Technopreneur",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Reffi Aliyaningrum",
+        "nim": "2341420022",
+        "id_prodi": 11,
+        "tahun_masuk": 2023,
+        "noHp": "085230931057"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Septia Ayu Asdi Kristina",
+        "nim": "2341420069",
+        "id_prodi": 11,
+        "tahun_masuk": 2023,
+        "noHp": "085649950816"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Aghnia Ilmi Diyanah",
+        "nim": "2341420100",
+        "id_prodi": 11,
+        "tahun_masuk": 2023,
+        "noHp": "082144168051"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Syinta Trinil Yuniar",
+        "nim": "2341420082",
+        "id_prodi": 11,
+        "tahun_masuk": 2023,
+        "noHp": "082332969798"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Zufatun Ni’mah",
+        "nim": "2341420020",
+        "id_prodi": 11,
+        "tahun_masuk": 2023,
+        "noHp": "085895808746"
+      }
+    ]
+  },
+  {
+    "no": 52,
+    "judul": "“BANARICE”: Inovasi Beras Analog Berbasis Pseudostem Pisang dan Talas\r\nsebagai Pangan Fungsional Rendah Glikemik dan Berkelanjutan",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Rucita Ramadhana",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Maulina Zalfa Zallia Farahdila",
+        "nim": "244104020068",
+        "id_prodi": 11,
+        "tahun_masuk": 2024,
+        "noHp": "088801416972"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Annisa Dini Rizki",
+        "nim": "244206020057",
+        "id_prodi": 4,
+        "tahun_masuk": 2024,
+        "noHp": "085767167942"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Lailil Hikmah",
+        "nim": "244104020050",
+        "id_prodi": 11,
+        "tahun_masuk": 2024,
+        "noHp": "0859679271241"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Najwa Nadiva Naila Agusti",
+        "nim": "244206020032",
+        "id_prodi": 11,
+        "tahun_masuk": 2024,
+        "noHp": "082233027081"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Salsabillah Qurotul Aini",
+        "nim": "244206020015",
+        "id_prodi": 11,
+        "tahun_masuk": 2024,
+        "noHp": "088989416966"
+      }
+    ]
+  },
+  {
+    "no": 53,
+    "judul": "BanaGlaze: Keripik Pisang dengan Sentuhan Glaze Modern sebagai Peluang Usaha Kreatif",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Lely Indah Kurnia",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Marivatus Sarah Mayang Sari",
+        "nim": "243205060028",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "082330538936"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Inayatul Maula",
+        "nim": "243205060010",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "085730886426"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Izza Afkarina",
+        "nim": "243205060027",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "085735709418"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Kharisma Eka Putri",
+        "nim": "243205060016",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "085608225405"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Putri Agustia Ningrum",
+        "nim": "243205060004",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "087786734755"
+      }
+    ]
+  },
+  {
+    "no": 54,
+    "judul": "BONANA",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Mahesa Rendra",
+        "nim": "254206020025",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082342261747"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Cantika Selvina Oktavia",
+        "nim": "254206020019",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081358222056"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Juliana Firsta Lianda",
+        "nim": "252206020178",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085706398897"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Muhammad Emyrdza Al Fathir",
+        "nim": "254206020059",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085134945036"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Rafi Aji Ramadhani",
+        "nim": "254206020185",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085330034487"
+      }
+    ]
+  },
+  {
+    "no": 55,
+    "judul": "CEKRIS PESISIR: Inovasi Ceker Ayam Krispi sebagai Oleh-Oleh Wisata Malang Selatan",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Nila Alia",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Muhamat Khoirudin Karim",
+        "nim": "2341220023",
+        "id_prodi": 13,
+        "tahun_masuk": 2023,
+        "noHp": "081615753557"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Meisela Rosalina Dewi",
+        "nim": "241040200444",
+        "id_prodi": 11,
+        "tahun_masuk": 2024,
+        "noHp": "089514671746"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Selvi Nafisatul Islamiyah",
+        "nim": "244205020022",
+        "id_prodi": 1,
+        "tahun_masuk": 2024,
+        "noHp": "081252513529"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Rizqi Fajar Rahman",
+        "nim": "243101010071",
+        "id_prodi": 20,
+        "tahun_masuk": 2024,
+        "noHp": "082330491001"
+      }
+    ]
+  },
+  {
+    "no": 56,
+    "judul": "CHEEZLE",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Elmi Rakhma Aalin",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Thiara Chyndi Elvina Marelda",
+        "nim": "254205070070",
+        "id_prodi": 3,
+        "tahun_masuk": 2025,
+        "noHp": "0895367062131"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Emiliacesa Rasendriya Feriant",
+        "nim": "254205070040",
+        "id_prodi": 3,
+        "tahun_masuk": 2025,
+        "noHp": "085704583071"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Dhina Novianti",
+        "nim": "254205070073",
+        "id_prodi": 3,
+        "tahun_masuk": 2025,
+        "noHp": "085604896118"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Habibah Dwy Cahyatri",
+        "nim": "254205070052",
+        "id_prodi": 3,
+        "tahun_masuk": 2025,
+        "noHp": "085607494807"
+      }
+    ]
+  },
+  {
+    "no": 57,
+    "judul": "CornLava “Inovasi Camilan Jagung Lumer Kekinian \r\ndengan Sensasi Meleleh di Setiap Gigitan”",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Lely Indah Kurnia",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Nabila Zahiya",
+        "nim": "243205060017",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "085748536017"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Alfelan Aulia Prymadona",
+        "nim": "243205060002",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "0859191661086"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Agustina Dwi Nalendra Sari",
+        "nim": "243205060038",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "081249322766"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ulvi Rofi’ah",
+        "nim": "243205060034",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "085791664569"
+      }
+    ]
+  },
+  {
+    "no": 58,
+    "judul": "CRAVORY: Inovasi Flat Cookies kulit pisang dan daun kelor sebagai pangan fungsional kaya serat dan antioksidan",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Elmi Rakhma Aalin",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Aisyah Nabilla Aulia",
+        "nim": "244205070068",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "085708831385"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Agparita Pratiwi",
+        "nim": "244205070009",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "085943803748"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Anisa hidayatu rahma",
+        "nim": "243205050022",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "085174081910"
+      }
+    ]
+  },
+  {
+    "no": 59,
+    "judul": "Dragon Jam",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Atik Tri Andari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Distriya Vibi Uliany",
+        "nim": "253205050072",
+        "id_prodi": 19,
+        "tahun_masuk": 2025,
+        "noHp": "085856518543"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Aisyah Ayu Nur Asma",
+        "nim": "253205050069",
+        "id_prodi": 19,
+        "tahun_masuk": 2025,
+        "noHp": "089603068863"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Luthfi Annisaq",
+        "nim": "254205070057",
+        "id_prodi": 3,
+        "tahun_masuk": 2025,
+        "noHp": "085855067574"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Mas Yuliana Purba",
+        "nim": "254205070045",
+        "id_prodi": 3,
+        "tahun_masuk": 2025,
+        "noHp": "087866721419"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Wulan Dwi Nia Ramadhani",
+        "nim": "253205050119",
+        "id_prodi": 19,
+        "tahun_masuk": 2025,
+        "noHp": "08563547427"
+      }
+    ]
+  },
+  {
+    "no": 60,
+    "judul": "Es Cendol Kecebong",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Ayu Sulasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Muhammad Dwi Khabibulloh",
+        "nim": "2342840045",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "085604542689"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Luna Sri Handari Adaninggar",
+        "nim": "2342840015",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "085642701647"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Rafki Febrian",
+        "nim": "2342840013",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "082335687493"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Tinezia Moza Tsabita",
+        "nim": "2342840009",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "085858030534"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ardhanareswari Pradanaduhita",
+        "nim": "2342840034",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "081235697109"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Karen Florencia",
+        "nim": "2342840040",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "081515584697"
+      }
+    ]
+  },
+  {
+    "no": 61,
+    "judul": "Inovasi Produk Kerupuk Sambal Geprek Sebagai Cemilan Pedas Kekinian",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Ahmad Mustofa",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Adinda Rahma Noor Fadilla",
+        "nim": "253205060017",
+        "id_prodi": 19,
+        "tahun_masuk": 2025,
+        "noHp": "085791149884"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Feby Dwi Amelia",
+        "nim": "253205060047",
+        "id_prodi": 19,
+        "tahun_masuk": 2025,
+        "noHp": "083147757925"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Habibatul Khoiriyah",
+        "nim": "253205060002",
+        "id_prodi": 19,
+        "tahun_masuk": 2025,
+        "noHp": "085730653226"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Mochamad Nasrullah",
+        "nim": "253205060005",
+        "id_prodi": 19,
+        "tahun_masuk": 2025,
+        "noHp": "085792063062"
+      }
+    ]
+  },
+  {
+    "no": 62,
+    "judul": "Iwakkum : Ikan Segar Siap Masak dengan Metode Vacuum Packing untuk Kemudahan dan Kepraktisan",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Rosy Aprieza Puspita Zandra",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Jenar Maesa Alif",
+        "nim": "243205010120",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "087891518352"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Dinda Ferginur Andini",
+        "nim": "243205010040",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "081231881469"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Farel Mahdyan Naura Austrin",
+        "nim": "243205010059",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "085731762609"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Gianina Resty Ashianty",
+        "nim": "243205010013",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "085645738638"
+      }
+    ]
+  },
+  {
+    "no": 63,
+    "judul": "Kemripik Singkong",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Suselo Utoyo",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Trustha Sulthan Oriza Erdiansyah",
+        "nim": "253103010006",
+        "id_prodi": 27,
+        "tahun_masuk": 2025,
+        "noHp": "085189312424"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Afasya Bumi Chaid Muhammad",
+        "nim": "253103010017",
+        "id_prodi": 27,
+        "tahun_masuk": 2025,
+        "noHp": "081026761876"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Arya Rizki Azdi Ramadhan",
+        "nim": "253103010068",
+        "id_prodi": 27,
+        "tahun_masuk": 2025,
+        "noHp": "085732373209"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Muhammad Iqbal Muzaki",
+        "nim": "253103010034",
+        "id_prodi": 27,
+        "tahun_masuk": 2025,
+        "noHp": "081359367331"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Rava Alfian Wiloka",
+        "nim": "253103010031",
+        "id_prodi": 27,
+        "tahun_masuk": 2025,
+        "noHp": "085141132673"
+      }
+    ]
+  },
+  {
+    "no": 64,
+    "judul": "KRINA (Kripik Kulit Buah Naga)\r\nInovasi Cemilan Sehat dari Limbah Buah Naga",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Lely Indah Kurnia",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Nanda Rivon Salsa Balista",
+        "nim": "243205060032",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "083140561581"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Hafshah Fadhilatul Afifah",
+        "nim": "243205060033",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "089521801480"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Maulidatus Syarifah",
+        "nim": "243205060021",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "081232343478"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ganesha Herlang Jatmoko",
+        "nim": "243205060019",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "087762221081"
+      }
+    ]
+  },
+  {
+    "no": 65,
+    "judul": "MORIMIE: Mie instan sehat dengan ekstrak daun kelor sebagai alternatif sajian padat nutrisi bagi keluarga dan anak muda.",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Kareza Maulana Iskhak",
+        "nim": "254107060104",
+        "id_prodi": 16,
+        "tahun_masuk": 2025,
+        "noHp": "081529397451"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Budi Septian Caraka",
+        "nim": "254107060062",
+        "id_prodi": 16,
+        "tahun_masuk": 2025,
+        "noHp": "085746964335"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Muhammad Akmal Dzakwan",
+        "nim": "254206020128",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085878650590"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Davina Aura Salsabila",
+        "nim": "254206020026",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081234872297"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Allifia Shaqilla Fauziah Khakim",
+        "nim": "254206020035",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "0895421844380"
+      }
+    ]
+  },
+  {
+    "no": 66,
+    "judul": "MORINA: INOVASI MIE FUNGSIONAL BERBASIS DAUN KELOR DAN KULIT PISANG SEBAGAI UPAYA PENCEGAHAN STUNTING DAN ANEMIA",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Yusna",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Anggi Reza Lestari",
+        "nim": "2342520222",
+        "id_prodi": 1,
+        "tahun_masuk": 2023,
+        "noHp": "085704174382"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Alen Cika Yuda Pratiwi",
+        "nim": "2342530008",
+        "id_prodi": 3,
+        "tahun_masuk": 2023,
+        "noHp": "081515514827"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Binti Nurkasanah",
+        "nim": "244104020045",
+        "id_prodi": 11,
+        "tahun_masuk": 2024,
+        "noHp": "082331231099"
+      }
+    ]
+  },
+  {
+    "no": 67,
+    "judul": "Nature Dough: Inovasi Donat Rendah Gluten dari Tepung Pisang",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": null,
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Firnanda Ramadhani",
+        "nim": "244205020038",
+        "id_prodi": 1,
+        "tahun_masuk": 2024,
+        "noHp": "085780846225"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Annisa Shabuna Rahma Argitya",
+        "nim": "244206030036",
+        "id_prodi": 6,
+        "tahun_masuk": 2024,
+        "noHp": "085708105425"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Adinda Risqi Ardiyanti",
+        "nim": "2342520068",
+        "id_prodi": 1,
+        "tahun_masuk": 2023,
+        "noHp": null
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Valencia Anindya Antari",
+        "nim": "2342520227",
+        "id_prodi": 1,
+        "tahun_masuk": 2023,
+        "noHp": "08990968100"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Imatuzzahro",
+        "nim": "244104020071",
+        "id_prodi": 11,
+        "tahun_masuk": 2024,
+        "noHp": "085746645542"
+      }
+    ]
+  },
+  {
+    "no": 68,
+    "judul": "Obby Bakery",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Ayu Sulasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Hanuva Budi Lestari",
+        "nim": "253206010102",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "081216383156"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Cici Wulandari",
+        "nim": "253206010069",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "082335353486"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Laudya Alzhira Chintya Rashya",
+        "nim": "253206010099",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "083119356811"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Yemima Olivia Putri Subiantoro",
+        "nim": "253206010083",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "089504106382"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Putri Bilqis",
+        "nim": "253206010109",
+        "id_prodi": 18,
+        "tahun_masuk": 2025,
+        "noHp": "083185462571"
+      }
+    ]
+  },
+  {
+    "no": 69,
+    "judul": "Pinest",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Ayu Sulasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Akhmad Arifin Abinaya Firjatullah",
+        "nim": "2342840017",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "081359023958"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Gabriel El Farisi Iqbal",
+        "nim": "2342840052",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "089514635527"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Fanisa Salsabilla Agustin",
+        "nim": "2342840032",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "088294558839"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Intan Auliana Putri",
+        "nim": "2342840004",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "081818192248"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Putri Masayu Wandira",
+        "nim": "2342840026",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "085858710774"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ussy Sofi Aryani",
+        "nim": "2342840053",
+        "id_prodi": 15,
+        "tahun_masuk": 2023,
+        "noHp": "088294558839"
+      }
+    ]
+  },
+  {
+    "no": 70,
+    "judul": "PROGRAM MAHASISWA WIRAUSAHA\r\nSAMIE (SEHAT ALAMI MIE)\r\nINOVASI MIE INSTAN BERBASIS EKSTRAK SAYURAN ORGANIK SEBAGAI SOLUSI KULINER SEHAT DAN BERGIZI",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Ayu Sulasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "MUHAMMAD ARVA YOGA",
+        "nim": "254206020082",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081232164216"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "MAHARSA ARYA WIRATAMA",
+        "nim": "254206020152",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082230189797"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "CINTA EFRIL NAZARA",
+        "nim": "254206020103",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085704041875"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "FELISA RACHMA AISYA",
+        "nim": "254206020091",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085736442880"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "AL KAYANA CALISTA ANNOVY",
+        "nim": "254206020182",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085860953184"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "HAAFIDZAH RAYYAA RAASYIDAH W",
+        "nim": "254206020088",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082332750753"
+      }
+    ]
+  },
+  {
+    "no": 71,
+    "judul": "Purple Bliss: Inovasi Lumpia dan Es Ubi Ungu Creamy Kekinian Berbahan Dasar Ubi Ungu sebagai Peluang Wirausaha Mahasiswa",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Rucita Ramadhana",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Lely Nur Afiani",
+        "nim": "2342520058",
+        "id_prodi": 1,
+        "tahun_masuk": 2023,
+        "noHp": "082334852020"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Adinda Risqi Ardiyanti",
+        "nim": "2342520068",
+        "id_prodi": 1,
+        "tahun_masuk": 2023,
+        "noHp": "082233355279"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Alya Sarah Faradina",
+        "nim": "2342520040",
+        "id_prodi": 1,
+        "tahun_masuk": 2023,
+        "noHp": "081328164560"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Siti Khoirun Nisa’",
+        "nim": "2342520167",
+        "id_prodi": 1,
+        "tahun_masuk": 2023,
+        "noHp": "081231961769"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Cledyan Basyasyah",
+        "nim": "243104010073",
+        "id_prodi": 21,
+        "tahun_masuk": 2024,
+        "noHp": "082245766599"
+      }
+    ]
+  },
+  {
+    "no": 72,
+    "judul": "RECRUNUSA (Rempah Crumble Nusantara): Inovasi Kondimen Kremesan Lauk Berbahan Dasar Ampas Kelapa dengan Perpaduan Rempah Premium Berkualitas Tinggi sebagai Produk Bernilai Jual Tinggi",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "ASLAM ROSUL AHMAD",
+        "nim": "2341720195",
+        "id_prodi": 40,
+        "tahun_masuk": 2023,
+        "noHp": "085601534193"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Mega cahayaningsih",
+        "nim": "2342820086",
+        "id_prodi": 2,
+        "tahun_masuk": 2023,
+        "noHp": "085784164237"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Kinan Nafisa",
+        "nim": "2342820070",
+        "id_prodi": 2,
+        "tahun_masuk": 2023,
+        "noHp": "085244824372"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Azhar Zulkarnain",
+        "nim": "2341170012",
+        "id_prodi": 8,
+        "tahun_masuk": 2023,
+        "noHp": "0895398237089"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Yanuar Rizki Aminudin",
+        "nim": "2341720030",
+        "id_prodi": 9,
+        "tahun_masuk": 2023,
+        "noHp": "089666832419"
+      }
+    ]
+  },
+  {
+    "no": 73,
+    "judul": "Savory toast",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Noverita Wahyuningsih",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Bagus Nurqolbi Nasrulloh",
+        "nim": "244208020024",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "082330712944"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Cintya Natasha Happy Tesalonika",
+        "nim": "244208020035",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "082338486651"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Elvina Zianes Margareta",
+        "nim": "244208020054",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "082337588224"
+      }
+    ]
+  },
+  {
+    "no": 74,
+    "judul": "Soyfee",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Noverita Wahyuningsih",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Alya Diyah Safina",
+        "nim": "244208020065",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "082332647695"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Leyliya Dewi Agustin",
+        "nim": "244208020002",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "081226794695"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Rafeyfa Elya Husni Wibowo",
+        "nim": "244208020033",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "081527815716"
+      }
+    ]
+  },
+  {
+    "no": 75,
+    "judul": "Sukii Cookies: Inovasi Cookies Tepung Sukun dengan Kombinasi Buah Bit dan Kelor Sebagai Upaya Pengembangan Camilan Sehat Berbasis Pangan Lokal.",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Tri Yulistyawati Evelina",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Alya Alwachidah",
+        "nim": "244206020107",
+        "id_prodi": 4,
+        "tahun_masuk": 2024,
+        "noHp": "0882009028904"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Rifdha Salsabila Putri Amalia",
+        "nim": "244206020036",
+        "id_prodi": 4,
+        "tahun_masuk": 2024,
+        "noHp": "089608663578"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Syafrida Ade Aulia Hakim",
+        "nim": "244107060002",
+        "id_prodi": 16,
+        "tahun_masuk": 2024,
+        "noHp": "081779324861"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nur Sabrina Putri",
+        "nim": "244104020030",
+        "id_prodi": 11,
+        "tahun_masuk": 2024,
+        "noHp": "085692175473"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Reffa Mifthahul Ramadhani",
+        "nim": "254205020130",
+        "id_prodi": 1,
+        "tahun_masuk": 2025,
+        "noHp": "083825901444"
+      }
+    ]
+  },
+  {
+    "no": 76,
+    "judul": "TAHU KOCEK",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Ita Rifiani Permatasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "AHMAD FAOZAN ARDIANSYAH",
+        "nim": "254206020100",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "087808189688"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "FARETA DWI AMALIA PUTRI",
+        "nim": "254206020018",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085706602047"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Fifi Machfiroh",
+        "nim": "254206020115",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085784276312"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "NANDYTA SEPTARINA DESYA",
+        "nim": "254206020124",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085746678206"
+      }
+    ]
+  },
+  {
+    "no": 77,
+    "judul": "TEMURASA: SOLUSI JAMU PRAKTIS UNTUK GAYA HIDUP SEHAT",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Sigit Setya Wiwaha",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Redafyn Danu Mahardika",
+        "nim": "2341150025",
+        "id_prodi": 7,
+        "tahun_masuk": 2023,
+        "noHp": "087814881020"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Athallah Ayudya Pramesti",
+        "nim": "2341760061",
+        "id_prodi": 16,
+        "tahun_masuk": 2023,
+        "noHp": "085236798880"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Indira Nafa Aurah Huda",
+        "nim": "2341720001",
+        "id_prodi": 9,
+        "tahun_masuk": 2023,
+        "noHp": "085806956564"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ignatia Dwi Maharani",
+        "nim": "243205010012",
+        "id_prodi": 19,
+        "tahun_masuk": 2024,
+        "noHp": "083861631662"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Rosa Zahrina",
+        "nim": "244205020020",
+        "id_prodi": 1,
+        "tahun_masuk": 2024,
+        "noHp": "0895325711627"
+      }
+    ]
+  },
+  {
+    "no": 78,
+    "judul": "Twin taste",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Ayu Sulasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Shafa Areza Tirta",
+        "nim": "254206020050",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085161203994"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Fanny Faradillah Lutfi",
+        "nim": "254206020022",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085647455112"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Ayu Nurcahyani",
+        "nim": "254206020092",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "089660679988"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nurul Hamidah",
+        "nim": "254206020087",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "085648897978"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Sherina Awalia Ramadhan",
+        "nim": "254206020011",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "083124261621"
+      }
+    ]
+  },
+  {
+    "no": 79,
+    "judul": "Uhat Kilaw",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Ayu Sulasari",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Shalwa Kirani Az-Zahra",
+        "nim": "254206020123",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081217411700"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Melisa Julinar Indah Taiwanti",
+        "nim": "254206020109",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "082230040016"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Maulidya Vernanda",
+        "nim": "254206020037",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "089513864045"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nisa Istiqomatur Rohmah",
+        "nim": "254206020158",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "087896249561"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Indah Dwi Maulidiyah",
+        "nim": "254206020023",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081935300035"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Indah Dwi Maulidiyah",
+        "nim": "254206020023",
+        "id_prodi": 4,
+        "tahun_masuk": 2025,
+        "noHp": "081935300035"
+      }
+    ]
+  },
+  {
+    "no": 80,
+    "judul": "Melimbu : Pengembangan Minuman Herbal Bubuk dari Kulit Semangka dan Kulit Mentimun sebagai Produk Minuman Sehat Berkelanjutan.",
+    "kategori": "Teknologi Pangan",
+    "dosenPembimbing": "Noverita Wahyuningsih",
+    "anggota": [
+      {
+        "jabatan": "Ketua",
+        "nama": "Kurnia Ika Wibisono",
+        "nim": "244208020062",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "081574556701"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Nabila Nur Rahma Aisyah",
+        "nim": "244208020057",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "085175298252"
+      },
+      {
+        "jabatan": "Anggota",
+        "nama": "Diah Ayu Tantri",
+        "nim": "244208020010",
+        "id_prodi": 2,
+        "tahun_masuk": 2024,
+        "noHp": "087875302947"
+      }
+    ]
+  }
+]

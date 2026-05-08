@@ -3,6 +3,7 @@ const {
   getDetailPenugasan,
   acceptPenugasan,
   rejectPenugasan,
+  getPeringkat,
 } = require("../services/penugasan.services");
 
 const getPenugasanController = async (req, res, next) => {
@@ -139,3 +140,20 @@ module.exports = {
   acceptPenugasanController,
   rejectPenugasanController,
 };
+
+const getPeringkatController = async (req, res, next) => {
+  try {
+    const { tahap } = req.query;
+    const tahapNum = parseInt(tahap) || 2;
+    const result = await getPeringkat(req.user.id_user, tahapNum);
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.getPeringkatController = getPeringkatController;

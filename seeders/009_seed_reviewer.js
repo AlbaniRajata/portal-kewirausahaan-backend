@@ -32,7 +32,7 @@ const seedReviewer = async () => {
   const roleResult = await pool.query("SELECT id_role FROM public.m_role WHERE nama_role = 'Reviewer'");
   const reviewerRoleId = roleResult.rows[0].id_role;
 
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 8; i++) {
     const email = `reviewer${i}@mail.com`;
     const username = `reviewer${i}`;
     const nama_lengkap = `Reviewer ${i}`;
@@ -57,7 +57,7 @@ const seedReviewer = async () => {
       );
     }
   }
-  console.log('5 Reviewer seeded');
+  console.log('8 Reviewer seeded');
 };
 
 module.exports = seedReviewer;

@@ -16,8 +16,7 @@ const getHistoryPenilaianTahap2 = async (id_program) => {
 
   const data = raw.map((row) => ({
     ...row,
-    rata_rata_gabungan:
-      Number(row.rata_rata_reviewer || 0) + Number(row.rata_rata_juri || 0),
+    nilai_rata_rata: (Number(row.rata_rata_reviewer || 0) + Number(row.rata_rata_juri || 0)) / 2.0,
   }));
 
   return { error: false, message: "History penilaian tahap 2 berhasil diambil", data };
