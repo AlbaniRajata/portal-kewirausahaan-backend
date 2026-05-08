@@ -160,15 +160,6 @@ const rejectDistribusiDb = async (id_distribusi, id_reviewer, catatan) => {
   return rows[0] || null;
 };
 
-module.exports = {
-  getTahapAktifDb,
-  getPenugasanDb,
-  getPenugasanCountDb,
-  getDetailPenugasanDb,
-  acceptDistribusiDb,
-  rejectDistribusiDb,
-};
-
 const getPeringkatDb = async (id_reviewer, tahap) => {
   const q = `
     SELECT
@@ -208,4 +199,12 @@ const getPeringkatDb = async (id_reviewer, tahap) => {
   return rows;
 };
 
-module.exports.getPeringkatDb = getPeringkatDb;
+module.exports = {
+  getTahapAktifDb,
+  getPenugasanDb,
+  getPenugasanCountDb,
+  getDetailPenugasanDb,
+  acceptDistribusiDb,
+  rejectDistribusiDb,
+  getPeringkatDb,
+};

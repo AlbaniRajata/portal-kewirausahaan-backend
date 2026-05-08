@@ -33,7 +33,7 @@ const seedJuri = async () => {
   const juriRoleId = roleResult.rows[0].id_role;
 
   for (let i = 1; i <= 8; i++) {
-    const email = `juri${i}@mail.com`;
+    const email = `eksternal${i}@mail.com`;
     const username = `juri${i}`;
     const nama_lengkap = `Juri ${i}`;
 

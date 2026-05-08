@@ -123,13 +123,6 @@ const rejectPenugasan = async (id_user, id_distribusi, catatan) => {
   };
 };
 
-module.exports = {
-  getPenugasan,
-  getDetailPenugasan,
-  acceptPenugasan,
-  rejectPenugasan,
-};
-
 const getPeringkat = async (id_user, tahap) => {
   const data = await require("../db/penugasan.db").getPeringkatDb(id_user, tahap);
   return {
@@ -139,4 +132,10 @@ const getPeringkat = async (id_user, tahap) => {
   };
 };
 
-module.exports.getPeringkat = getPeringkat;
+module.exports = {
+  getPenugasan,
+  getDetailPenugasan,
+  acceptPenugasan,
+  rejectPenugasan,
+  getPeringkat,
+};

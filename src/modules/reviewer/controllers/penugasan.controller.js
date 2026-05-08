@@ -149,13 +149,6 @@ const rejectPenugasanController = async (req, res, next) => {
   }
 };
 
-module.exports = {
-  getPenugasanController,
-  getDetailPenugasanController,
-  acceptPenugasanController,
-  rejectPenugasanController,
-};
-
 const getPeringkatController = async (req, res, next) => {
   try {
     const { tahap } = req.query;
@@ -171,4 +164,10 @@ const getPeringkatController = async (req, res, next) => {
   }
 };
 
-module.exports.getPeringkatController = getPeringkatController;
+module.exports = {
+  getPenugasanController,
+  getDetailPenugasanController,
+  acceptPenugasanController,
+  rejectPenugasanController,
+  getPeringkatController,
+};

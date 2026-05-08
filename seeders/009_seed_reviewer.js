@@ -33,7 +33,7 @@ const seedReviewer = async () => {
   const reviewerRoleId = roleResult.rows[0].id_role;
 
   for (let i = 1; i <= 8; i++) {
-    const email = `reviewer${i}@mail.com`;
+    const email = `internal${i}@mail.com`;
     const username = `reviewer${i}`;
     const nama_lengkap = `Reviewer ${i}`;
 
