@@ -63,14 +63,16 @@ const login = async ({ email, password }) => {
     };
   }
 
-  if (user.nama_role === "mahasiswa" && user.mahasiswa_verifikasi !== 1) {
+  const roleName = (user.nama_role || "").toLowerCase();
+
+  if (roleName === "mahasiswa" && user.mahasiswa_verifikasi !== 1) {
     return {
       error: "Akun mahasiswa masih dalam proses verifikasi admin.",
       field: "status_verifikasi",
     };
   }
 
-  if (user.nama_role === "dosen" && user.dosen_verifikasi !== 1) {
+  if (roleName === "dosen" && user.dosen_verifikasi !== 1) {
     return {
       error: "Akun dosen masih dalam proses verifikasi admin.",
       field: "status_verifikasi",
