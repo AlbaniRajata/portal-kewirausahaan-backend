@@ -37,7 +37,7 @@ const validateProposalStatus = (dist) => {
     return { error: true, message: "Proposal belum masuk tahap desk evaluasi", data: { status_proposal: dist.status_proposal } };
   }
   if (dist.urutan_tahap === 2 && dist.status_proposal !== 5) {
-    return { error: true, message: "Proposal belum masuk panel wawancara", data: { status_proposal: dist.status_proposal } };
+    return { error: true, message: "Proposal belum masuk wawancara", data: { status_proposal: dist.status_proposal } };
   }
   return null;
 };

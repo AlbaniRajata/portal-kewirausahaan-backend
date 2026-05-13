@@ -63,7 +63,7 @@ const getProposalWithTimDb = async (id_program) => {
     JOIN m_program pr ON pr.id_program = p.id_program
     JOIN t_tim t ON t.id_tim = p.id_tim
     JOIN m_kategori k ON k.id_kategori = p.id_kategori
-    ${where}
+    ${where} AND t.status != 2
     ORDER BY p.tanggal_submit DESC
   `;
 

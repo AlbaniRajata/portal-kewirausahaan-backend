@@ -41,6 +41,7 @@ const getMonevTimBimbinganDb = async (id_dosen) => {
     LEFT JOIN t_luaran_tim lt ON lt.id_tim = t.id_tim AND lt.id_luaran = ml.id_luaran
     WHERE pg.id_dosen = $1
       AND pg.status = 1
+      AND t.status != 2
     GROUP BY
       t.id_tim,
       t.nama_tim,

@@ -12,11 +12,12 @@ const getStatistikPengajuanPembimbingDb = async (id_program) => {
   const { rows } = await pool.query(
     `SELECT
       COUNT(*)::int AS total,
-      COUNT(*) FILTER (WHERE status = 0)::int AS pending,
-      COUNT(*) FILTER (WHERE status = 1)::int AS approved,
-      COUNT(*) FILTER (WHERE status = 2)::int AS rejected
-     FROM t_pengajuan_pembimbing
-     WHERE id_program = $1`,
+      COUNT(*) FILTER (WHERE pp.status = 0)::int AS pending,
+      COUNT(*) FILTER (WHERE pp.status = 1)::int AS approved,
+      COUNT(*) FILTER (WHERE pp.status = 2)::int AS rejected
+     FROM t_pengajuan_pembimbing pp
+     JOIN t_tim t ON t.id_tim = pp.id_tim
+     WHERE pp.id_program = $1 AND t.status != 2`,
     [id_program]
   );
   return rows[0];
@@ -55,7 +56,7 @@ const getListPengajuanPembimbingDb = async (id_program, status_filter = null) =>
      JOIN m_user dosen ON dosen.id_user = d.id_user
      JOIN m_user mhs ON mhs.id_user = pp.diajukan_oleh
      LEFT JOIN t_proposal p ON p.id_tim = pp.id_tim
-     WHERE pp.id_program = $1 ${statusClause}
+     WHERE pp.id_program = $1 AND t.status != 2 ${statusClause}
      ORDER BY pp.created_at DESC`,
     values
   );
@@ -71,7 +72,7 @@ const getStatistikBimbinganDb = async (id_program) => {
       COUNT(*) FILTER (WHERE b.status = 2)::int AS rejected
      FROM t_bimbingan b
      JOIN t_tim t ON t.id_tim = b.id_tim
-     WHERE t.id_program = $1`,
+     WHERE t.id_program = $1 AND t.status != 2`,
     [id_program]
   );
   return rows[0];
@@ -112,7 +113,7 @@ const getListBimbinganDb = async (id_program, status_filter = null) => {
      JOIN m_user dosen ON dosen.id_user = d.id_user
      JOIN m_user mhs ON mhs.id_user = b.diajukan_oleh
      LEFT JOIN t_proposal p ON p.id_proposal = b.id_proposal
-     WHERE t.id_program = $1 ${statusClause}
+     WHERE t.id_program = $1 AND t.status != 2 ${statusClause}
      ORDER BY b.tanggal_bimbingan DESC, b.created_at DESC`,
     values
   );

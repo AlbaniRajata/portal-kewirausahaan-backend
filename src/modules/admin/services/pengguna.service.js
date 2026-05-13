@@ -7,10 +7,11 @@ const {
   checkEmailExistsDb, checkUsernameExistsDb, checkNimExistsDb, checkNipExistsDb,
   insertMahasiswaDb, insertDosenDb, insertReviewerDb, insertJuriDb,
   updateUserBaseDb, updateMahasiswaDetailDb, updateDosenDetailDb, updateReviewerDetailDb, updateJuriDetailDb,
-  toggleUserActiveDb, resetPasswordDb, getPoolClient,
+  toggleUserActiveDb, deleteUserDb, resetPasswordDb, getPoolClient,
 } = require("../db/pengguna.db");
 const { hashPassword } = require("../../../helpers/password.helper");
 const { parsePaginationParams } = require("../../../utils/pagination");
+const { ROLE } = require("../../../constants/role");
 
 const getMahasiswaList = async (filters) => {
   const { page, limit } = parsePaginationParams(filters);
@@ -325,6 +326,16 @@ const updateJuri = async (id_user, payload) => {
 const toggleUserActive = async (id_user, is_active) => {
   const user = await getUserByIdDb(id_user);
   if (!user) return { error: true, message: "User tidak ditemukan", data: null };
+
+  // Jika mahasiswa dan is_active = false, lakukan soft delete (nonaktifkan)
+  // Jika bukan mahasiswa (dosen, reviewer, juri) dan is_active = false, lakukan hard delete
+  if (!is_active && user.id_role !== ROLE.MAHASISWA) {
+    const deleted = await deleteUserDb(id_user);
+    if (!deleted) return { error: true, message: "Gagal menghapus user", data: null };
+    return { error: false, message: `User berhasil dihapus`, data: deleted };
+  }
+
+  // Untuk mahasiswa atau saat diaktifkan, lakukan update status
   const updated = await toggleUserActiveDb(id_user, is_active);
   return { error: false, message: `User berhasil ${is_active ? "diaktifkan" : "dinonaktifkan"}`, data: updated };
 };

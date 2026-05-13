@@ -13,7 +13,8 @@ const getDashboardStatsDb = async (id_program) => {
       COUNT(*) FILTER (WHERE p.status = 1)                           AS menunggu_distribusi,
       COUNT(*) FILTER (WHERE p.status IN (8, 9))                     AS total_bimbingan
      FROM t_proposal p
-     WHERE p.id_program = $1`,
+     JOIN t_tim t ON t.id_tim = p.id_tim
+     WHERE p.id_program = $1 AND t.status != 2`,
     [id_program]
   );
   return rows[0];
@@ -23,7 +24,8 @@ const getProposalPerStatusDb = async (id_program) => {
   const { rows } = await pool.query(
     `SELECT p.status, COUNT(*)::int AS total
      FROM t_proposal p
-     WHERE p.id_program = $1 AND p.status >= 1
+     JOIN t_tim t ON t.id_tim = p.id_tim
+     WHERE p.id_program = $1 AND p.status >= 1 AND t.status != 2
      GROUP BY p.status
      ORDER BY p.status ASC`,
     [id_program]
@@ -36,7 +38,8 @@ const getProposalPerKategoriDb = async (id_program) => {
     `SELECT k.nama_kategori, COUNT(p.id_proposal)::int AS total
      FROM t_proposal p
      JOIN m_kategori k ON k.id_kategori = p.id_kategori
-     WHERE p.id_program = $1 AND p.status >= 1
+     JOIN t_tim t ON t.id_tim = p.id_tim
+     WHERE p.id_program = $1 AND p.status >= 1 AND t.status != 2
      GROUP BY k.id_kategori, k.nama_kategori
      ORDER BY total DESC`,
     [id_program]
@@ -70,7 +73,7 @@ const getRecentProposalDb = async (id_program) => {
      FROM t_proposal p
      JOIN t_tim t ON t.id_tim = p.id_tim
      JOIN m_kategori k ON k.id_kategori = p.id_kategori
-     WHERE p.id_program = $1 AND p.status >= 1
+     WHERE p.id_program = $1 AND p.status >= 1 AND t.status != 2
      ORDER BY p.tanggal_submit DESC
      LIMIT 5`,
     [id_program]
@@ -138,7 +141,8 @@ const getMenungguFinalisasiDb = async (id_program) => {
        FROM (
          SELECT p.id_proposal
          FROM t_proposal p
-         WHERE p.id_program = $1 AND p.status = 2
+         JOIN t_tim t ON t.id_tim = p.id_tim
+         WHERE p.id_program = $1 AND p.status = 2 AND t.status != 2
            AND (
              SELECT COUNT(*) FROM t_distribusi_reviewer dr
              WHERE dr.id_proposal = p.id_proposal AND dr.status IN (1,3,4)
@@ -154,7 +158,8 @@ const getMenungguFinalisasiDb = async (id_program) => {
          UNION
          SELECT p.id_proposal
          FROM t_proposal p
-         WHERE p.id_program = $1 AND p.status = 5
+         JOIN t_tim t ON t.id_tim = p.id_tim
+         WHERE p.id_program = $1 AND p.status = 5 AND t.status != 2
            AND (
              SELECT COUNT(*) FROM t_distribusi_reviewer dr
              JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = dr.tahap AND tp.urutan = 2
@@ -170,13 +175,14 @@ const getMenungguFinalisasiDb = async (id_program) => {
     return rows[0]?.total || 0;
   } catch (error) {
     // Fallback saat t_penilaian_reviewer table belum ada (migration pending)
-    // Hitung proposal tahap 2 yang menunggu finalisasi dengan hitung distribusi saja
     try {
       const { rows: fallbackRows } = await pool.query(
         `SELECT COUNT(DISTINCT p.id_proposal)::int AS total
          FROM t_proposal p
+         JOIN t_tim t ON t.id_tim = p.id_tim
          WHERE p.id_program = $1 
            AND p.status IN (2, 5)
+           AND t.status != 2
            AND EXISTS (
              SELECT 1 FROM t_distribusi_reviewer dr
              WHERE dr.id_proposal = p.id_proposal AND dr.status IN (1, 3, 4)

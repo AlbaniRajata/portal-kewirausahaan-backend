@@ -43,10 +43,11 @@ const getProposalSiapDistribusiDb = async (id_program, tahap) => {
      JOIN m_kategori k ON k.id_kategori = p.id_kategori
      WHERE p.status = 1
        AND p.id_program = $1
-       AND NOT EXISTS (
-         SELECT 1 FROM t_distribusi_reviewer d
-         WHERE d.id_proposal = p.id_proposal AND d.tahap = $2
-       )
+       AND t.status != 2
+       AND (
+         SELECT count(*) FROM t_distribusi_reviewer d
+         WHERE d.id_proposal = p.id_proposal AND d.tahap = $2 AND d.status NOT IN (2, 5)
+       ) < 2
      ORDER BY p.id_proposal`,
     [id_program, tahap]
   );
@@ -56,12 +57,14 @@ const getProposalSiapDistribusiDb = async (id_program, tahap) => {
 const lockProposalForDistribusiDb = async (client, id_proposal, tahap) => {
   const { rows } = await client.query(
     `SELECT p.id_proposal FROM t_proposal p
+     JOIN t_tim t ON t.id_tim = p.id_tim
      WHERE p.id_proposal = $1
        AND p.status = 1
-       AND NOT EXISTS (
-         SELECT 1 FROM t_distribusi_reviewer d
-         WHERE d.id_proposal = p.id_proposal AND d.tahap = $2
-       )
+       AND t.status != 2
+       AND (
+         SELECT count(*) FROM t_distribusi_reviewer d
+         WHERE d.id_proposal = p.id_proposal AND d.tahap = $2 AND d.status NOT IN (2, 5)
+       ) < 2
      FOR UPDATE`,
     [id_proposal, tahap]
   );
@@ -211,6 +214,26 @@ const reaktifkanDistribusiDb = async (client, id_distribusi, assigned_by) => {
   return rows[0];
 };
 
+const getDistribusiTahap1SummaryDb = async (id_program, tahap) => {
+  const { rows } = await pool.query(
+    `SELECT
+      p.id_proposal, p.judul, t.nama_tim, p.modal_diajukan,
+      k.id_kategori, k.nama_kategori,
+      ARRAY_AGG(d.id_reviewer) FILTER (WHERE d.id_reviewer IS NOT NULL) as reviewer_ids,
+      ARRAY_AGG(u.nama_lengkap) FILTER (WHERE u.nama_lengkap IS NOT NULL) as reviewer_names
+     FROM t_proposal p
+     JOIN t_tim t ON t.id_tim = p.id_tim
+     JOIN m_kategori k ON k.id_kategori = p.id_kategori
+     LEFT JOIN t_distribusi_reviewer d ON d.id_proposal = p.id_proposal AND d.tahap = $2 AND d.status NOT IN (2, 5)
+     LEFT JOIN m_user u ON u.id_user = d.id_reviewer
+     WHERE p.id_program = $1 AND p.status IN (1, 2, 3) AND t.status != 2
+     GROUP BY p.id_proposal, p.judul, t.nama_tim, p.modal_diajukan, k.id_kategori, k.nama_kategori
+     ORDER BY p.id_proposal`,
+    [id_program, tahap]
+  );
+  return rows;
+};
+
 module.exports = {
   getTahapAktifDb,
   getReviewerAktifDb,
@@ -228,4 +251,5 @@ module.exports = {
   updateProposalStatusDb,
   getDistribusiByProposalReviewerDb,
   reaktifkanDistribusiDb,
+  getDistribusiTahap1SummaryDb,
 };

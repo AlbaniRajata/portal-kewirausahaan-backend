@@ -84,7 +84,7 @@ const previewDistribusiTahap2 = async (id_program) => {
     getJuriAktifDb(),
   ]);
 
-  if (!proposals.length) return { error: true, message: "Tidak ada proposal yang siap masuk panel wawancara", data: { id_program } };
+  if (!proposals.length) return { error: true, message: "Tidak ada proposal yang siap masuk wawancara", data: { id_program } };
   if (!reviewers.length) return { error: true, message: "Tidak ada reviewer aktif", data: null };
   if (!juries.length) return { error: true, message: "Tidak ada juri aktif", data: null };
 
@@ -117,19 +117,49 @@ const previewDistribusiTahap2 = async (id_program) => {
 
   const jumlahPasang = Math.min(poolReviewer.length, poolJuri.length);
 
-  const rencanaPasangan = belumTerdistribusi.map((p, idx) => {
-    const pasanganIdx = idx % jumlahPasang;
-    return {
-      id_proposal: p.id_proposal,
-      judul: p.judul,
-      reviewer: { id_user: poolReviewer[pasanganIdx].id_user, nama_lengkap: poolReviewer[pasanganIdx].nama_lengkap },
-      juri: { id_user: poolJuri[pasanganIdx].id_user, nama_lengkap: poolJuri[pasanganIdx].nama_lengkap },
-    };
-  });
+  // Kelompokkan proposal berdasarkan kategori
+  const groupedByCategory = {};
+  const kategoriOrder = [];
+  for (const p of belumTerdistribusi) {
+    if (!groupedByCategory[p.id_kategori]) {
+      groupedByCategory[p.id_kategori] = [];
+      kategoriOrder.push(p.id_kategori);
+    }
+    groupedByCategory[p.id_kategori].push(p);
+  }
+
+  // Interleave proposals across categories so pairing is balanced per kategori
+  const rencanaPasangan = [];
+  let globalPasanganCursor = 0;
+  let idx = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    hasMore = false;
+    for (const kategoriId of kategoriOrder) {
+      const proposalsInCat = groupedByCategory[kategoriId];
+      const p = proposalsInCat[idx];
+      if (!p) continue;
+      hasMore = true;
+
+      const pasanganIdx = globalPasanganCursor % jumlahPasang;
+      globalPasanganCursor++;
+
+      rencanaPasangan.push({
+        id_proposal: p.id_proposal,
+        judul: p.judul,
+        id_kategori: p.id_kategori,
+        nama_kategori: p.nama_kategori,
+        reviewer: { id_user: poolReviewer[pasanganIdx].id_user, nama_lengkap: poolReviewer[pasanganIdx].nama_lengkap },
+        juri: { id_user: poolJuri[pasanganIdx].id_user, nama_lengkap: poolJuri[pasanganIdx].nama_lengkap },
+      });
+    }
+    idx++;
+  }
 
   return {
     error: false,
-    message: "Preview distribusi panel wawancara siap",
+    message: "Preview distribusi wawancara siap",
     data: {
       id_program,
       id_tahap: tahapAktif.id_tahap,
@@ -184,7 +214,7 @@ const autoDistribusiTahap2 = async (admin_id, id_program) => {
 
     return {
       error: false,
-      message: `Auto distribusi panel wawancara berhasil`,
+      message: `Auto distribusi wawancara berhasil`,
       data: { id_program, id_tahap, total_didistribusi: totalDidistribusi },
     };
   } catch (err) {
@@ -251,7 +281,7 @@ const manualDistribusiTahap2 = async (admin_id, id_program, payload) => {
 
     return {
       error: false,
-      message: "Distribusi manual panel wawancara berhasil",
+      message: "Distribusi manual wawancara berhasil",
       data: {
         id_proposal,
         reviewer: { id_distribusi: distReviewer.id_distribusi, nama: reviewerData.nama_lengkap },
@@ -402,7 +432,7 @@ const reassignJuriTahap2 = async (admin_id, id_distribusi, id_juri_baru, id_prog
 
 const getPanelTahap2History = async (id_program) => {
   const history = await getPanelTahap2HistoryDb(id_program);
-  return { error: false, message: "History panel wawancara berhasil dimuat", data: history };
+  return { error: false, message: "History wawancara berhasil dimuat", data: history };
 };
 
 module.exports = {

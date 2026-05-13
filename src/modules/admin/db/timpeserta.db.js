@@ -1,7 +1,7 @@
 const pool = require("../../../config/db");
 
 const getTimListDb = async (filters = {}) => {
-  const { id_program, status, search, page, limit } = filters;
+  const { id_program, id_kategori, status, search, page, limit } = filters;
   const values = [];
   let idx = 1;
   const offset = (page - 1) * limit;
@@ -17,6 +17,8 @@ const getTimListDb = async (filters = {}) => {
       pr.id_proposal,
       pr.judul AS judul_proposal,
       pr.status AS status_proposal,
+      pr.id_kategori,
+      k.nama_kategori,
       pr.modal_diajukan,
       pr.tanggal_submit,
       (
@@ -42,19 +44,21 @@ const getTimListDb = async (filters = {}) => {
     FROM t_tim t
     JOIN m_program p ON p.id_program = t.id_program
     LEFT JOIN t_proposal pr ON pr.id_tim = t.id_tim AND pr.id_program = t.id_program
+    LEFT JOIN m_kategori k ON k.id_kategori = pr.id_kategori
     LEFT JOIN t_anggota_tim at ON at.id_tim = t.id_tim
     LEFT JOIN m_user u ON u.id_user = at.id_user
     WHERE 1=1
   `;
 
   if (id_program !== undefined && id_program !== null) { q += ` AND t.id_program = $${idx++}`; values.push(id_program); }
+  if (id_kategori !== undefined && id_kategori !== null) { q += ` AND pr.id_kategori = $${idx++}`; values.push(id_kategori); }
   if (status !== undefined && status !== null) { q += ` AND t.status = $${idx++}`; values.push(status); }
   if (search) {
     q += ` AND (t.nama_tim ILIKE $${idx} OR pr.judul ILIKE $${idx})`;
     values.push(`%${search}%`); idx++;
   }
 
-  q += ` GROUP BY t.id_tim, p.id_program, p.nama_program, pr.id_proposal, pr.judul, pr.status, pr.modal_diajukan, pr.tanggal_submit ORDER BY t.created_at DESC`;
+  q += ` GROUP BY t.id_tim, t.status, t.created_at, p.id_program, p.nama_program, pr.id_proposal, pr.judul, pr.status, pr.id_kategori, k.nama_kategori, pr.modal_diajukan, pr.tanggal_submit ORDER BY t.created_at DESC`;
 
   let finalQuery = q;
   if (page && limit) {
@@ -67,13 +71,14 @@ const getTimListDb = async (filters = {}) => {
 };
 
 const getTimCountDb = async (filters = {}) => {
-  const { id_program, status, search } = filters;
+  const { id_program, id_kategori, status, search } = filters;
   const values = [];
   let idx = 1;
 
-  let q = `SELECT COUNT(*) as total FROM t_tim t LEFT JOIN t_proposal pr ON pr.id_tim = t.id_tim WHERE 1=1`;
+  let q = `SELECT COUNT(*) as total FROM t_tim t LEFT JOIN t_proposal pr ON pr.id_tim = t.id_tim LEFT JOIN m_kategori k ON k.id_kategori = pr.id_kategori WHERE 1=1`;
 
   if (id_program !== undefined && id_program !== null) { q += ` AND t.id_program = $${idx++}`; values.push(id_program); }
+  if (id_kategori !== undefined && id_kategori !== null) { q += ` AND pr.id_kategori = $${idx++}`; values.push(id_kategori); }
   if (status !== undefined && status !== null) { q += ` AND t.status = $${idx++}`; values.push(status); }
   if (search) {
     q += ` AND (t.nama_tim ILIKE $${idx} OR pr.judul ILIKE $${idx})`;
@@ -82,6 +87,37 @@ const getTimCountDb = async (filters = {}) => {
 
   const { rows } = await pool.query(q, values);
   return parseInt(rows[0].total);
+};
+
+const updateTimStatusDb = async (id_tim, new_status) => {
+  const { rows } = await pool.query(
+    `UPDATE t_tim SET status = $1 WHERE id_tim = $2 RETURNING id_tim, status`,
+    [new_status, id_tim]
+  );
+  return rows[0] || null;
+};
+
+const deleteTimDb = async (id_tim) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const { rows: tim } = await client.query(`SELECT id_tim, status FROM t_tim WHERE id_tim = $1`, [id_tim]);
+    if (!tim.length) { await client.query("ROLLBACK"); return null; }
+
+    const { rows: deleted } = await client.query(
+      `DELETE FROM t_tim WHERE id_tim = $1 AND status = 2 RETURNING id_tim`,
+      [id_tim]
+    );
+    if (!deleted.length) { await client.query("ROLLBACK"); return { blocked: true, status: tim[0].status }; }
+
+    await client.query("COMMIT");
+    return deleted[0];
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 };
 
 const getTimDetailDb = async (id_tim) => {
@@ -167,6 +203,9 @@ const getPesertaListDb = async (filters = {}) => {
       j.nama_jurusan, k.nama_kampus,
       p.nama_program,
       t.nama_tim,
+      prop.id_proposal,
+      prop.judul AS judul_proposal,
+      prop.status AS status_proposal,
       (
         SELECT json_build_object(
           'id_pengajuan', pg.id_pengajuan,
@@ -195,6 +234,7 @@ const getPesertaListDb = async (filters = {}) => {
     JOIN m_program p ON p.id_program = pp.id_program
     JOIN t_tim t ON t.id_tim = pp.id_tim
     LEFT JOIN t_anggota_tim at ON at.id_tim = pp.id_tim AND at.id_user = pp.id_user
+    LEFT JOIN t_proposal prop ON prop.id_tim = pp.id_tim AND prop.id_program = pp.id_program
     WHERE 1=1
   `;
 
@@ -205,6 +245,9 @@ const getPesertaListDb = async (filters = {}) => {
     q += ` AND (u.nama_lengkap ILIKE $${idx} OR u.email ILIKE $${idx} OR m.nim ILIKE $${idx} OR t.nama_tim ILIKE $${idx})`;
     values.push(`%${search}%`); idx++;
   }
+
+  // Tim nonaktif (status = 2) tidak ditampilkan dalam list peserta
+  q += ` AND t.status != 2`;
 
   q += ` ORDER BY pp.created_at DESC`;
   const { rows } = await pool.query(q, values);
@@ -252,11 +295,27 @@ const getPesertaDetailDb = async (id_user, id_program) => {
     WHERE pp.id_user = $1 AND pp.id_program = $2`,
     [id_user, id_program]
   );
-  return rows[0] || null;
+
+  if (!rows[0]) return null;
+
+  const { rows: proposal } = await pool.query(
+    `SELECT
+      pr.id_proposal, pr.judul, pr.file_proposal, pr.status,
+      pr.modal_diajukan, pr.tanggal_submit, pr.wawancara_at,
+      k.id_kategori, k.nama_kategori
+    FROM t_proposal pr
+    JOIN m_kategori k ON k.id_kategori = pr.id_kategori
+    WHERE pr.id_tim = $1 AND pr.id_program = $2`,
+    [rows[0].id_tim, id_program]
+  );
+
+  return { ...rows[0], proposal: proposal[0] || null };
 };
 
 module.exports = {
   getTimListDb, getTimCountDb,
   getTimDetailDb,
-  getPesertaListDb, getPesertaDetailDb
+  getPesertaListDb, getPesertaDetailDb,
+  updateTimStatusDb,
+  deleteTimDb,
 };

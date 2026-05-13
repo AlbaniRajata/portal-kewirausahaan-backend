@@ -2,6 +2,7 @@ const {
   listPendingMahasiswa,
   detailMahasiswa,
   approveMahasiswa,
+  bulkApproveMahasiswa,
   rejectMahasiswa,
 } = require("../services/verification.service");
 
@@ -57,6 +58,23 @@ const approveMahasiswaController = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+const bulkApproveMahasiswaController = async (req, res, next) => {
+  try {
+    const id_user_list = Array.isArray(req.body?.id_user_list)
+      ? req.body.id_user_list
+      : Array.isArray(req.body?.ids)
+        ? req.body.ids
+        : [];
+
+    const result = await bulkApproveMahasiswa(id_user_list);
+    if (result.error) {
+      return res.status(400).json({ success: false, message: result.message, data: result.data });
+    }
+
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
+
 const rejectMahasiswaController = async (req, res, next) => {
   try {
     const id_user = parseInt(req.params.id);
@@ -78,5 +96,6 @@ module.exports = {
   getPendingMahasiswaController,
   getDetailMahasiswaController,
   approveMahasiswaController,
+  bulkApproveMahasiswaController,
   rejectMahasiswaController,
 };

@@ -1,6 +1,8 @@
 const {
   getTimList,
   getTimDetail,
+  withdrawTim,
+  deleteTim,
   getPesertaList,
   getPesertaDetail,
 } = require("../services/timpeserta.service");
@@ -32,6 +34,40 @@ const getTimDetailController = async (req, res, next) => {
     }
     const result = await getTimDetail(id_tim);
     if (result.error) return res.status(404).json({ success: false, message: result.message, data: null });
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
+
+const withdrawTimController = async (req, res, next) => {
+  try {
+    const id_tim = parseInt(req.params.id_tim);
+    if (isNaN(id_tim) || id_tim <= 0) {
+      return res.status(400).json({ success: false, message: "ID tim tidak valid", data: null });
+    }
+
+    const result = await withdrawTim(id_tim);
+    if (result.error) {
+      const statusCode = result.message.includes("tidak ditemukan") ? 404 : 400;
+      return res.status(statusCode).json({ success: false, message: result.message, data: null });
+    }
+
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
+
+const deleteTimController = async (req, res, next) => {
+  try {
+    const id_tim = parseInt(req.params.id_tim);
+    if (isNaN(id_tim) || id_tim <= 0) {
+      return res.status(400).json({ success: false, message: "ID tim tidak valid", data: null });
+    }
+
+    const result = await deleteTim(id_tim);
+    if (result.error) {
+      const statusCode = result.message.includes("dinonaktifkan") ? 400 : 404;
+      return res.status(statusCode).json({ success: false, message: result.message, data: null });
+    }
+
     return res.status(200).json({ success: true, message: result.message, data: result.data });
   } catch (err) { next(err); }
 };
@@ -72,6 +108,8 @@ const getPesertaDetailController = async (req, res, next) => {
 module.exports = {
   getTimListController,
   getTimDetailController,
+  withdrawTimController,
+  deleteTimController,
   getPesertaListController,
   getPesertaDetailController,
 };

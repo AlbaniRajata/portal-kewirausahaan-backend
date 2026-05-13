@@ -55,7 +55,7 @@ const getFormPenilaian = async (id_user, id_distribusi) => {
   }
 
   if (dist.status_proposal !== 5) {
-    return { error: true, message: "Proposal belum masuk panel wawancara", data: { status_proposal: dist.status_proposal } };
+    return { error: true, message: "Proposal belum masuk wawancara", data: { status_proposal: dist.status_proposal } };
   }
 
   if (!isTimelineOpen(dist.penilaian_mulai, dist.penilaian_selesai)) {
@@ -104,7 +104,7 @@ const simpanNilai = async (id_user, id_distribusi, payload) => {
   }
 
   if (dist.status_proposal !== 5) {
-    return { error: true, message: "Proposal belum masuk panel wawancara", data: { status_proposal: dist.status_proposal } };
+    return { error: true, message: "Proposal belum masuk wawancara", data: { status_proposal: dist.status_proposal } };
   }
 
   if (!isTimelineOpen(dist.penilaian_mulai, dist.penilaian_selesai)) {

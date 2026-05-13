@@ -372,6 +372,33 @@ const toggleUserActiveDb = async (id_user, is_active) => {
   }
 };
 
+const deleteUserDb = async (id_user) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    // Delete from role-specific tables that have ON DELETE CASCADE
+    // m_mahasiswa, m_dosen, m_reviewer, m_juri will be deleted automatically due to FK constraints
+    // Delete from any tables with soft foreign keys or other references
+    await client.query(`DELETE FROM t_refresh_token WHERE id_user = $1`, [id_user]);
+
+    // Finally delete from m_user (will cascade to m_mahasiswa, m_dosen, m_reviewer, m_juri)
+    const { rows: deleted } = await client.query(
+      `DELETE FROM m_user WHERE id_user = $1 RETURNING id_user`,
+      [id_user]
+    );
+    if (!deleted.length) { await client.query("ROLLBACK"); return null; }
+
+    await client.query("COMMIT");
+    return deleted[0];
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+};
+
 const resetPasswordDb = async (id_user, password_hash) => {
   const { rows } = await pool.query(
     `UPDATE m_user SET password_hash = $2 WHERE id_user = $1 RETURNING id_user`,
@@ -391,5 +418,5 @@ module.exports = {
   checkEmailExistsDb, checkUsernameExistsDb, checkNimExistsDb, checkNipExistsDb,
   insertMahasiswaDb, insertDosenDb, insertReviewerDb, insertJuriDb,
   updateUserBaseDb, updateMahasiswaDetailDb, updateDosenDetailDb, updateReviewerDetailDb, updateJuriDetailDb,
-  toggleUserActiveDb, resetPasswordDb, getPoolClient,
+  toggleUserActiveDb, deleteUserDb, resetPasswordDb, getPoolClient,
 };

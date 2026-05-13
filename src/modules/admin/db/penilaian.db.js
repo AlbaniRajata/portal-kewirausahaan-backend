@@ -115,7 +115,7 @@ const getListProposalRekapTahap1Db = async (id_program) => {
      LEFT JOIN t_distribusi_reviewer dr ON dr.id_proposal = p.id_proposal
      LEFT JOIN m_tahap_penilaian tp ON tp.id_program = p.id_program AND tp.urutan = dr.tahap AND tp.urutan = 1
      LEFT JOIN t_penilaian_reviewer pr ON pr.id_distribusi = dr.id_distribusi
-     WHERE p.id_program = $1 AND p.status IN (2, 3, 4)
+     WHERE p.id_program = $1 AND p.status IN (2, 3, 4) AND t.status != 2
      GROUP BY p.id_proposal, p.judul, p.status, t.nama_tim, k.nama_kategori
      ORDER BY p.id_proposal ASC`,
     [id_program]
@@ -166,7 +166,7 @@ const getListProposalRekapTahap2Db = async (id_program) => {
      FROM t_proposal p
      JOIN t_tim t ON t.id_tim = p.id_tim
      JOIN m_kategori k ON k.id_kategori = p.id_kategori
-     WHERE p.id_program = $1 AND p.status IN (5, 6, 7, 8)
+     WHERE p.id_program = $1 AND p.status IN (5, 6, 7, 8) AND t.status != 2
      ORDER BY p.id_proposal ASC`,
     [id_program]
   );

@@ -95,7 +95,7 @@ const getProgressLuaranTimDb = async (id_program) => {
     JOIN m_mahasiswa mhs ON mhs.id_user = u.id_user
     JOIN m_luaran ml ON ml.id_program = t.id_program
     LEFT JOIN t_luaran_tim lt ON lt.id_tim = t.id_tim AND lt.id_luaran = ml.id_luaran
-    WHERE t.id_program = $1
+    WHERE t.id_program = $1 AND t.status != 2
     GROUP BY t.id_tim, t.nama_tim, u.id_user, u.nama_lengkap, mhs.nim
     ORDER BY t.nama_tim ASC
   `;

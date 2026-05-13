@@ -5,6 +5,7 @@ const {
   getPendingMahasiswaController,
   getDetailMahasiswaController,
   approveMahasiswaController,
+  bulkApproveMahasiswaController,
   rejectMahasiswaController,
 } = require("../controllers/verification.controller");
 
@@ -116,6 +117,8 @@ const {
 const {
   getTimListController,
   getTimDetailController,
+  withdrawTimController,
+  deleteTimController,
   getPesertaListController,
   getPesertaDetailController,
 } = require("../controllers/timpeserta.controller");
@@ -173,6 +176,7 @@ router.put("/password", updatePasswordController);
 
 router.get("/verifikasi/mahasiswa", getPendingMahasiswaController);
 router.get("/verifikasi/mahasiswa/:id", getDetailMahasiswaController);
+router.post("/verifikasi/mahasiswa/bulk-approve", bulkApproveMahasiswaController);
 router.post("/verifikasi/mahasiswa/:id/approve", approveMahasiswaController);
 router.post("/verifikasi/mahasiswa/:id/reject", rejectMahasiswaController);
 
@@ -270,6 +274,8 @@ router.patch("/pengguna/:id_user/reset-password", resetPasswordController);
 
 router.get("/tim-peserta/tim", getTimListController);
 router.get("/tim-peserta/tim/:id_tim", getTimDetailController);
+router.put("/tim-peserta/tim/:id_tim/withdraw", withdrawTimController);
+router.delete("/tim-peserta/tim/:id_tim", deleteTimController);
 router.get("/tim-peserta/peserta", getPesertaListController);
 router.get("/tim-peserta/peserta/:id_user/:id_program", getPesertaDetailController);
 

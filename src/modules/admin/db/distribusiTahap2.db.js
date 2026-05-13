@@ -11,9 +11,11 @@ const getTahap2AktifDb = async (id_program) => {
 
 const getProposalTahap2Db = async (id_program) => {
   const { rows } = await pool.query(
-    `SELECT id_proposal, judul FROM t_proposal
-     WHERE status IN (4, 5) AND id_program = $1
-     ORDER BY id_proposal`,
+    `SELECT p.id_proposal, p.judul, k.id_kategori, k.nama_kategori FROM t_proposal p
+     JOIN t_tim t ON t.id_tim = p.id_tim
+     JOIN m_kategori k ON k.id_kategori = p.id_kategori
+     WHERE p.status IN (4, 5) AND p.id_program = $1 AND t.status != 2
+     ORDER BY p.id_proposal`,
     [id_program]
   );
   return rows;
@@ -210,7 +212,7 @@ const getPanelTahap2HistoryDb = async (id_program) => {
      LEFT JOIN t_distribusi_juri dj ON dj.id_proposal = p.id_proposal
        AND dj.tahap = 2 AND dj.status NOT IN (2, 5)
      LEFT JOIN m_user uj ON uj.id_user = dj.id_juri
-     WHERE p.id_program = $1 AND p.status IN (4, 5)
+     WHERE p.id_program = $1 AND p.status IN (4, 5) AND t.status != 2
      ORDER BY p.id_proposal ASC`,
     [id_program]
   );

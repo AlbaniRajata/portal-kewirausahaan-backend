@@ -1,5 +1,7 @@
 const pool = require("../../../config/db");
 
+const MIN_SUBMIT_TAHAP1 = 2;
+
 const {
   getRekapReviewerTahap1Db,
   countDistribusiReviewerTahap1Db,
@@ -58,7 +60,7 @@ const finalisasiDeskBatch = async (id_program, payload) => {
       countDistribusiReviewerTahap1Db(id_program, id_proposal),
       countSubmittedReviewerTahap1Db(id_program, id_proposal),
     ]);
-    if (totalDistribusi === 0 || totalSubmit !== totalDistribusi) continue;
+    if (totalDistribusi === 0 || totalSubmit < MIN_SUBMIT_TAHAP1) continue;
     const updated = await updateStatusProposalTahap1Db(id_program, id_proposal, 4);
     hasil.push({ id_proposal, status: "LOLOS", updated });
   }
@@ -68,7 +70,7 @@ const finalisasiDeskBatch = async (id_program, payload) => {
       countDistribusiReviewerTahap1Db(id_program, id_proposal),
       countSubmittedReviewerTahap1Db(id_program, id_proposal),
     ]);
-    if (totalDistribusi === 0 || totalSubmit !== totalDistribusi) continue;
+    if (totalDistribusi === 0 || totalSubmit < MIN_SUBMIT_TAHAP1) continue;
     const updated = await updateStatusProposalTahap1Db(id_program, id_proposal, 3);
     hasil.push({ id_proposal, status: "TIDAK LOLOS", updated });
   }
@@ -95,7 +97,7 @@ const getRekapWawancaraTahap2 = async (id_program, id_proposal) => {
   ]);
 
   if (!reviewerRows.length && !juriRows.length) {
-    return { error: true, message: "Belum ada penilaian panel wawancara yang disubmit", data: { id_proposal } };
+    return { error: true, message: "Belum ada penilaian wawancara yang disubmit", data: { id_proposal } };
   }
 
   const proposal = {
@@ -110,7 +112,7 @@ const getRekapWawancaraTahap2 = async (id_program, id_proposal) => {
 
   return {
     error: false,
-    message: "Rekap panel wawancara tahap 2 berhasil diambil",
+    message: "Rekap wawancara tahap 2 berhasil diambil",
     data: { proposal, reviewer_panel: reviewer, juri_panel: juri, total_reviewer: totalReviewer, total_juri: totalJuri, total_gabungan: totalReviewer + totalJuri },
   };
 };
