@@ -32,8 +32,8 @@ const getTimDetail = async (id_tim) => {
 const withdrawTim = async (id_tim) => {
   const data = await getTimDetailDb(id_tim);
   if (!data) return { error: true, message: "Tim tidak ditemukan", data: null };
-  if (parseInt(data.status, 10) !== 0) {
-    return { error: true, message: "Tim hanya bisa dinonaktifkan jika masih aktif", data: null };
+  if (parseInt(data.status, 10) === 2) {
+    return { error: true, message: "Tim sudah dinonaktifkan", data: null };
   }
 
   const updated = await updateTimStatusDb(id_tim, 2);
