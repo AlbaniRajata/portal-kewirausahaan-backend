@@ -30,6 +30,7 @@ const detailMahasiswa = async (id_user) => {
 
 const approveMahasiswa = async (id_user) => {
   const result = await approveMahasiswaDb(id_user);
+  console.log(`[APPROVE] ID ${id_user} - DB Result:`, result);
 
   if (!result) return { error: true, message: "Mahasiswa tidak ditemukan", data: null };
 
@@ -41,6 +42,7 @@ const approveMahasiswa = async (id_user) => {
     return { error: true, message: "Mahasiswa sudah diverifikasi sebelumnya", data: { field: "status_verifikasi", status_verifikasi: result.status_verifikasi } };
   }
 
+  console.log(`[APPROVE] ID ${id_user} - Success, returning:`, { id_user, username: result.username });
   return { error: false, message: "Mahasiswa berhasil diverifikasi", data: result };
 };
 
@@ -54,21 +56,30 @@ const bulkApproveMahasiswa = async (id_user_list = []) => {
     return { error: true, message: "Pilih minimal satu mahasiswa untuk diverifikasi", data: null };
   }
 
+  console.log(`[BULK APPROVE] Processing ${uniqueIds.length} mahasiswa:`, uniqueIds);
+
   const success = [];
   const failed = [];
 
   for (const id_user of uniqueIds) {
     try {
       const result = await approveMahasiswa(id_user);
+      console.log(`[BULK APPROVE] ID ${id_user}:`, { hasError: !!result.error, message: result.message });
+      
       if (result.error) {
+        console.log(`[BULK APPROVE] Adding to failed:`, { id_user, error: result.error });
         failed.push({ id_user, message: result.message, data: result.data });
       } else {
-        success.push(result.data);
+        console.log(`[BULK APPROVE] Adding to success:`, { id_user, username: result.data?.username });
+        success.push({ ...result.data, id_user });
       }
     } catch (err) {
+      console.error(`[BULK APPROVE] Exception for ID ${id_user}:`, err.message);
       failed.push({ id_user, message: err.message || "Gagal memverifikasi mahasiswa", data: null });
     }
   }
+
+  console.log(`[BULK APPROVE] Result: success=${success.length}, failed=${failed.length}`);
 
   return {
     error: false,
