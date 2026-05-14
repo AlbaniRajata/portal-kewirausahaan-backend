@@ -3,7 +3,7 @@ const {
   getTimDetailDb,
   getPesertaListDb,
   getPesertaDetailDb,
-  updateTimStatusDb,
+  withdrawTimDb,
   deleteTimDb,
 } = require("../db/timpeserta.db");
 const { parsePaginationParams } = require("../../../utils/pagination");
@@ -30,18 +30,17 @@ const getTimDetail = async (id_tim) => {
 };
 
 const withdrawTim = async (id_tim) => {
-  const data = await getTimDetailDb(id_tim);
-  if (!data) return { error: true, message: "Tim tidak ditemukan", data: null };
-  if (parseInt(data.status, 10) === 2) {
+  const withdrawn = await withdrawTimDb(id_tim);
+  if (!withdrawn) return { error: true, message: "Tim tidak ditemukan", data: null };
+  if (withdrawn.blocked) {
     return { error: true, message: "Tim sudah dinonaktifkan", data: null };
   }
 
-  const updated = await updateTimStatusDb(id_tim, 2);
-  if (!updated) {
-    return { error: true, message: "Gagal memperbarui status tim", data: null };
-  }
-
-  return { error: false, message: "Tim berhasil dinonaktifkan (mengundurkan diri)", data: updated };
+  return {
+    error: false,
+    message: "Tim berhasil dinonaktifkan (mengundurkan diri)",
+    data: withdrawn,
+  };
 };
 
 const deleteTim = async (id_tim) => {

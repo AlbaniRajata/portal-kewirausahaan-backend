@@ -89,12 +89,51 @@ const getTimCountDb = async (filters = {}) => {
   return parseInt(rows[0].total);
 };
 
-const updateTimStatusDb = async (id_tim, new_status) => {
-  const { rows } = await pool.query(
-    `UPDATE t_tim SET status = $1 WHERE id_tim = $2 RETURNING id_tim, status`,
-    [new_status, id_tim]
-  );
-  return rows[0] || null;
+const withdrawTimDb = async (id_tim) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const { rows: timRows } = await client.query(
+      `SELECT id_tim, id_program, status FROM t_tim WHERE id_tim = $1 FOR UPDATE`,
+      [id_tim]
+    );
+
+    if (!timRows.length) {
+      await client.query("ROLLBACK");
+      return null;
+    }
+
+    const tim = timRows[0];
+    if (parseInt(tim.status, 10) === 2) {
+      await client.query("ROLLBACK");
+      return { blocked: true, status: tim.status };
+    }
+
+    const { rows: updatedTim } = await client.query(
+      `UPDATE t_tim SET status = 2 WHERE id_tim = $1 RETURNING id_tim, status`,
+      [id_tim]
+    );
+
+    const { rows: updatedProposal } = await client.query(
+      `UPDATE t_proposal
+       SET status = 10
+       WHERE id_tim = $1 AND id_program = $2
+       RETURNING id_proposal, status`,
+      [id_tim, tim.id_program]
+    );
+
+    await client.query("COMMIT");
+    return {
+      ...updatedTim[0],
+      proposal: updatedProposal[0] || null,
+    };
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 };
 
 const deleteTimDb = async (id_tim) => {
@@ -316,6 +355,6 @@ module.exports = {
   getTimListDb, getTimCountDb,
   getTimDetailDb,
   getPesertaListDb, getPesertaDetailDb,
-  updateTimStatusDb,
+  withdrawTimDb,
   deleteTimDb,
 };
