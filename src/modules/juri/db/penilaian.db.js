@@ -102,6 +102,25 @@ const submitPenilaianDb = async (id_penilaian) => {
   return rows[0] || null;
 };
 
+const resetPenilaianDb = async (id_penilaian) => {
+  const q = `
+    UPDATE t_penilaian_juri
+    SET status = 0, submitted_at = NULL
+    WHERE id_penilaian = $1
+    RETURNING *
+  `;
+  const { rows } = await pool.query(q, [id_penilaian]);
+  return rows[0] || null;
+};
+
+const clearNilaiDb = async (id_penilaian) => {
+  const q = `
+    DELETE FROM t_penilaian_juri_detail
+    WHERE id_penilaian = $1
+  `;
+  await pool.query(q, [id_penilaian]);
+};
+
 const markDistribusiDraftDb = async (id_distribusi) => {
   const q = `
     UPDATE t_distribusi_juri
@@ -117,6 +136,17 @@ const markDistribusiSubmittedDb = async (id_distribusi) => {
   const q = `
     UPDATE t_distribusi_juri
     SET status = 4, responded_at = now()
+    WHERE id_distribusi = $1 AND status IN (1, 3)
+    RETURNING *
+  `;
+  const { rows } = await pool.query(q, [id_distribusi]);
+  return rows[0] || null;
+};
+
+const markDistribusiResetDb = async (id_distribusi) => {
+  const q = `
+    UPDATE t_distribusi_juri
+    SET status = 1
     WHERE id_distribusi = $1 AND status IN (1, 3)
     RETURNING *
   `;
@@ -210,8 +240,11 @@ module.exports = {
   getDetailNilaiDb,
   upsertNilaiDb,
   submitPenilaianDb,
+  resetPenilaianDb,
+  clearNilaiDb,
   markDistribusiDraftDb,
   markDistribusiSubmittedDb,
+  markDistribusiResetDb,
   getPasanganReviewerByProposalDb,
   getOrCreatePenilaianReviewerDb,
   upsertNilaiReviewerDb,

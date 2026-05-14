@@ -22,6 +22,7 @@ const {
   getFormPenilaianController,
   simpanNilaiController,
   submitPenilaianController,
+  resetPenilaianController,
   bulkSubmitPenilaianController,
 } = require("../controllers/penilaian.controller");
 
@@ -46,6 +47,7 @@ router.patch("/penugasan/:id_distribusi/reject", rejectPenugasanController);
 router.post("/penilaian/bulk-submit", bulkSubmitPenilaianController);
 router.get("/penilaian/:id_distribusi", getFormPenilaianController);
 router.post("/penilaian/:id_distribusi", simpanNilaiController);
+router.post("/penilaian/:id_distribusi/reset", resetPenilaianController);
 router.post("/penilaian/:id_distribusi/submit", submitPenilaianController);
 
 router.get("/peringkat", getPeringkatController);

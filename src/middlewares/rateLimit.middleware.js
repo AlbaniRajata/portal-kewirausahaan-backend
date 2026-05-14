@@ -1,4 +1,5 @@
 const rateLimit = require("express-rate-limit");
+const { ipKeyGenerator } = require("express-rate-limit");
 
 const loginLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
@@ -6,7 +7,7 @@ const loginLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
-    return req.body?.email ? req.body.email.toLowerCase().trim() : req.ip;
+    return req.body?.email ? req.body.email.toLowerCase().trim() : ipKeyGenerator(req);
   },
   message: {
     success: false,
@@ -23,7 +24,7 @@ const registerLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
-    return req.body?.email ? req.body.email.toLowerCase().trim() : req.ip;
+    return req.body?.email ? req.body.email.toLowerCase().trim() : ipKeyGenerator(req);
   },
   message: {
     success: false,
@@ -40,7 +41,7 @@ const verifyEmailLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
-    return req.body?.email ? req.body.email.toLowerCase().trim() : req.ip;
+    return req.body?.email ? req.body.email.toLowerCase().trim() : ipKeyGenerator(req);
   },
   message: {
     success: false,
@@ -56,7 +57,7 @@ const forgotPasswordLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
-    return req.body?.email ? req.body.email.toLowerCase().trim() : req.ip;
+    return req.body?.email ? req.body.email.toLowerCase().trim() : ipKeyGenerator(req);
   },
   message: {
     success: false,

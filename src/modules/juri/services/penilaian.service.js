@@ -5,8 +5,11 @@ const {
   getDetailNilaiDb,
   upsertNilaiDb,
   submitPenilaianDb,
+  resetPenilaianDb,
+  clearNilaiDb,
   markDistribusiDraftDb,
   markDistribusiSubmittedDb,
+  markDistribusiResetDb,
   getPasanganReviewerByProposalDb,
   getOrCreatePenilaianReviewerDb,
   upsertNilaiReviewerDb,
@@ -181,6 +184,38 @@ const submitPenilaian = async (id_user, id_distribusi) => {
   };
 };
 
+const resetPenilaian = async (id_user, id_distribusi) => {
+  const { err, dist } = await getAccessibleDist(id_distribusi, id_user);
+  if (err) return err;
+
+  if (![1, 3].includes(dist.status_distribusi)) {
+    return { error: true, message: "Penilaian hanya bisa direset sebelum submit", data: { status: dist.status_distribusi } };
+  }
+
+  if (dist.status_proposal !== 5) {
+    return { error: true, message: "Proposal belum masuk wawancara", data: { status_proposal: dist.status_proposal } };
+  }
+
+  if (!isTimelineOpen(dist.penilaian_mulai, dist.penilaian_selesai)) {
+    return { error: true, message: "Penilaian belum dibuka atau sudah ditutup", data: null };
+  }
+
+  const penilaian = await getOrCreatePenilaianDb(dist.id_distribusi, dist.id_tahap);
+  if (penilaian.status === 1) {
+    return { error: true, message: "Penilaian sudah disubmit", data: null };
+  }
+
+  await clearNilaiDb(penilaian.id_penilaian);
+  await resetPenilaianDb(penilaian.id_penilaian);
+  await markDistribusiResetDb(id_distribusi);
+
+  return {
+    error: false,
+    message: "Penilaian berhasil direset",
+    data: { id_penilaian: penilaian.id_penilaian },
+  };
+};
+
 const bulkSubmitPenilaian = async (id_user, id_distribusi_list) => {
   if (!Array.isArray(id_distribusi_list) || id_distribusi_list.length === 0) {
     return { error: true, message: "Daftar distribusi kosong", data: null };
@@ -205,4 +240,4 @@ const bulkSubmitPenilaian = async (id_user, id_distribusi_list) => {
   };
 };
 
-module.exports = { getFormPenilaian, simpanNilai, submitPenilaian, bulkSubmitPenilaian };
+module.exports = { getFormPenilaian, simpanNilai, submitPenilaian, resetPenilaian, bulkSubmitPenilaian };
