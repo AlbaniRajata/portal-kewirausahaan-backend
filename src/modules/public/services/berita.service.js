@@ -59,13 +59,23 @@ const createBerita = async (id_author, payload, file_gambar = null, file_pdf = n
 const updateBerita = async (id_berita, payload, file_gambar_baru = null, file_pdf_baru = null) => {
   const { judul, isi, status, gambar_url } = payload;
 
-  if (!judul || !judul.trim()) return { error: true, message: "Judul berita wajib diisi", data: null };
-
-  const statusNum = status !== undefined ? parseInt(status) : 0;
-  if (!VALID_STATUS.includes(statusNum)) return { error: true, message: "Status tidak valid, gunakan 0 (draft) atau 1 (published)", data: null };
-
   const existing = await getBeritaDetailAdminDb(id_berita);
   if (!existing) return { error: true, message: "Berita tidak ditemukan", data: null };
+
+  const hasJudul = judul !== undefined;
+  const hasStatus = status !== undefined;
+
+  if (hasJudul && (!judul || !String(judul).trim())) {
+    return { error: true, message: "Judul berita wajib diisi", data: null };
+  }
+
+  let statusNum = existing.status;
+  if (hasStatus) {
+    statusNum = parseInt(status);
+    if (!VALID_STATUS.includes(statusNum)) {
+      return { error: true, message: "Status tidak valid, gunakan 0 (draft) atau 1 (published)", data: null };
+    }
+  }
 
   const hasNewImage = Boolean(file_gambar_baru || gambar_url);
   const hasNewPdf = Boolean(file_pdf_baru);
@@ -73,7 +83,10 @@ const updateBerita = async (id_berita, payload, file_gambar_baru = null, file_pd
     return { error: true, message: "Sementara hanya boleh upload 1 file (gambar atau PDF)", data: null };
   }
 
-  const slug = await makeUniqueSlugDb(generateSlug(judul), id_berita);
+  const judulFinal = hasJudul ? String(judul).trim() : existing.judul;
+  const slug = hasJudul
+    ? await makeUniqueSlugDb(generateSlug(judulFinal), id_berita)
+    : existing.slug;
   let file_gambar_final = existing.file_gambar;
   let file_pdf_final = existing.file_pdf;
 
@@ -89,7 +102,15 @@ const updateBerita = async (id_berita, payload, file_gambar_baru = null, file_pd
     if (existing.file_pdf) deleteFile(existing.file_pdf);
   }
 
-  const berita = await updateBeritaDb(id_berita, judul.trim(), slug, isi || null, file_gambar_final, file_pdf_final, statusNum);
+  const berita = await updateBeritaDb(
+    id_berita,
+    judulFinal,
+    slug,
+    isi !== undefined ? (isi || null) : (existing.isi || null),
+    file_gambar_final,
+    file_pdf_final,
+    statusNum
+  );
 
   cache.del(`berita:slug:${existing.slug}`);
   cache.del(`berita:list:`);

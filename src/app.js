@@ -166,7 +166,10 @@ app.use((err, req, res, next) => {
     (err.message.includes("Hanya file") ||
       err.message.includes("Format nama file") ||
       err.message.includes("File proposal") ||
-      err.message.includes("Bagian "));
+      err.message.includes("Bagian ") ||
+      err.message.includes("File gambar") ||
+      err.message.includes("File PDF") ||
+      err.message.includes("Field upload berita"));
   if (isFileValidationError) {
     return res.status(400).json({
       success: false,

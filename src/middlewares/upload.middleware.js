@@ -29,6 +29,12 @@ const createFilename = (prefix) => {
   };
 };
 
+const isPdfFile = (file) => {
+  const mime = String(file?.mimetype || "").toLowerCase();
+  const ext = path.extname(file?.originalname || "").toLowerCase();
+  return mime === "application/pdf" || mime === "application/x-pdf" || (mime === "application/octet-stream" && ext === ".pdf") || ext === ".pdf";
+};
+
 const validateProposalFilename = (filename) => {
   const nameWithoutExt = path.basename(filename, path.extname(filename));
   const parts = nameWithoutExt.split("_");
@@ -126,7 +132,7 @@ const uploadBerita = multer({
     }
 
     if (file.fieldname === "file_pdf") {
-      if (file.mimetype === "application/pdf") {
+      if (isPdfFile(file)) {
         return cb(null, true);
       }
       return cb(new Error("File PDF harus berupa PDF"));
@@ -134,7 +140,7 @@ const uploadBerita = multer({
 
     return cb(new Error("Field upload berita tidak valid"));
   },
-  limits: { fileSize: 10 * 1024 * 1024, files: 1 },
+  limits: { fileSize: 10 * 1024 * 1024, files: 2 },
 });
 
 const luaranDir = path.join(UPLOADS_BASE, "luaran");
