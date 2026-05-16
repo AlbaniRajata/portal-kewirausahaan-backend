@@ -45,13 +45,14 @@ const getUserByIdForResetDb = async (id_user) => {
 const createUserDb = async (data, client) => {
   const db = client || pool;
   const query = `
-    INSERT INTO m_user (username, email, password_hash, id_role)
-    VALUES ($1, $2, $3, $4)
+    INSERT INTO m_user (username, email, nama_lengkap, password_hash, id_role)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING id_user, username, email, id_role
   `;
   const result = await db.query(query, [
     data.username,
     data.email,
+    data.nama_lengkap,
     data.password_hash,
     data.id_role,
   ]);

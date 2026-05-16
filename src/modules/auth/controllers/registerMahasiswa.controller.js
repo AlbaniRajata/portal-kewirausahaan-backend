@@ -11,10 +11,10 @@ const isValidYear = (year) => {
 
 const registerMahasiswaHandler = async (req, res, next) => {
   try {
-    const { username, email, password, nim, id_prodi, tahun_masuk } = req.body;
+    const { nama_lengkap, email, password, nim, id_prodi, tahun_masuk } = req.body;
 
     const requiredFields = [
-      { key: "username", label: "Username" },
+      { key: "nama_lengkap", label: "Nama Lengkap" },
       { key: "email", label: "Email" },
       { key: "password", label: "Password" },
       { key: "nim", label: "NIM" },
@@ -83,7 +83,7 @@ const registerMahasiswaHandler = async (req, res, next) => {
     }
 
     const { user, token } = await registerMahasiswa({
-      username: username.trim(),
+      nama_lengkap: (nama_lengkap || "").trim(),
       email: email.toLowerCase().trim(),
       password,
       nim: nim.trim(),

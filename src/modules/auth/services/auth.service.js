@@ -32,7 +32,7 @@ const generateRefreshToken = () => {
 const createBaseUser = async (data, client) => {
   const password_hash = await hashPassword(data.password);
   return createUserDb(
-    { username: data.username, email: data.email, password_hash, id_role: data.id_role },
+    { username: data.username, email: data.email, nama_lengkap: data.nama_lengkap || null, password_hash, id_role: data.id_role },
     client
   );
 };
@@ -68,13 +68,6 @@ const login = async ({ email, password }) => {
   if (roleName === "mahasiswa" && user.mahasiswa_verifikasi !== 1) {
     return {
       error: "Akun mahasiswa masih dalam proses verifikasi admin.",
-      field: "status_verifikasi",
-    };
-  }
-
-  if (roleName === "dosen" && user.dosen_verifikasi !== 1) {
-    return {
-      error: "Akun dosen masih dalam proses verifikasi admin.",
       field: "status_verifikasi",
     };
   }

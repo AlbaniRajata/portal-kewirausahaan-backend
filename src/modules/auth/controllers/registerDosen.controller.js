@@ -4,10 +4,10 @@ const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 const registerDosenHandler = async (req, res, next) => {
   try {
-    const { username, email, password, nip, id_prodi, bidang_keahlian } = req.body;
+    const { nama_lengkap, email, password, nip, id_prodi, bidang_keahlian } = req.body;
 
     const requiredFields = [
-      { key: "username", label: "Username" },
+      { key: "nama_lengkap", label: "Nama Lengkap" },
       { key: "email", label: "Email" },
       { key: "password", label: "Password" },
       { key: "nip", label: "NIP" },
@@ -59,7 +59,7 @@ const registerDosenHandler = async (req, res, next) => {
     }
 
     const { user, token } = await registerDosen({
-      username: username.trim(),
+      nama_lengkap: (nama_lengkap || "").trim(),
       email: email.toLowerCase().trim(),
       password,
       nip: nip.trim(),
