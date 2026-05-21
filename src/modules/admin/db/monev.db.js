@@ -96,6 +96,10 @@ const getProgressLuaranTimDb = async (id_program) => {
     JOIN m_luaran ml ON ml.id_program = t.id_program
     LEFT JOIN t_luaran_tim lt ON lt.id_tim = t.id_tim AND lt.id_luaran = ml.id_luaran
     WHERE t.id_program = $1 AND t.status != 2
+      AND EXISTS (
+        SELECT 1 FROM t_proposal p
+        WHERE p.id_tim = t.id_tim AND p.status >= 7
+      )
     GROUP BY t.id_tim, t.nama_tim, u.id_user, u.nama_lengkap, mhs.nim
     ORDER BY t.nama_tim ASC
   `;

@@ -249,12 +249,12 @@ const insertMahasiswaDb = async (client, userData, mahasiswaData) => {
   const password_hash = await hashPassword(userData.password);
   const { rows } = await client.query(
     `INSERT INTO m_user (id_role, username, email, password_hash, nama_lengkap, no_hp, alamat, is_active, email_verified_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, false, NULL) RETURNING id_user`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, true, NOW()) RETURNING id_user`,
     [ROLE.MAHASISWA, userData.username, userData.email, password_hash, userData.nama_lengkap, userData.no_hp || null, userData.alamat || null]
   );
   const id_user = rows[0].id_user;
   await client.query(
-    `INSERT INTO m_mahasiswa (id_user, nim, id_prodi, tahun_masuk, status_verifikasi) VALUES ($1, $2, $3, $4, 0)`,
+    `INSERT INTO m_mahasiswa (id_user, nim, id_prodi, tahun_masuk, status_verifikasi) VALUES ($1, $2, $3, $4, 1)`,
     [id_user, mahasiswaData.nim, mahasiswaData.id_prodi, mahasiswaData.tahun_masuk]
   );
   return id_user;
@@ -264,12 +264,12 @@ const insertDosenDb = async (client, userData, dosenData) => {
   const password_hash = await hashPassword(userData.password);
   const { rows } = await client.query(
     `INSERT INTO m_user (id_role, username, email, password_hash, nama_lengkap, no_hp, alamat, is_active, email_verified_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, false, NULL) RETURNING id_user`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, true, NOW()) RETURNING id_user`,
     [ROLE.DOSEN, userData.username, userData.email, password_hash, userData.nama_lengkap, userData.no_hp || null, userData.alamat || null]
   );
   const id_user = rows[0].id_user;
   await client.query(
-    `INSERT INTO m_dosen (id_user, nip, id_prodi, bidang_keahlian, status_verifikasi) VALUES ($1, $2, $3, $4, 0)`,
+    `INSERT INTO m_dosen (id_user, nip, id_prodi, bidang_keahlian, status_verifikasi) VALUES ($1, $2, $3, $4, 1)`,
     [id_user, dosenData.nip, dosenData.id_prodi, dosenData.bidang_keahlian || null]
   );
   return id_user;
@@ -279,7 +279,7 @@ const insertReviewerDb = async (client, userData, reviewerData) => {
   const password_hash = await hashPassword(userData.password);
   const { rows } = await client.query(
     `INSERT INTO m_user (id_role, username, email, password_hash, nama_lengkap, no_hp, alamat, is_active, email_verified_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, false, NULL) RETURNING id_user`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, true, NOW()) RETURNING id_user`,
     [ROLE.REVIEWER, userData.username, userData.email, password_hash, userData.nama_lengkap, userData.no_hp || null, userData.alamat || null]
   );
   const id_user = rows[0].id_user;
@@ -294,7 +294,7 @@ const insertJuriDb = async (client, userData, juriData) => {
   const password_hash = await hashPassword(userData.password);
   const { rows } = await client.query(
     `INSERT INTO m_user (id_role, username, email, password_hash, nama_lengkap, no_hp, alamat, is_active, email_verified_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, false, NULL) RETURNING id_user`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, true, NOW()) RETURNING id_user`,
     [ROLE.JURI, userData.username, userData.email, password_hash, userData.nama_lengkap, userData.no_hp || null, userData.alamat || null]
   );
   const id_user = rows[0].id_user;
