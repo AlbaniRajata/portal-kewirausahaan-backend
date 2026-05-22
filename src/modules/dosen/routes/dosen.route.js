@@ -7,7 +7,8 @@ const { uploadFotoProfil } = require("../../../middlewares/upload.middleware");
 const { 
   getProfileController, 
   updateProfileController, 
-  updatePasswordController 
+  updatePasswordController,
+  deleteProfilePhotoController
 } = require("../controllers/profile.controller");
 const { 
   getPengajuanMasukController, 
@@ -37,6 +38,7 @@ const uploadFotoOptional = (req, res, next) => {
 
 router.get("/profile", getProfileController);
 router.patch("/profile", uploadFotoOptional, updateProfileController);
+router.delete("/profile/foto", deleteProfilePhotoController);
 router.put("/password", updatePasswordController);
 
 router.get("/pembimbing/pengajuan", getPengajuanMasukController);

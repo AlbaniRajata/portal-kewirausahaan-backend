@@ -155,6 +155,7 @@ const {
   getProfileController,
   updateProfileController,
   updatePasswordController,
+  deleteProfilePhotoController,
 } = require("../controllers/profile.controller");
 
 const { uploadBerita, uploadFotoProfil } = require("../../../middlewares/upload.middleware");
@@ -172,6 +173,7 @@ const uploadFotoOptional = (req, res, next) => {
 
 router.get("/profile", getProfileController);
 router.patch("/profile", uploadFotoOptional, updateProfileController);
+router.delete("/profile/foto", deleteProfilePhotoController);
 router.put("/password", updatePasswordController);
 
 router.get("/verifikasi/mahasiswa", getPendingMahasiswaController);

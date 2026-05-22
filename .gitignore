@@ -15,4 +15,8 @@ build/
 # test coverage
 coverage/
 
+# k6 local credentials
+k6-tests/helpers/credentials.local.js
+k6-tests/credentials.local.json
+
 uploads/

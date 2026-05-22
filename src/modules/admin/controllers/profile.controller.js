@@ -128,8 +128,44 @@ const updatePasswordController = async (req, res, next) => {
   }
 };
 
+const deleteProfilePhotoController = async (req, res, next) => {
+  try {
+    const { id_user } = req.user;
+    const profile = await getProfile(id_user);
+
+    if (profile.error === "PROFILE_NOT_FOUND") {
+      return res.status(404).json({
+        success: false,
+        message: "Profil tidak ditemukan",
+        data: null,
+      });
+    }
+
+    if (!profile.foto) {
+      return res.status(400).json({
+        success: false,
+        message: "Foto profil tidak ditemukan",
+        data: null,
+      });
+    }
+
+    const oldPath = `uploads/profil/${profile.foto}`;
+    if (fs.existsSync(oldPath)) fs.unlink(oldPath, () => {});
+
+    const updated = await updateBiodata(id_user, { foto: null });
+    return res.status(200).json({
+      success: true,
+      message: "Foto profil berhasil dihapus",
+      data: updated,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getProfileController,
   updateProfileController,
   updatePasswordController,
+  deleteProfilePhotoController,
 };

@@ -25,4 +25,3 @@ CREATE TABLE IF NOT EXISTS public.t_bimbingan (
 CREATE INDEX IF NOT EXISTS idx_bimbingan_dosen ON public.t_bimbingan USING btree (id_dosen);
 CREATE INDEX IF NOT EXISTS idx_bimbingan_status ON public.t_bimbingan USING btree (status);
 CREATE INDEX IF NOT EXISTS idx_bimbingan_tim ON public.t_bimbingan USING btree (id_tim);
-CREATE UNIQUE INDEX IF NOT EXISTS one_pending_bimbingan_per_tim ON public.t_bimbingan USING btree (id_tim) WHERE (status = 0);

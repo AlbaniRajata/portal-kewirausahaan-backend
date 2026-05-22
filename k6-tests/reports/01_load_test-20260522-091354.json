@@ -1,0 +1,406 @@
+{
+    "root_group": {
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {
+            "setup": {
+                "groups": {},
+                "checks": {
+                        "login status is 200": {
+                            "path": "::setup::login status is 200",
+                            "id": "bb27b460b057923f4a083e3603c038b9",
+                            "passes": 7,
+                            "fails": 0,
+                            "name": "login status is 200"
+                        }
+                    },
+                "name": "setup",
+                "path": "::setup",
+                "id": "5c0f8025f7e0b6654089e5b00e950f1a"
+            },
+            "health": {
+                "groups": {},
+                "checks": {
+                        "health 200": {
+                            "name": "health 200",
+                            "path": "::health::health 200",
+                            "id": "1923beb3f69502def2b065e42e13b3e0",
+                            "passes": 3553,
+                            "fails": 0
+                        }
+                    },
+                "name": "health",
+                "path": "::health",
+                "id": "612cc1c9a7c3d7996d1eb6414fb9c69d"
+            },
+            "public_berita": {
+                "name": "public_berita",
+                "path": "::public_berita",
+                "id": "e373370a7fb61c3f4fb72c6567d84c98",
+                "groups": {},
+                "checks": {
+                        "berita 200": {
+                            "name": "berita 200",
+                            "path": "::public_berita::berita 200",
+                            "id": "c00e6515528880c03d34d345cd09be0a",
+                            "passes": 3553,
+                            "fails": 0
+                        }
+                    }
+            },
+            "auth_login": {
+                "name": "auth_login",
+                "path": "::auth_login",
+                "id": "e03ed2a2ca64543a870f6fe7ee1ba9c5",
+                "groups": {},
+                "checks": {
+                        "login status is 200": {
+                            "name": "login status is 200",
+                            "path": "::auth_login::login status is 200",
+                            "id": "678be8dee029ec99a69b4bb78d08ca8b",
+                            "passes": 1052,
+                            "fails": 0
+                        }
+                    }
+            },
+            "mahasiswa_profile": {
+                "name": "mahasiswa_profile",
+                "path": "::mahasiswa_profile",
+                "id": "9079e3d59890f0a8d60cb1ba1ce47a6c",
+                "groups": {},
+                "checks": {
+                        "profile 200": {
+                            "passes": 3553,
+                            "fails": 0,
+                            "name": "profile 200",
+                            "path": "::mahasiswa_profile::profile 200",
+                            "id": "fc0f90624a1ddb2f79a08eb35ab9d94e"
+                        }
+                    }
+            },
+            "mahasiswa_tim_status": {
+                "groups": {},
+                "checks": {
+                        "tim status 200": {
+                            "name": "tim status 200",
+                            "path": "::mahasiswa_tim_status::tim status 200",
+                            "id": "fb1d99e8df4ee5875ae6b2ef87d7d69b",
+                            "passes": 3553,
+                            "fails": 0
+                        }
+                    },
+                "name": "mahasiswa_tim_status",
+                "path": "::mahasiswa_tim_status",
+                "id": "2b86956e466451e8411880feb28c08e1"
+            },
+            "mahasiswa_proposal_status": {
+                "id": "270a0fdaa9f806f722c891d32a7601da",
+                "groups": {},
+                "checks": {
+                        "proposal status 200": {
+                            "name": "proposal status 200",
+                            "path": "::mahasiswa_proposal_status::proposal status 200",
+                            "id": "3881904083de3d768e0a2fc8309b4349",
+                            "passes": 3553,
+                            "fails": 0
+                        }
+                    },
+                "name": "mahasiswa_proposal_status",
+                "path": "::mahasiswa_proposal_status"
+            },
+            "mahasiswa_pembimbing_dosen": {
+                "id": "5174933a239ad8df543252fd4df38c86",
+                "groups": {},
+                "checks": {
+                        "pembimbing dosen 200": {
+                            "name": "pembimbing dosen 200",
+                            "path": "::mahasiswa_pembimbing_dosen::pembimbing dosen 200",
+                            "id": "78fc176e053c8fc37bb11e62c43bfe20",
+                            "passes": 3553,
+                            "fails": 0
+                        }
+                    },
+                "name": "mahasiswa_pembimbing_dosen",
+                "path": "::mahasiswa_pembimbing_dosen"
+            },
+            "mahasiswa_bimbingan": {
+                "groups": {},
+                "checks": {
+                        "bimbingan 200": {
+                            "name": "bimbingan 200",
+                            "path": "::mahasiswa_bimbingan::bimbingan 200",
+                            "id": "9a8e30701862aeae32ea2404cd8c9a6d",
+                            "passes": 3553,
+                            "fails": 0
+                        }
+                    },
+                "name": "mahasiswa_bimbingan",
+                "path": "::mahasiswa_bimbingan",
+                "id": "d90ee76f88f5bf76c7990fa85a98d670"
+            }
+        },
+        "checks": {},
+        "name": "",
+        "path": ""
+    },
+    "metrics": {
+        "http_req_duration{expected_response:true}": {
+            "avg": 299.65543954493023,
+            "min": 10.3496,
+            "med": 267.3895,
+            "max": 6576.6828,
+            "p(90)": 485.60678,
+            "p(95)": 585.513825
+        },
+        "data_sent": {
+            "count": 7243321,
+            "rate": 26587.70613008006
+        },
+        "http_req_duration{name:mahasiswa_pembimbing_dosen}": {
+            "min": 14.8528,
+            "med": 253.1183,
+            "max": 2212.9049,
+            "p(90)": 443.29844,
+            "p(95)": 501.58165999999966,
+            "avg": 266.17477911623985,
+            "thresholds": {
+                "p(95)<700": false,
+                "p(99)<1200": false
+            }
+        },
+        "http_req_connecting": {
+            "avg": 0.03865721172387197,
+            "min": 0,
+            "med": 0,
+            "max": 66.0922,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_duration{name:auth_login}": {
+            "min": 95.5833,
+            "med": 665.1157,
+            "max": 6576.6828,
+            "p(90)": 1379.09668,
+            "p(95)": 2479.508769999999,
+            "avg": 902.2984378659116,
+            "thresholds": {
+                "p(95)<700": true,
+                "p(99)<1200": true
+            }
+        },
+        "http_reqs": {
+            "count": 25930,
+            "rate": 95.17998994563074,
+            "thresholds": {
+                "rate>10": false
+            }
+        },
+        "data_received": {
+            "count": 42512046,
+            "rate": 156046.89976275322
+        },
+        "http_req_failed": {
+            "fails": 25930,
+            "passes": 0,
+            "thresholds": {
+                "rate<0.01": false
+            },
+            "value": 0
+        },
+        "vus_max": {
+            "value": 50,
+            "min": 50,
+            "max": 50
+        },
+        "iteration_duration": {
+            "med": 3172.3792,
+            "max": 9095.574,
+            "p(90)": 4296.6743,
+            "p(95)": 4658.683379999999,
+            "avg": 3189.6081997748443,
+            "min": 1169.2235
+        },
+        "http_req_duration{name:mahasiswa_tim_status}": {
+            "avg": 283.4299906557837,
+            "min": 14.6548,
+            "med": 267.9077,
+            "max": 2218.3725,
+            "p(90)": 464.79088,
+            "p(95)": 531.2124399999999,
+            "thresholds": {
+                "p(99)<1000": false,
+                "p(95)<500": true
+            }
+        },
+        "http_req_duration{name:public_berita}": {
+            "avg": 244.59170940050697,
+            "min": 15.4415,
+            "med": 237.4516,
+            "max": 2074.2742,
+            "p(90)": 426.12316000000004,
+            "p(95)": 482.56115999999986,
+            "thresholds": {
+                "p(99)<1000": false,
+                "p(95)<500": false
+            }
+        },
+        "http_req_duration{name:health}": {
+            "p(90)": 435.94736,
+            "p(95)": 497.6306399999999,
+            "avg": 267.3820861806918,
+            "min": 10.3496,
+            "med": 250.7805,
+            "max": 2718.5061,
+            "thresholds": {
+                "p(95)<300": true,
+                "p(99)<600": true
+            }
+        },
+        "checks": {
+            "passes": 25930,
+            "fails": 0,
+            "value": 1
+        },
+        "iterations": {
+            "count": 3553,
+            "rate": 13.041824306857926
+        },
+        "http_req_sending": {
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0.016162757423833392,
+            "min": 0,
+            "med": 0,
+            "max": 31.1591
+        },
+        "http_req_receiving": {
+            "max": 15.9472,
+            "p(90)": 5.158920000000009,
+            "p(95)": 7.283549999999999,
+            "avg": 1.5366449903586505,
+            "min": 0,
+            "med": 0.43825000000000003
+        },
+        "http_req_tls_handshaking": {
+            "min": 0,
+            "med": 0,
+            "max": 42.8438,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0.05656022753567297
+        },
+        "http_req_duration{name:mahasiswa_proposal_status}": {
+            "max": 2554.9151,
+            "p(90)": 499.58044,
+            "p(95)": 565.7350799999997,
+            "avg": 312.274834871939,
+            "min": 12.0454,
+            "med": 297.6267,
+            "thresholds": {
+                "p(95)<700": false,
+                "p(99)<1200": false
+            }
+        },
+        "vus": {
+            "value": 3,
+            "min": 0,
+            "max": 50
+        },
+        "http_req_waiting": {
+            "min": 9.467,
+            "med": 265.7961,
+            "max": 6576.0038,
+            "p(90)": 483.9134500000002,
+            "p(95)": 583.6463499999998,
+            "avg": 298.1026317971471
+        },
+        "http_req_duration{name:mahasiswa_bimbingan}": {
+            "avg": 270.7250064171117,
+            "min": 14.7711,
+            "med": 261.5552,
+            "max": 2016.9016,
+            "p(90)": 447.4496200000001,
+            "p(95)": 500.51413999999966,
+            "thresholds": {
+                "p(95)<700": false,
+                "p(99)<1200": false
+            }
+        },
+        "http_req_duration{name:mahasiswa_profile}": {
+            "min": 10.4089,
+            "med": 262.4247,
+            "max": 2529.2735,
+            "p(90)": 454.03294,
+            "p(95)": 511.96661999999986,
+            "avg": 273.3871159302,
+            "thresholds": {
+                "p(95)<500": true,
+                "p(99)<1000": false
+            }
+        },
+        "http_req_blocked": {
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0.10076963748553801,
+            "min": 0,
+            "med": 0,
+            "max": 93.6222
+        },
+        "http_req_duration": {
+            "p(95)": 585.513825,
+            "avg": 299.65543954493023,
+            "min": 10.3496,
+            "med": 267.3895,
+            "max": 6576.6828,
+            "p(90)": 485.60678
+        },
+        "group_duration": {
+            "min": 0,
+            "med": 252.32015,
+            "max": 6576.6828,
+            "p(90)": 474.84164000000004,
+            "p(95)": 570.73845,
+            "avg": 273.62015924570943
+        }
+    },
+    "setup_data": {
+        "tokens": [
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VyIjo0MDcsImlkX3JvbGUiOjEsInJvbGUiOiJNYWhhc2lzd2EiLCJpYXQiOjE3Nzk0MTYwMjksImV4cCI6MTc3OTUwMjQyOX0.jgTt74DLRHMHoq6sIPkR17ZcLYl-zCujcof7VTqNBTA",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VyIjo0MTMsImlkX3JvbGUiOjEsInJvbGUiOiJNYWhhc2lzd2EiLCJpYXQiOjE3Nzk0MTYwMzAsImV4cCI6MTc3OTUwMjQzMH0.ZlSS7igIxVAOgi2qYNa6i9aXEd90J7blCsai_AgBqh8",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VyIjo0NTEsImlkX3JvbGUiOjEsInJvbGUiOiJNYWhhc2lzd2EiLCJpYXQiOjE3Nzk0MTYwMzEsImV4cCI6MTc3OTUwMjQzMX0.bcZLu2QRUKT8_Jl0qBb-oDruNDhWfc5y4io3VNPZMTs",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VyIjo0NTAsImlkX3JvbGUiOjEsInJvbGUiOiJNYWhhc2lzd2EiLCJpYXQiOjE3Nzk0MTYwMzEsImV4cCI6MTc3OTUwMjQzMX0.vyw7MWL6BXe1mOM8u32tOQVkaORHA0cAGQ96PcT3nCo",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VyIjo0NTUsImlkX3JvbGUiOjEsInJvbGUiOiJNYWhhc2lzd2EiLCJpYXQiOjE3Nzk0MTYwMzEsImV4cCI6MTc3OTUwMjQzMX0.vIxkC6gncGjkoi2cCkkz95PU6B7HSa0qLFqyVryG7C0",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VyIjo0NTMsImlkX3JvbGUiOjEsInJvbGUiOiJNYWhhc2lzd2EiLCJpYXQiOjE3Nzk0MTYwMzEsImV4cCI6MTc3OTUwMjQzMX0.lfljIFWoyTlMwR4XJ3P9S6OnLBldfC9-MKjpkVLgIB0",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VyIjo0NDgsImlkX3JvbGUiOjEsInJvbGUiOiJNYWhhc2lzd2EiLCJpYXQiOjE3Nzk0MTYwMzIsImV4cCI6MTc3OTUwMjQzMn0.t5KkHe-K-s_6srPzk9-x4ZJQTLN7ONDLhjYT_Q0yVpI"
+        ],
+        "users": [
+            {
+                "password": "15112003",
+                "email": "lailatulsofi11@gmail.com"
+            },
+            {
+                "email": "agtafadjrin@gmail.com",
+                "password": "12345678"
+            },
+            {
+                "email": "zanuar0101aldisyahputra@gmail.com",
+                "password": "qpzmqpzm"
+            },
+            {
+                "email": "rifqisabililah00@gmail.com",
+                "password": "password123"
+            },
+            {
+                "email": "fikrismksore@gmail.com",
+                "password": "password123"
+            },
+            {
+                "email": "nopallpa@gmail.com",
+                "password": "NaufalPutra2241"
+            },
+            {
+                "email": "ahmadfirmansyah385@gmail.com",
+                "password": "2241760097"
+            }
+        ]
+    }
+}
