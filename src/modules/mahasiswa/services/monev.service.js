@@ -5,6 +5,7 @@ const {
   getLuaranMahasiswaDb,
   getLuaranTimByTimAndLuaranDb,
   upsertLuaranTimDb,
+  deleteLuaranTimDb,
 } = require("../db/monev.db");
 
 const { getProgramTimeline } = require("../db/tim.db");
@@ -38,20 +39,19 @@ const submitLuaran = async (id_user, id_luaran, payload, file) => {
   const tim = await getTimMahasiswaDb(id_user);
   if (!tim) return { error: true, message: "Anda belum terdaftar dalam tim", data: null, file };
   if (tim.status_anggota !== 1) return { error: true, message: "Status keanggotaan tim Anda belum aktif", data: null, file };
-  if (tim.peran !== 1) return { error: true, message: "Hanya ketua tim yang dapat mengumpulkan luaran", data: null, file };
+  if (tim.peran !== 1) return { error: true, message: "Hanya ketua tim yang dapat menyimpan luaran", data: null, file };
 
   const luaran = await getLuaranByIdDb(id_luaran);
   if (!luaran) return { error: true, message: "Luaran tidak ditemukan", data: null, file };
   if (luaran.id_program !== tim.id_program) return { error: true, message: "Luaran ini tidak sesuai dengan program tim Anda", data: null, file };
 
   const now = new Date();
-  if (now > new Date(luaran.deadline)) return { error: true, message: "Deadline pengumpulan luaran ini sudah lewat", data: null, file };
+  if (now > new Date(luaran.deadline)) return { error: true, message: "Deadline penyimpanan luaran ini sudah lewat", data: null, file };
 
   const existing = await getLuaranTimByTimAndLuaranDb(tim.id_tim, id_luaran);
 
   if (existing) {
     if (existing.status === 2) return { error: true, message: "Luaran ini sudah disetujui dan tidak dapat diubah", data: null, file };
-    if (existing.status === 1) return { error: true, message: "Luaran ini sedang menunggu review admin. Tidak dapat diubah sebelum direview", data: null, file };
   }
 
   let links = [];
@@ -98,7 +98,30 @@ const submitLuaran = async (id_user, id_luaran, payload, file) => {
     link_luaran: linkToSave,
   });
 
-  return { error: false, message: "Luaran berhasil dikumpulkan", data: result, file: null };
+  return { error: false, message: "Luaran berhasil disimpan", data: result, file: null };
+};
+
+const deleteLuaran = async (id_user, id_luaran) => {
+  const tim = await getTimMahasiswaDb(id_user);
+  if (!tim) return { error: true, message: "Anda belum terdaftar dalam tim", data: null };
+  if (tim.status_anggota !== 1) return { error: true, message: "Status keanggotaan tim Anda belum aktif", data: null };
+  if (tim.peran !== 1) return { error: true, message: "Hanya ketua tim yang dapat menghapus luaran", data: null };
+
+  const luaran = await getLuaranByIdDb(id_luaran);
+  if (!luaran) return { error: true, message: "Luaran tidak ditemukan", data: null };
+  if (luaran.id_program !== tim.id_program) return { error: true, message: "Luaran ini tidak sesuai dengan program tim Anda", data: null };
+
+  const existing = await getLuaranTimByTimAndLuaranDb(tim.id_tim, id_luaran);
+  if (!existing) return { error: true, message: "Luaran belum pernah disimpan", data: null };
+  if (existing.status === 2) return { error: true, message: "Luaran sudah disetujui dan tidak dapat dihapus", data: null };
+
+  if (existing.file_luaran) {
+    const oldPath = `uploads/luaran/${existing.file_luaran}`;
+    if (fs.existsSync(oldPath)) fs.unlink(oldPath, () => {});
+  }
+
+  const deleted = await deleteLuaranTimDb(tim.id_tim, id_luaran);
+  return { error: false, message: "Luaran berhasil dihapus", data: deleted };
 };
 
 const cekEligibilitasInbis = async (id_user) => {
@@ -172,5 +195,6 @@ const cekEligibilitasInbis = async (id_user) => {
 module.exports = {
   getLuaranMahasiswa,
   submitLuaran,
+  deleteLuaran,
   cekEligibilitasInbis,
 };

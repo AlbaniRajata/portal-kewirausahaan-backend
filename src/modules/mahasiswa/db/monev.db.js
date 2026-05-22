@@ -94,6 +94,16 @@ const upsertLuaranTimDb = async (id_tim, id_luaran, data) => {
   return rows[0];
 };
 
+const deleteLuaranTimDb = async (id_tim, id_luaran) => {
+  const q = `
+    DELETE FROM t_luaran_tim
+    WHERE id_tim = $1 AND id_luaran = $2
+    RETURNING *
+  `;
+  const { rows } = await pool.query(q, [id_tim, id_luaran]);
+  return rows[0] || null;
+};
+
 const getCekMonevLulusDb = async (id_user) => {
   const q = `
     SELECT
@@ -115,5 +125,6 @@ module.exports = {
   getLuaranMahasiswaDb,
   getLuaranTimByTimAndLuaranDb,
   upsertLuaranTimDb,
+  deleteLuaranTimDb,
   getCekMonevLulusDb,
 };

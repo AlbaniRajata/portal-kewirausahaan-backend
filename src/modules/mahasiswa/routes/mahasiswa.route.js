@@ -45,6 +45,7 @@ const {
 const { 
   getLuaranMahasiswaController, 
   submitLuaranController,
+  deleteLuaranController,
   cekEligibilitasInbisController, 
 } = require("../controllers/monev.controller");
 
@@ -87,6 +88,7 @@ router.post("/bimbingan/ajukan", ajukanBimbinganController);
 
 router.get("/monev/luaran", getLuaranMahasiswaController);
 router.post("/monev/luaran/:id_luaran/submit", uploadLuaran.single("file_luaran"), submitLuaranController);
+router.delete("/monev/luaran/:id_luaran", deleteLuaranController);
 router.get("/monev/eligibilitas-inbis", cekEligibilitasInbisController);
 
 module.exports = router;
