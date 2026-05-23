@@ -65,7 +65,8 @@ const updateProposalController = async (req, res, next) => {
 
     if (result.error) {
       if (req.file) fs.unlink(req.file.path, () => {});
-      return res.status(400).json({
+      const statusCode = result.message.includes("tidak berhak") ? 403 : 400;
+      return res.status(statusCode).json({
         success: false,
         message: result.message,
         data: result.data || null,
@@ -88,7 +89,8 @@ const submitProposalController = async (req, res, next) => {
     const result = await submitProposal(req.user.id_user, req.params.id_proposal);
 
     if (result.error) {
-      return res.status(400).json({
+      const statusCode = result.message.includes("tidak berhak") ? 403 : 400;
+      return res.status(statusCode).json({
         success: false,
         message: result.message,
         data: result.data || null,
@@ -110,7 +112,8 @@ const getProposalDetailController = async (req, res, next) => {
     const result = await getProposalDetail(req.user.id_user, req.params.id_proposal);
 
     if (result.error) {
-      return res.status(404).json({
+      const statusCode = result.message.includes("tidak berhak") ? 403 : 404;
+      return res.status(statusCode).json({
         success: false,
         message: result.message,
         data: result.data || null,
