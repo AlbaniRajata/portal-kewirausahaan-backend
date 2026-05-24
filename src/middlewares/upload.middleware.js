@@ -43,7 +43,7 @@ const validateProposalFilename = (filename) => {
     return {
       valid: false,
       message:
-        'Format nama file tidak valid. Gunakan format: "Program_Nama Tim_Judul Proposal" (dipisahkan tepat 2 underscore). Contoh: "PKM-K_Tim Inovasi_Alat Pembersih Otomatis.pdf"',
+        'Format nama file tidak valid. Gunakan format: "Program_Nama Tim_Judul Proposal" (dipisahkan tepat 2 underscore). Contoh: "PMW_Tim Inovasi_Alat Pembersih Otomatis.pdf"',
     };
   }
 
