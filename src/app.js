@@ -14,6 +14,7 @@ const { apiVersionMiddleware, contentNegotiationMiddleware: contentNeg, requestI
 const { formatApiInfo } = require("./utils/response");
 
 const swaggerSpec = require("./config/swagger");
+const logger = require("./utils/logger");
 
 if (!process.env.JWT_SECRET) {
   throw new Error("JWT_SECRET tidak terdefinisi di environment variables!");
@@ -62,7 +63,7 @@ app.use(helmet({
 }));
 
 app.use(sqlInjectionProtectionMiddleware);
-app.use(morgan("dev"));
+app.use(morgan(':remote-addr - :method :url :status :res[content-length] - :response-time ms', { stream: { write: message => logger.info(message.trim()) } }));
 
 const UPLOADS_DIR = path.join(__dirname, "../uploads");
 
@@ -142,7 +143,6 @@ app.use((req, res) => {
   });
 });
 
-const logger = require("./utils/logger");
 
 app.use((err, req, res, next) => {
   logger.error("Request error", {

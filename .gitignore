@@ -19,4 +19,7 @@ coverage/
 k6-tests/helpers/credentials.local.js
 k6-tests/credentials.local.json
 
+# k6 test reports
+k6-tests/reports/
+
 uploads/
