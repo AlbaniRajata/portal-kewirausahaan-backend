@@ -49,11 +49,13 @@ const getRekapReviewerTahap1Db = async (id_program, id_proposal) => {
       pr.id_proposal, pr.judul,
       p.id_penilaian, p.submitted_at,
       u.id_user AS id_reviewer, u.nama_lengkap AS nama_reviewer,
+      r.institusi AS institusi_reviewer,
       k.id_kriteria, k.nama_kriteria, k.bobot,
       d.skor, d.nilai, d.catatan
      FROM t_penilaian_reviewer p
      JOIN t_distribusi_reviewer dr ON dr.id_distribusi = p.id_distribusi
      JOIN m_user u ON u.id_user = dr.id_reviewer
+     LEFT JOIN m_reviewer r ON r.id_user = u.id_user
      JOIN t_proposal pr ON pr.id_proposal = dr.id_proposal
      JOIN t_penilaian_reviewer_detail d ON d.id_penilaian = p.id_penilaian
      JOIN m_kriteria_penilaian k ON k.id_kriteria = d.id_kriteria
@@ -236,11 +238,13 @@ const getRekapReviewerTahap2Db = async (id_program, id_proposal) => {
       pr.id_proposal, pr.judul,
       p.id_penilaian, p.submitted_at,
       u.id_user AS id_reviewer, u.nama_lengkap AS nama_reviewer,
+      r.institusi AS institusi_reviewer,
       k.id_kriteria, k.nama_kriteria, k.bobot,
       d.skor, d.nilai, d.catatan
      FROM t_penilaian_reviewer p
      JOIN t_distribusi_reviewer dr ON dr.id_distribusi = p.id_distribusi
      JOIN m_user u ON u.id_user = dr.id_reviewer
+     LEFT JOIN m_reviewer r ON r.id_user = u.id_user
      JOIN t_proposal pr ON pr.id_proposal = dr.id_proposal
      JOIN t_penilaian_reviewer_detail d ON d.id_penilaian = p.id_penilaian
      JOIN m_kriteria_penilaian k ON k.id_kriteria = d.id_kriteria
@@ -258,11 +262,13 @@ const getRekapJuriTahap2Db = async (id_program, id_proposal) => {
       pr.id_proposal, pr.judul,
       p.id_penilaian, p.submitted_at,
       u.id_user AS id_juri, u.nama_lengkap AS nama_juri,
+      j.institusi AS institusi_juri,
       k.id_kriteria, k.nama_kriteria, k.bobot,
       d.skor, d.nilai, d.catatan
      FROM t_penilaian_juri p
      JOIN t_distribusi_juri dj ON dj.id_distribusi = p.id_distribusi
      JOIN m_user u ON u.id_user = dj.id_juri
+     LEFT JOIN m_juri j ON j.id_user = u.id_user
      JOIN t_proposal pr ON pr.id_proposal = dj.id_proposal
      JOIN t_penilaian_juri_detail d ON d.id_penilaian = p.id_penilaian
      JOIN m_kriteria_penilaian k ON k.id_kriteria = d.id_kriteria

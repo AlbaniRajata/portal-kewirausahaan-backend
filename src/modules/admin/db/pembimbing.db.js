@@ -130,9 +130,14 @@ const getDosenDb = async () => {
       d.id_user AS id_dosen,
       u.nama_lengkap,
       d.nip,
-      d.bidang_keahlian
+      d.bidang_keahlian,
+      p.nama_prodi,
+      p.jenjang,
+      j.nama_jurusan
     FROM m_dosen d
     JOIN m_user u ON u.id_user = d.id_user
+    LEFT JOIN m_prodi p ON p.id_prodi = d.id_prodi
+    LEFT JOIN m_jurusan j ON j.id_jurusan = p.id_jurusan
     WHERE d.status_verifikasi = 1
     ORDER BY u.nama_lengkap ASC
   `;
@@ -147,9 +152,14 @@ const getDosenByIdDb = async (id_dosen) => {
       u.nama_lengkap,
       d.nip,
       d.bidang_keahlian,
-      d.status_verifikasi
+      d.status_verifikasi,
+      p.nama_prodi,
+      p.jenjang,
+      j.nama_jurusan
     FROM m_dosen d
     JOIN m_user u ON u.id_user = d.id_user
+    LEFT JOIN m_prodi p ON p.id_prodi = d.id_prodi
+    LEFT JOIN m_jurusan j ON j.id_jurusan = p.id_jurusan
     WHERE d.id_user = $1
     LIMIT 1
   `;

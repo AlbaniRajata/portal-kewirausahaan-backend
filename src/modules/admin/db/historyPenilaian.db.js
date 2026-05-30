@@ -4,6 +4,7 @@ const getHistoryPenilaianTahap1Db = async (id_program) => {
   const { rows } = await pool.query(
     `SELECT
       p.id_proposal,
+      p.id_program,
       p.judul,
       p.status AS status_proposal,
       p.tanggal_submit AS tanggal_finalisasi,
@@ -40,7 +41,7 @@ const getHistoryPenilaianTahap1Db = async (id_program) => {
          WHERE dr3.id_proposal = p.id_proposal
            AND pr3.status = 1
        )
-     GROUP BY p.id_proposal, p.judul, p.status, p.tanggal_submit, t.nama_tim, k.nama_kategori
+     GROUP BY p.id_proposal, p.id_program, p.judul, p.status, p.tanggal_submit, t.nama_tim, k.nama_kategori
      ORDER BY p.tanggal_submit DESC NULLS LAST`,
     [id_program]
   );
@@ -51,6 +52,7 @@ const getHistoryPenilaianTahap2Db = async (id_program) => {
   const { rows } = await pool.query(
     `SELECT
       p.id_proposal,
+      p.id_program,
       p.judul,
       p.status AS status_proposal,
         COALESCE(p.wawancara_at, p.tanggal_submit) AS tanggal_finalisasi,

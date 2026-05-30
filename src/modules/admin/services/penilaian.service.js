@@ -37,7 +37,16 @@ const getRekapDeskEvaluasi = async (id_program, id_proposal) => {
 
   for (const r of rows) {
     if (!reviewerMap[r.id_reviewer]) {
-      reviewerMap[r.id_reviewer] = { reviewer: { id_user: r.id_reviewer, nama: r.nama_reviewer }, submitted_at: r.submitted_at, detail: [], total_nilai: 0 };
+      const institusi = r.institusi_reviewer || null;
+      const roleType = institusi ? "Eksternal" : "Internal";
+      reviewerMap[r.id_reviewer] = {
+        reviewer: { id_user: r.id_reviewer, nama: r.nama_reviewer, nama_lengkap: r.nama_reviewer },
+        institusi,
+        role_type: roleType,
+        submitted_at: r.submitted_at,
+        detail: [],
+        total_nilai: 0,
+      };
     }
     reviewerMap[r.id_reviewer].detail.push({ id_kriteria: r.id_kriteria, nama_kriteria: r.nama_kriteria, bobot: Number(r.bobot), skor: r.skor, nilai: Number(r.nilai), catatan: r.catatan });
     reviewerMap[r.id_reviewer].total_nilai += Number(r.nilai);
@@ -78,11 +87,20 @@ const finalisasiDeskBatch = async (id_program, payload) => {
   return { error: false, message: "Finalisasi desk evaluasi batch berhasil", data: hasil };
 };
 
-const groupPenilaian = (rows, roleKey, nameKey) => {
+const groupPenilaian = (rows, roleKey, nameKey, institusiKey) => {
   const map = {};
   for (const r of rows) {
     if (!map[r[roleKey]]) {
-      map[r[roleKey]] = { user: { id_user: r[roleKey], nama: r[nameKey] }, submitted_at: r.submitted_at, detail: [], total_nilai: 0 };
+      const institusi = institusiKey ? r[institusiKey] : null;
+      const roleType = institusi ? "Eksternal" : "Internal";
+      map[r[roleKey]] = {
+        user: { id_user: r[roleKey], nama: r[nameKey], nama_lengkap: r[nameKey] },
+        institusi,
+        role_type: roleType,
+        submitted_at: r.submitted_at,
+        detail: [],
+        total_nilai: 0,
+      };
     }
     map[r[roleKey]].detail.push({ id_kriteria: r.id_kriteria, nama_kriteria: r.nama_kriteria, bobot: Number(r.bobot), skor: r.skor, nilai: Number(r.nilai), catatan: r.catatan });
     map[r[roleKey]].total_nilai += Number(r.nilai);
@@ -105,8 +123,8 @@ const getRekapWawancaraTahap2 = async (id_program, id_proposal) => {
     judul: reviewerRows[0]?.judul || juriRows[0]?.judul,
   };
 
-  const reviewer = groupPenilaian(reviewerRows, "id_reviewer", "nama_reviewer");
-  const juri = groupPenilaian(juriRows, "id_juri", "nama_juri");
+  const reviewer = groupPenilaian(reviewerRows, "id_reviewer", "nama_reviewer", "institusi_reviewer");
+  const juri = groupPenilaian(juriRows, "id_juri", "nama_juri", "institusi_juri");
   const totalReviewer = reviewer.reduce((sum, r) => sum + r.total_nilai, 0);
   const totalJuri = juri.reduce((sum, j) => sum + j.total_nilai, 0);
 

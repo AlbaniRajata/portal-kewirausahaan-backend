@@ -108,7 +108,9 @@ const getProposalDetailAdminDb = async (id_proposal) => {
       json_build_object(
         'id_user', u.id_user,
         'nama_lengkap', u.nama_lengkap,
-        'nim', mhs_ketua.nim
+        'nim', mhs_ketua.nim,
+        'no_hp', u.no_hp,
+        'nama_jurusan', j_ketua.nama_jurusan
       ) AS ketua,
       (
         SELECT json_build_object(
@@ -135,7 +137,9 @@ const getProposalDetailAdminDb = async (id_proposal) => {
             'nama_lengkap', um.nama_lengkap,
             'nim', mhs.nim,
             'email', um.email,
+            'no_hp', um.no_hp,
             'nama_prodi', prod.nama_prodi,
+            'nama_jurusan', j_anggota.nama_jurusan,
             'peran', at.peran,
             'status', at.status
           ) ORDER BY at.peran ASC
@@ -144,6 +148,7 @@ const getProposalDetailAdminDb = async (id_proposal) => {
         JOIN m_user um ON um.id_user = at.id_user
         JOIN m_mahasiswa mhs ON mhs.id_user = um.id_user
         LEFT JOIN m_prodi prod ON prod.id_prodi = mhs.id_prodi
+        LEFT JOIN m_jurusan j_anggota ON j_anggota.id_jurusan = prod.id_jurusan
         WHERE at.id_tim = t.id_tim
       ) AS anggota_tim
     FROM t_proposal p
@@ -159,6 +164,8 @@ const getProposalDetailAdminDb = async (id_proposal) => {
     ) ketua ON true
     LEFT JOIN m_user u ON u.id_user = ketua.id_user
     LEFT JOIN m_mahasiswa mhs_ketua ON mhs_ketua.id_user = ketua.id_user
+    LEFT JOIN m_prodi prod_ketua ON prod_ketua.id_prodi = mhs_ketua.id_prodi
+    LEFT JOIN m_jurusan j_ketua ON j_ketua.id_jurusan = prod_ketua.id_jurusan
     WHERE p.id_proposal = $1
   `;
 
