@@ -21,24 +21,26 @@ const getProposalTahap2Db = async (id_program) => {
   return rows;
 };
 
-const getReviewerAktifDb = async () => {
+const getReviewerAktifDb = async (id_program) => {
   const { rows } = await pool.query(
     `SELECT r.id_user, u.nama_lengkap, r.institusi, r.bidang_keahlian
      FROM m_reviewer r
      JOIN m_user u ON u.id_user = r.id_user
-     WHERE u.is_active = true
-     ORDER BY u.nama_lengkap`
+     WHERE u.is_active = true AND r.id_program = $1
+     ORDER BY u.nama_lengkap`,
+    [id_program]
   );
   return rows;
 };
 
-const getJuriAktifDb = async () => {
+const getJuriAktifDb = async (id_program) => {
   const { rows } = await pool.query(
     `SELECT j.id_user, u.nama_lengkap, u.email
      FROM m_juri j
      JOIN m_user u ON u.id_user = j.id_user
-     WHERE u.is_active = true
-     ORDER BY u.nama_lengkap`
+     WHERE u.is_active = true AND j.id_program = $1
+     ORDER BY u.nama_lengkap`,
+    [id_program]
   );
   return rows;
 };

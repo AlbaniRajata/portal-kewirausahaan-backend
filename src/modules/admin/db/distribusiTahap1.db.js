@@ -9,13 +9,14 @@ const getTahapAktifDb = async (id_program, urutan) => {
   return rows[0] || null;
 };
 
-const getReviewerAktifDb = async () => {
+const getReviewerAktifDb = async (id_program) => {
   const { rows } = await pool.query(
     `SELECT r.id_user, u.nama_lengkap, r.institusi, r.bidang_keahlian
      FROM m_reviewer r
      JOIN m_user u ON u.id_user = r.id_user
-     WHERE u.is_active = true
-     ORDER BY u.nama_lengkap`
+     WHERE u.is_active = true AND r.id_program = $1
+     ORDER BY u.nama_lengkap`,
+    [id_program]
   );
   return rows;
 };

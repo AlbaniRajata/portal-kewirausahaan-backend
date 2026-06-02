@@ -3,7 +3,7 @@ const { createJuriDb, getJurisDb, getJuriDetailDb } = require("../db/juri.db");
 const { hashPassword } = require("../../../helpers/password.helper");
 
 const createJuri = async (data) => {
-  const { nama_lengkap, username, email, password, no_hp, institusi, bidang_keahlian } = data;
+  const { nama_lengkap, username, email, password, no_hp, institusi, bidang_keahlian, id_program } = data;
 
   const missing = [];
   if (!nama_lengkap) missing.push("nama_lengkap");
@@ -25,7 +25,7 @@ const createJuri = async (data) => {
 
   const hashed = await hashPassword(password);
   const user = await createUserDb({ nama_lengkap, username, email, password: hashed, no_hp, id_role: role.id_role });
-  const juri = await createJuriDb(user.id_user, institusi.trim(), bidang_keahlian.trim());
+  const juri = await createJuriDb(user.id_user, institusi.trim(), bidang_keahlian.trim(), id_program || null);
 
   return { error: false, message: "Juri berhasil didaftarkan", data: { user, juri } };
 };

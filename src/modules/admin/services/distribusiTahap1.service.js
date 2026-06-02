@@ -28,7 +28,7 @@ const previewDistribusiTahap1 = async (id_program) => {
 
   const [summary, reviewers] = await Promise.all([
     getDistribusiTahap1SummaryDb(id_program, TAHAP),
-    getReviewerAktifDb(),
+    getReviewerAktifDb(id_program),
   ]);
 
   if (!summary.length) return { error: true, message: "Tidak ada proposal untuk distribusi tahap 1", data: { tahap: TAHAP } };

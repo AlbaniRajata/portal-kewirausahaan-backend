@@ -80,8 +80,8 @@ const previewDistribusiTahap2 = async (id_program) => {
 
   const [proposals, reviewers, juries] = await Promise.all([
     getProposalTahap2Db(id_program),
-    getReviewerAktifDb(),
-    getJuriAktifDb(),
+    getReviewerAktifDb(id_program),
+    getJuriAktifDb(id_program),
   ]);
 
   if (!proposals.length) return { error: true, message: "Tidak ada proposal yang siap masuk wawancara", data: { id_program } };

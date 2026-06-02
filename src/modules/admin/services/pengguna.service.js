@@ -280,7 +280,7 @@ const updateDosen = async (id_user, payload) => {
 };
 
 const updateReviewer = async (id_user, payload) => {
-  const { nama_lengkap, email, no_hp, alamat, institusi, bidang_keahlian } = payload;
+  const { nama_lengkap, email, no_hp, alamat, institusi, bidang_keahlian, id_program } = payload;
 
   if (!nama_lengkap || !email) return { error: true, message: "Nama lengkap dan email wajib diisi", data: null };
 
@@ -290,7 +290,7 @@ const updateReviewer = async (id_user, payload) => {
   try {
     await client.query("BEGIN");
     await updateUserBaseDb(client, id_user, { nama_lengkap, email, no_hp, alamat });
-    await updateReviewerDetailDb(client, id_user, { institusi, bidang_keahlian });
+    await updateReviewerDetailDb(client, id_user, { institusi, bidang_keahlian, id_program });
     await client.query("COMMIT");
     return { error: false, message: "Data reviewer berhasil diperbarui", data: null };
   } catch (err) {
@@ -302,7 +302,7 @@ const updateReviewer = async (id_user, payload) => {
 };
 
 const updateJuri = async (id_user, payload) => {
-  const { nama_lengkap, email, no_hp, alamat, institusi, bidang_keahlian } = payload;
+  const { nama_lengkap, email, no_hp, alamat, institusi, bidang_keahlian, id_program } = payload;
 
   if (!nama_lengkap || !email) return { error: true, message: "Nama lengkap dan email wajib diisi", data: null };
 
@@ -312,7 +312,7 @@ const updateJuri = async (id_user, payload) => {
   try {
     await client.query("BEGIN");
     await updateUserBaseDb(client, id_user, { nama_lengkap, email, no_hp, alamat });
-    await updateJuriDetailDb(client, id_user, { institusi, bidang_keahlian });
+    await updateJuriDetailDb(client, id_user, { institusi, bidang_keahlian, id_program });
     await client.query("COMMIT");
     return { error: false, message: "Data juri berhasil diperbarui", data: null };
   } catch (err) {

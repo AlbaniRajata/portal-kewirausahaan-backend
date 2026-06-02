@@ -122,9 +122,11 @@ const getReviewerListDb = async (filters = {}) => {
     SELECT
       u.id_user, u.username, u.email, u.nama_lengkap, u.no_hp, u.alamat,
       u.is_active, u.email_verified_at, u.created_at,
-      rv.institusi, rv.bidang_keahlian
+      rv.institusi, rv.bidang_keahlian, rv.id_program,
+      p.nama_program
     FROM m_user u
     JOIN m_reviewer rv ON rv.id_user = u.id_user
+    LEFT JOIN m_program p ON p.id_program = rv.id_program
     WHERE 1=1
   `;
 
@@ -168,9 +170,11 @@ const getJuriListDb = async (filters = {}) => {
     SELECT
       u.id_user, u.username, u.email, u.nama_lengkap, u.no_hp, u.alamat,
       u.is_active, u.email_verified_at, u.created_at,
-      jr.institusi, jr.bidang_keahlian
+      jr.institusi, jr.bidang_keahlian, jr.id_program,
+      p.nama_program
     FROM m_user u
     JOIN m_juri jr ON jr.id_user = u.id_user
+    LEFT JOIN m_program p ON p.id_program = jr.id_program
     WHERE 1=1
   `;
 
@@ -329,15 +333,15 @@ const updateDosenDetailDb = async (client, id_user, data) => {
 
 const updateReviewerDetailDb = async (client, id_user, data) => {
   await client.query(
-    `UPDATE m_reviewer SET institusi = $2, bidang_keahlian = $3 WHERE id_user = $1`,
-    [id_user, data.institusi || null, data.bidang_keahlian || null]
+    `UPDATE m_reviewer SET institusi = $2, bidang_keahlian = $3, id_program = $4 WHERE id_user = $1`,
+    [id_user, data.institusi || null, data.bidang_keahlian || null, data.id_program || null]
   );
 };
 
 const updateJuriDetailDb = async (client, id_user, data) => {
   await client.query(
-    `UPDATE m_juri SET institusi = $2, bidang_keahlian = $3 WHERE id_user = $1`,
-    [id_user, data.institusi || null, data.bidang_keahlian || null]
+    `UPDATE m_juri SET institusi = $2, bidang_keahlian = $3, id_program = $4 WHERE id_user = $1`,
+    [id_user, data.institusi || null, data.bidang_keahlian || null, data.id_program || null]
   );
 };
 
