@@ -1,4 +1,3 @@
-const fs = require("fs");
 const {
   getTimMahasiswaDb,
   getLuaranByIdDb,
@@ -6,6 +5,7 @@ const {
   getLuaranTimByTimAndLuaranDb,
   upsertLuaranTimDb,
   deleteLuaranTimDb,
+  getRiwayatLuaranByUserDb,
 } = require("../db/monev.db");
 
 const { getProgramTimeline } = require("../db/tim.db");
@@ -192,9 +192,48 @@ const cekEligibilitasInbis = async (id_user) => {
   };
 };
 
+const getRiwayatLuaran = async (id_user) => {
+  const rows = await getRiwayatLuaranByUserDb(id_user);
+  // Group by id_tim
+  const grouped = {};
+  for (const row of rows) {
+    if (!grouped[row.id_tim]) {
+      grouped[row.id_tim] = {
+        id_tim: row.id_tim,
+        nama_tim: row.nama_tim,
+        id_program: row.id_program,
+        nama_program: row.nama_program,
+        keterangan: row.keterangan,
+        luaran: [],
+      };
+    }
+    grouped[row.id_tim].luaran.push({
+      id_luaran: row.id_luaran,
+      nama_luaran: row.nama_luaran,
+      keterangan: row.keterangan_luaran,
+      tipe: row.tipe,
+      deadline: row.deadline,
+      urutan: row.urutan,
+      id_luaran_tim: row.id_luaran_tim,
+      file_luaran: row.file_luaran,
+      link_luaran: row.link_luaran,
+      status: row.status,
+      catatan_admin: row.catatan_admin,
+      submitted_at: row.submitted_at,
+      reviewed_at: row.reviewed_at,
+    });
+  }
+  return {
+    error: false,
+    message: "Riwayat luaran monev berhasil diambil",
+    data: Object.values(grouped),
+  };
+};
+
 module.exports = {
   getLuaranMahasiswa,
   submitLuaran,
   deleteLuaran,
   cekEligibilitasInbis,
+  getRiwayatLuaran,
 };

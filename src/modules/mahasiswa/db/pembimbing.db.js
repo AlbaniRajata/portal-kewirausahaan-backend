@@ -11,6 +11,7 @@ const getTimByUserDb = async (id_user) => {
     JOIN t_tim t ON t.id_tim = a.id_tim
     WHERE a.id_user = $1
       AND a.status = 1
+      AND t.status = 0
     LIMIT 1
   `;
   const { rows } = await pool.query(q, [id_user]);
@@ -30,6 +31,7 @@ const getTimKetuaByUserDb = async (id_user) => {
     WHERE a.id_user = $1
       AND a.peran = 1
       AND a.status = 1
+      AND t.status = 0
     LIMIT 1
   `;
   const { rows } = await pool.query(q, [id_user]);
@@ -116,6 +118,40 @@ const upsertPengajuanDb = async (id_tim, id_program, id_dosen, diajukan_oleh) =>
   return rows[0];
 };
 
+const getRiwayatPembimbingByUserDb = async (id_user) => {
+  const q = `
+    SELECT
+      p.id_pengajuan,
+      p.id_tim,
+      p.id_program,
+      p.id_dosen,
+      p.status,
+      p.catatan_dosen,
+      CASE
+        WHEN p.catatan_dosen = '[REASSIGN_ADMIN]' THEN NULL
+        ELSE p.catatan_dosen
+      END AS catatan_dosen_display,
+      p.created_at,
+      p.responded_at,
+      u.nama_lengkap AS nama_dosen,
+      d.nip,
+      d.bidang_keahlian,
+      t.nama_tim,
+      prog.nama_program,
+      prog.keterangan
+    FROM t_pengajuan_pembimbing p
+    JOIN m_dosen d ON d.id_user = p.id_dosen
+    JOIN m_user u ON u.id_user = d.id_user
+    JOIN t_tim t ON t.id_tim = p.id_tim
+    JOIN m_program prog ON prog.id_program = t.id_program
+    JOIN t_anggota_tim a ON a.id_tim = t.id_tim
+    WHERE a.id_user = $1 AND t.status = 1
+    ORDER BY p.created_at DESC
+  `;
+  const { rows } = await pool.query(q, [id_user]);
+  return rows;
+};
+
 module.exports = {
   getTimByUserDb,
   getTimKetuaByUserDb,
@@ -123,4 +159,5 @@ module.exports = {
   getDosenByIdDb,
   getPengajuanTimDb,
   upsertPengajuanDb,
+  getRiwayatPembimbingByUserDb,
 };

@@ -14,7 +14,7 @@ const getTimMahasiswaDb = async (id_user) => {
     FROM t_anggota_tim a
     JOIN t_tim t ON t.id_tim = a.id_tim
     JOIN m_program prog ON prog.id_program = t.id_program
-    WHERE a.id_user = $1 AND a.status = 1
+    WHERE a.id_user = $1 AND a.status = 1 AND t.status = 0
   `;
   const { rows } = await pool.query(q, [id_user]);
   return rows[0] || null;
@@ -119,6 +119,39 @@ const getCekMonevLulusDb = async (id_user) => {
   return rows[0] || null;
 };
 
+const getRiwayatLuaranByUserDb = async (id_user) => {
+  const q = `
+    SELECT
+      t.id_tim,
+      t.nama_tim,
+      t.id_program,
+      prog.nama_program,
+      prog.keterangan,
+      ml.id_luaran,
+      ml.nama_luaran,
+      ml.keterangan AS keterangan_luaran,
+      ml.tipe,
+      ml.deadline,
+      ml.urutan,
+      lt.id_luaran_tim,
+      lt.file_luaran,
+      lt.link_luaran,
+      lt.status,
+      lt.catatan_admin,
+      lt.submitted_at,
+      lt.reviewed_at
+    FROM t_anggota_tim a
+    JOIN t_tim t ON t.id_tim = a.id_tim
+    JOIN m_program prog ON prog.id_program = t.id_program
+    JOIN m_luaran ml ON ml.id_program = t.id_program
+    LEFT JOIN t_luaran_tim lt ON lt.id_luaran = ml.id_luaran AND lt.id_tim = t.id_tim
+    WHERE a.id_user = $1 AND t.status = 1
+    ORDER BY t.id_tim DESC, ml.urutan ASC
+  `;
+  const { rows } = await pool.query(q, [id_user]);
+  return rows;
+};
+
 module.exports = {
   getTimMahasiswaDb,
   getLuaranByIdDb,
@@ -127,4 +160,5 @@ module.exports = {
   upsertLuaranTimDb,
   deleteLuaranTimDb,
   getCekMonevLulusDb,
+  getRiwayatLuaranByUserDb,
 };

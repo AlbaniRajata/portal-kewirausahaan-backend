@@ -62,8 +62,16 @@ const ajukanPembimbingController = async (req, res, next) => {
   }
 };
 
+const getRiwayatPembimbingController = async (req, res, next) => {
+  try {
+    const result = await require("../services/pembimbing.service").getRiwayatPembimbing(req.user.id_user);
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
+
 module.exports = {
   listDosenPembimbingController,
   getStatusPembimbingController,
   ajukanPembimbingController,
+  getRiwayatPembimbingController,
 };

@@ -5,6 +5,7 @@ const {
   getDosenByIdDb,
   getPengajuanTimDb,
   upsertPengajuanDb,
+  getRiwayatPembimbingByUserDb,
 } = require("../db/pembimbing.db");
 
 const listDosenPembimbing = async () => {
@@ -71,8 +72,14 @@ const ajukanPembimbing = async (id_user, payload) => {
   };
 };
 
+const getRiwayatPembimbing = async (id_user) => {
+  const riwayat = await getRiwayatPembimbingByUserDb(id_user);
+  return { error: false, message: "Riwayat pembimbing berhasil diambil", data: riwayat };
+};
+
 module.exports = {
   listDosenPembimbing,
   getStatusPembimbing,
   ajukanPembimbing,
+  getRiwayatPembimbing,
 };

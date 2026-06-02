@@ -24,6 +24,18 @@ const cekEligibleInbis = async (id_user) => {
     return { eligible: false, alasan: "Anda belum dinyatakan lolos program PMW.", timeline_open: true, lolos_pmw: false };
   }
 
+  const timelinePMW = await timDb.getProgramTimeline(PROGRAM.PMW);
+  const now = new Date();
+  const pmwMasihBuka = timelinePMW?.pendaftaran_selesai && now <= new Date(timelinePMW.pendaftaran_selesai);
+  if (pmwMasihBuka) {
+    return {
+      eligible: false,
+      alasan: "Timeline PMW masih berlangsung. Anda baru bisa mendaftar INBIS setelah timeline PMW selesai.",
+      timeline_open: true,
+      lolos_pmw: true,
+    };
+  }
+
   const monev = await timDb.cekMonevTimPMWSelesai(id_user, PROGRAM.PMW);
   const total = parseInt(monev?.total_luaran || 0);
   const disetujui = parseInt(monev?.total_disetujui || 0);
@@ -362,6 +374,107 @@ const resetTim = async (user) => {
   }
 };
 
+const getRiwayatTim = async (user) => {
+  const riwayat = await timDb.getRiwayatTimByUserId(user.id_user);
+  return { data: riwayat };
+};
+
+const lanjutInbis = async (user, payload) => {
+  // 1. Cek mahasiswa punya tim PMW aktif
+  const timAktif = await timDb.getTimByUserId(user.id_user);
+  if (!timAktif || timAktif.id_program !== PROGRAM.PMW) {
+    return { error: "Tidak ditemukan tim PMW aktif untuk dilanjutkan ke INBIS.", field: "tim" };
+  }
+  if (timAktif.peran !== 1) {
+    return { error: "Hanya ketua tim yang dapat melanjutkan ke program INBIS.", field: "tim" };
+  }
+
+  // 2. Cek timeline PMW sudah selesai
+  const timelinePMW = await timDb.getProgramTimeline(PROGRAM.PMW);
+  const now = new Date();
+  const pmwMasihBuka = timelinePMW?.pendaftaran_selesai && now <= new Date(timelinePMW.pendaftaran_selesai);
+  if (pmwMasihBuka) {
+    return { error: "Timeline pendaftaran PMW masih berlangsung. Anda baru bisa mendaftar INBIS setelah timeline PMW selesai.", field: "timeline" };
+  }
+
+  // 3. Cek monev PMW 100%
+  const monev = await timDb.cekMonevTimPMWSelesai(user.id_user, PROGRAM.PMW);
+  const total = parseInt(monev?.total_luaran || 0);
+  const disetujui = parseInt(monev?.total_disetujui || 0);
+  if (total === 0 || total !== disetujui) {
+    return { error: `Monev PMW belum 100% selesai (${disetujui}/${total} luaran disetujui). Selesaikan semua luaran terlebih dahulu.`, field: "monev" };
+  }
+
+  // 4. Cek lolos wawancara PMW (status_lolos = 1)
+  const pmwStatus = await timDb.cekLolosPMW(user.id_user, PROGRAM.PMW);
+  if (!pmwStatus || pmwStatus.status_lolos !== 1) {
+    return { error: "Anda belum dinyatakan lolos program PMW.", field: "pmw" };
+  }
+
+  // 5. Cek timeline INBIS sudah dibuka
+  const timelineINBIS = await timDb.getProgramTimeline(PROGRAM.INBIS);
+  const inbisOpen = timelineINBIS?.pendaftaran_mulai && timelineINBIS?.pendaftaran_selesai
+    && now >= new Date(timelineINBIS.pendaftaran_mulai)
+    && now <= new Date(timelineINBIS.pendaftaran_selesai);
+  if (!inbisOpen) {
+    return { error: "Timeline pendaftaran INBIS belum dibuka atau sudah ditutup.", field: "timeline" };
+  }
+
+  // 6. Validasi nama tim
+  const nama_tim = payload.nama_tim?.trim();
+  if (!nama_tim) {
+    return { error: "Nama tim wajib diisi.", field: "nama_tim" };
+  }
+
+  const gunakanAnggotaSama = payload.gunakan_anggota_sama === true;
+
+  const client = await db.connect();
+  try {
+    await client.query("BEGIN");
+
+    // 7. Arsipkan tim PMW lama
+    await timDb.archiveTim(timAktif.id_tim);
+
+    // 8. Buat tim INBIS baru
+    const timBaru = await timDb.createTim(client, PROGRAM.INBIS, nama_tim);
+
+    // 9. Daftarkan ketua ke tim baru
+    await timDb.insertAnggotaTim(client, timBaru.id_tim, user.id_user, 1, 1);
+    const currentYear = new Date().getFullYear();
+    await timDb.insertPesertaProgram(client, user.id_user, PROGRAM.INBIS, timBaru.id_tim, currentYear);
+
+    // 10. Jika gunakan anggota sama, salin semua anggota lama (selain ketua)
+    if (gunakanAnggotaSama) {
+      const anggotaLama = await timDb.getAnggotaAktifTim(timAktif.id_tim);
+      for (const anggota of anggotaLama) {
+        if (anggota.id_user === user.id_user) continue; // skip ketua
+        // Cek eligibilitas masing-masing anggota
+        const pmwAnggota = await timDb.cekLolosPMW(anggota.id_user, PROGRAM.PMW);
+        const monevAnggota = await timDb.cekMonevTimPMWSelesai(anggota.id_user, PROGRAM.PMW);
+        const totalA = parseInt(monevAnggota?.total_luaran || 0);
+        const disetujuiA = parseInt(monevAnggota?.total_disetujui || 0);
+        const eligible = pmwAnggota?.status_lolos === 1 && totalA > 0 && totalA === disetujuiA;
+
+        if (eligible) {
+          await timDb.insertAnggotaTim(client, timBaru.id_tim, anggota.id_user, 2, 0);
+        }
+      }
+    }
+
+    await client.query("COMMIT");
+    const detail = await timDb.getTimDetail(timBaru.id_tim);
+    return { data: detail };
+  } catch (err) {
+    await client.query("ROLLBACK");
+    if (err.code === "23505" && err.constraint === "unique_tim_per_program") {
+      return { error: "Nama tim sudah digunakan untuk program INBIS. Gunakan nama tim yang lain.", field: "nama_tim" };
+    }
+    throw err;
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   cekEligibleInbis,
   createTim,
@@ -372,4 +485,6 @@ module.exports = {
   getTimDetail,
   addAnggotaToTim,
   resetTim,
+  getRiwayatTim,
+  lanjutInbis,
 };

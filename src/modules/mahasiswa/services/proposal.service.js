@@ -11,6 +11,7 @@ const {
   getTimByUserDb,
   getProposalByUserDb,
   getPengajuanPembimbingByTimDb,
+  getRiwayatProposalByUserDb,
 } = require("../db/proposal.db");
 const PROGRAM = require("../../../constants/program");
 
@@ -206,10 +207,16 @@ const getProposalDetail = async (id_user, id_proposal) => {
   return { error: false, message: "Detail proposal berhasil diambil", data: proposal };
 };
 
+const getRiwayatProposal = async (id_user) => {
+  const riwayat = await getRiwayatProposalByUserDb(id_user);
+  return { error: false, message: "Riwayat proposal berhasil diambil", data: riwayat };
+};
+
 module.exports = {
   getProposalStatus,
   createProposal,
   updateProposal,
   submitProposal,
   getProposalDetail,
+  getRiwayatProposal,
 };

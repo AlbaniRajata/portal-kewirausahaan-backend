@@ -5,6 +5,7 @@ const {
   listBimbinganTimDb,
   getDetailBimbinganDb,
   createBimbinganDb,
+  getRiwayatBimbinganByUserDb,
 } = require("../db/bimbingan.db");
 
 const METODE_VALID = [1, 2, 3];
@@ -108,8 +109,14 @@ const ajukanBimbingan = async (id_user, payload) => {
   };
 };
 
+const getRiwayatBimbingan = async (id_user) => {
+  const riwayat = await getRiwayatBimbinganByUserDb(id_user);
+  return { error: false, message: "Riwayat bimbingan berhasil diambil", data: riwayat };
+};
+
 module.exports = {
   listBimbingan,
   detailBimbingan,
   ajukanBimbingan,
+  getRiwayatBimbingan,
 };

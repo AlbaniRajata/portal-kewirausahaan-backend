@@ -12,8 +12,9 @@ const getMahasiswaByUserId = async (id_user) => {
 
 const cekUserPunyaTim = async (id_user) => {
   const q = `
-    SELECT 1 FROM t_anggota_tim
-    WHERE id_user = $1 AND status = 1
+    SELECT 1 FROM t_anggota_tim a
+    JOIN t_tim t ON t.id_tim = a.id_tim
+    WHERE a.id_user = $1 AND a.status = 1 AND t.status = 0
   `;
   const r = await db.query(q, [id_user]);
   return r.rowCount > 0;
@@ -188,10 +189,61 @@ const getTimByUserId = async (id_user) => {
       a.status AS status_anggota
     FROM t_anggota_tim a
     JOIN t_tim t ON t.id_tim = a.id_tim
-    WHERE a.id_user = $1
+    WHERE a.id_user = $1 AND t.status = 0
   `;
   const r = await db.query(q, [id_user]);
   return r.rows[0] || null;
+};
+
+const archiveTim = async (id_tim) => {
+  const q = `UPDATE t_tim SET status = 1 WHERE id_tim = $1`;
+  await db.query(q, [id_tim]);
+};
+
+const getRiwayatTimByUserId = async (id_user) => {
+  const q = `
+    SELECT
+      t.id_tim,
+      t.nama_tim,
+      t.id_program,
+      prog.nama_program,
+      prog.keterangan,
+      t.status,
+      t.created_at,
+      a.peran,
+      a.status AS status_anggota,
+      (
+        SELECT json_agg(
+          json_build_object(
+            'id_user', u2.id_user,
+            'nim', m2.nim,
+            'nama_lengkap', u2.nama_lengkap,
+            'peran', a2.peran,
+            'status', a2.status
+          )
+        )
+        FROM t_anggota_tim a2
+        JOIN m_mahasiswa m2 ON m2.id_user = a2.id_user
+        JOIN m_user u2 ON u2.id_user = m2.id_user
+        WHERE a2.id_tim = t.id_tim
+      ) AS anggota
+    FROM t_anggota_tim a
+    JOIN t_tim t ON t.id_tim = a.id_tim
+    JOIN m_program prog ON prog.id_program = t.id_program
+    WHERE a.id_user = $1 AND t.status = 1
+    ORDER BY t.created_at DESC
+  `;
+  const r = await db.query(q, [id_user]);
+  return r.rows;
+};
+
+const getAnggotaAktifTim = async (id_tim) => {
+  const q = `
+    SELECT id_user, peran FROM t_anggota_tim
+    WHERE id_tim = $1 AND status = 1
+  `;
+  const r = await db.query(q, [id_tim]);
+  return r.rows;
 };
 
 const getTimDetailByUserId = async (id_user) => {
@@ -256,7 +308,7 @@ const getTimDetailByUserId = async (id_user) => {
     FROM t_anggota_tim ta
     JOIN t_tim t ON t.id_tim = ta.id_tim
     JOIN m_program prog ON prog.id_program = t.id_program
-    WHERE ta.id_user = $1
+    WHERE ta.id_user = $1 AND t.status = 0
   `;
   const r = await db.query(q, [id_user]);
   return r.rows[0] || null;
@@ -410,4 +462,7 @@ module.exports = {
   getAllAnggotaTim,
   getProgramTimeline,
   cekMonevTimPMWSelesai,
+  archiveTim,
+  getRiwayatTimByUserId,
+  getAnggotaAktifTim,
 };

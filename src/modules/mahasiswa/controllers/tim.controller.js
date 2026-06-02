@@ -198,6 +198,23 @@ const cekEligibleInbisController = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+const getRiwayatTimController = async (req, res, next) => {
+  try {
+    const result = await timService.getRiwayatTim(req.user);
+    return res.status(200).json({ success: true, message: "Riwayat tim berhasil diambil", data: result.data });
+  } catch (err) { next(err); }
+};
+
+const lanjutInbisController = async (req, res, next) => {
+  try {
+    const result = await timService.lanjutInbis(req.user, req.body);
+    if (result.error) {
+      return res.status(400).json({ success: false, message: result.error, data: { field: result.field } });
+    }
+    return res.status(201).json({ success: true, message: "Tim INBIS berhasil dibuat. Tim PMW Anda telah diarsipkan.", data: result.data });
+  } catch (err) { next(err); }
+};
+
 module.exports = {
   createTimController,
   searchMahasiswaController,
@@ -208,4 +225,6 @@ module.exports = {
   addAnggotaController,
   resetTimController,
   cekEligibleInbisController,
+  getRiwayatTimController,
+  lanjutInbisController,
 };

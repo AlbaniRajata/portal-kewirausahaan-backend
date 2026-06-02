@@ -5,6 +5,7 @@ const {
   updateProposal,
   submitProposal,
   getProposalDetail,
+  getRiwayatProposal,
 } = require("../services/proposal.service");
 
 const getProposalStatusController = async (req, res, next) => {
@@ -130,10 +131,18 @@ const getProposalDetailController = async (req, res, next) => {
   }
 };
 
+const getRiwayatProposalController = async (req, res, next) => {
+  try {
+    const result = await getRiwayatProposal(req.user.id_user);
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
+
 module.exports = {
   getProposalStatusController,
   createProposalController,
   updateProposalController,
   submitProposalController,
   getProposalDetailController,
+  getRiwayatProposalController,
 };

@@ -2,6 +2,7 @@ const {
   listBimbingan,
   detailBimbingan,
   ajukanBimbingan,
+  getRiwayatBimbingan,
 } = require("../services/bimbingan.service");
 
 const listBimbinganController = async (req, res, next) => {
@@ -70,8 +71,16 @@ const ajukanBimbinganController = async (req, res, next) => {
   }
 };
 
+const getRiwayatBimbinganController = async (req, res, next) => {
+  try {
+    const result = await getRiwayatBimbingan(req.user.id_user);
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
+
 module.exports = {
   listBimbinganController,
   detailBimbinganController,
   ajukanBimbinganController,
+  getRiwayatBimbinganController,
 };

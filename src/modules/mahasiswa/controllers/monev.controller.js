@@ -1,6 +1,5 @@
 const fs = require("fs");
-const { getLuaranMahasiswa, submitLuaran, deleteLuaran } = require("../services/monev.service");
-const { cekEligibilitasInbis } = require("../services/monev.service");
+const { getLuaranMahasiswa, submitLuaran, deleteLuaran, cekEligibilitasInbis, getRiwayatLuaran } = require("../services/monev.service");
 
 const getLuaranMahasiswaController = async (req, res, next) => {
   try {
@@ -60,9 +59,17 @@ const cekEligibilitasInbisController = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+const getRiwayatLuaranController = async (req, res, next) => {
+  try {
+    const result = await getRiwayatLuaran(req.user.id_user);
+    return res.status(200).json({ success: true, message: result.message, data: result.data });
+  } catch (err) { next(err); }
+};
+
 module.exports = {
   getLuaranMahasiswaController,
   submitLuaranController,
   deleteLuaranController,
   cekEligibilitasInbisController,
+  getRiwayatLuaranController,
 };

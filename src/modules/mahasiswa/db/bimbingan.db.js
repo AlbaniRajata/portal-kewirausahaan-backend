@@ -11,6 +11,7 @@ const getPesertaAktifDb = async (id_user) => {
     JOIN t_tim t ON t.id_tim = a.id_tim
     WHERE a.id_user = $1
       AND a.status = 1
+      AND t.status = 0
     LIMIT 1
   `;
   const { rows } = await pool.query(q, [id_user]);
@@ -136,6 +137,37 @@ const createBimbinganDb = async (payload) => {
   return rows[0];
 };
 
+const getRiwayatBimbinganByUserDb = async (id_user) => {
+  const q = `
+    SELECT
+      b.id_bimbingan,
+      b.tanggal_bimbingan,
+      b.metode,
+      b.topik,
+      b.deskripsi,
+      b.status,
+      b.catatan_dosen,
+      b.created_at,
+      b.responded_at,
+      u.nama_lengkap AS nama_dosen,
+      mhs.nama_lengkap AS nama_pengaju,
+      t.id_tim,
+      t.nama_tim,
+      prog.nama_program,
+      prog.keterangan
+    FROM t_bimbingan b
+    JOIN m_user u ON u.id_user = b.id_dosen
+    JOIN m_user mhs ON mhs.id_user = b.diajukan_oleh
+    JOIN t_tim t ON t.id_tim = b.id_tim
+    JOIN m_program prog ON prog.id_program = t.id_program
+    JOIN t_anggota_tim a ON a.id_tim = t.id_tim
+    WHERE a.id_user = $1 AND t.status = 1
+    ORDER BY b.created_at DESC
+  `;
+  const { rows } = await pool.query(q, [id_user]);
+  return rows;
+};
+
 module.exports = {
   getPesertaAktifDb,
   getProposalTimDb,
@@ -144,4 +176,5 @@ module.exports = {
   listBimbinganTimDb,
   getDetailBimbinganDb,
   createBimbinganDb,
+  getRiwayatBimbinganByUserDb,
 };
