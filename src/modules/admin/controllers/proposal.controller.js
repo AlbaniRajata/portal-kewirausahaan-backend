@@ -3,12 +3,24 @@ const {
   getProposalDetailAdmin,
   getMonitoringDistribusi,
 } = require("../services/proposal.service");
+const { getProgramByAdminDb } = require("../db/program.db");
+const { ROLE } = require("../../../constants/role");
 
 const getProposalListController = async (req, res, next) => {
   try {
     const { id_program, status, page, limit } = req.query;
+    let programFilter = id_program ? parseInt(id_program) : undefined;
+
+    if (req.user?.id_role === ROLE.ADMIN) {
+      const program = await getProgramByAdminDb(req.user.id_user);
+      if (!program) {
+        return res.status(403).json({ success: false, message: "Program admin tidak ditemukan atau akses ditolak", data: null });
+      }
+      programFilter = program.id_program;
+    }
+
     const result = await getProposalList({
-      id_program: id_program ? parseInt(id_program) : undefined,
+      id_program: programFilter,
       status: status !== undefined ? parseInt(status) : undefined,
       page: page ? parseInt(page) : undefined,
       limit: limit ? parseInt(limit) : undefined,
