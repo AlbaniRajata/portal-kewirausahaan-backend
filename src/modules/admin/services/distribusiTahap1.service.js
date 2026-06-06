@@ -105,10 +105,14 @@ const previewDistribusiTahap1 = async (id_program) => {
         reviewer1: assigned[0] || null,
         reviewer2: assigned[1] || null,
         needed_count: needed,
+        is_lengkap: assigned.length >= 2,
       });
     }
     idx++;
   }
+
+  const rencanaLengkap = rencanaDistribusi.filter((r) => r.is_lengkap);
+  const rencanaTidakLengkap = rencanaDistribusi.filter((r) => !r.is_lengkap);
 
   return {
     error: false,
@@ -119,8 +123,10 @@ const previewDistribusiTahap1 = async (id_program) => {
       total_reviewer: reviewers.length,
       sudah_terdistribusi: sudahTerdistribusi.length,
       belum_terdistribusi: belumTerdistribusi.length,
+      total_tidak_lengkap: rencanaTidakLengkap.length,
       detail_sudah: sudahTerdistribusi,
-      rencana_distribusi: rencanaDistribusi,
+      rencana_distribusi: rencanaLengkap,
+      rencana_tidak_lengkap: rencanaTidakLengkap,
     },
   };
 };
@@ -133,32 +139,51 @@ const autoDistribusiTahap1 = async (admin_id, id_program) => {
   try {
     await client.query("BEGIN");
     let totalAssigned = 0;
+    let totalLengkap = 0;
+    const tidakLengkap = [];
 
+    // Hanya eksekusi rencana yang lengkap (2 reviewer)
     for (const rencana of preview.data.rencana_distribusi) {
       const reviewers = [rencana.reviewer1, rencana.reviewer2].filter(Boolean);
-      
+
       for (const r of reviewers) {
-        // Check if already assigned
         const existing = await getDistribusiByProposalReviewerDb(client, rencana.id_proposal, r.id_user, TAHAP);
         if (existing) {
           if (existing.status === 5) {
-             await reaktifkanDistribusiDb(client, existing.id_distribusi, admin_id);
+            await reaktifkanDistribusiDb(client, existing.id_distribusi, admin_id);
           }
           continue;
         }
-
-        // Lock if not already locked (handled by DB query logic in getProposalSiapDistribusi)
-        // Actually since we use the plan from preview, we should double check if it's still valid
         await insertDistribusiDb(client, [rencana.id_proposal, r.id_user, TAHAP, admin_id]);
         totalAssigned++;
       }
-      
-      // Update proposal status to 2 (Desk Evaluasi) if at least one reviewer is assigned
+
+      // Hanya ubah status ke Desk Evaluasi jika proposal mendapat 2 reviewer
       await updateStatusProposalDistribusiDb(client, rencana.id_proposal);
+      totalLengkap++;
+    }
+
+    // Kumpulkan proposal yang tidak dapat didistribusikan lengkap
+    for (const rencana of (preview.data.rencana_tidak_lengkap || [])) {
+      tidakLengkap.push({ id_proposal: rencana.id_proposal, judul: rencana.judul, reviewer1: rencana.reviewer1 });
     }
 
     await client.query("COMMIT");
-    return { error: false, message: "Distribusi otomatis tahap 1 berhasil", data: { tahap: TAHAP, total_distribusi: totalAssigned } };
+
+    const adaTidakLengkap = tidakLengkap.length > 0;
+    return {
+      error: false,
+      message: adaTidakLengkap
+        ? `Distribusi selesai. ${totalLengkap} proposal berhasil didistribusikan. ${tidakLengkap.length} proposal tidak dapat didistribusikan lengkap karena reviewer tidak cukup — lakukan distribusi manual.`
+        : "Distribusi otomatis tahap 1 berhasil",
+      data: {
+        tahap: TAHAP,
+        total_distribusi: totalAssigned,
+        total_lengkap: totalLengkap,
+        tidak_lengkap: tidakLengkap,
+        ada_tidak_lengkap: adaTidakLengkap,
+      },
+    };
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;
