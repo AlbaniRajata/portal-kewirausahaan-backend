@@ -9,7 +9,7 @@ const compression = require("compression");
 const swaggerUi = require("swagger-ui-express");
 const routes = require("./routes");
 const pool = require("./config/db");
-const { requestSizeLimiter, sqlInjectionProtectionMiddleware, blockSuspiciousInput } = require("./middlewares/security.middleware");
+const { requestSizeLimiter, sqlInjectionProtectionMiddleware, blockSuspiciousInput, inputValidationMiddleware } = require("./middlewares/security.middleware");
 const { apiVersionMiddleware, contentNegotiationMiddleware: contentNeg, requestIdMiddleware } = require("./middlewares/compatibility.middleware");
 const { formatApiInfo } = require("./utils/response");
 
@@ -30,8 +30,8 @@ app.use(apiVersionMiddleware);
 app.use(contentNeg);
 app.use(requestIdMiddleware);
 
-app.use(sqlInjectionProtectionMiddleware);
-app.use(blockSuspiciousInput);
+
+
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -62,7 +62,7 @@ app.use(helmet({
   crossOriginResourcePolicy: false
 }));
 
-app.use(sqlInjectionProtectionMiddleware);
+
 app.use(morgan(':remote-addr - :method :url :status :res[content-length] - :response-time ms', { stream: { write: message => logger.info(message.trim()) } }));
 
 const UPLOADS_DIR = path.join(__dirname, "../uploads");
@@ -106,6 +106,10 @@ app.use((req, res, next) => {
 app.use(requestSizeLimiter(15 * 1024 * 1024));
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: true, limit: "15mb" }));
+
+app.use(sqlInjectionProtectionMiddleware);
+app.use(blockSuspiciousInput);
+app.use(inputValidationMiddleware);
 
 app.get("/health", async (req, res) => {
   let dbStatus = "unknown";

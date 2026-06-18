@@ -22,8 +22,13 @@ const {
   verifyEmailLimiter,
   forgotPasswordLimiter,
 } = require("../../../middlewares/rateLimit.middleware");
+const { 
+  sqlInjectionProtectionMiddleware, 
+  blockSuspiciousInput, 
+  inputValidationMiddleware 
+} = require("../../../middlewares/security.middleware");
 
-router.post("/register/mahasiswa", registerLimiter, uploadKTM.single("foto_ktm"), registerMahasiswa);
+router.post("/register/mahasiswa", registerLimiter, uploadKTM.single("foto_ktm"), sqlInjectionProtectionMiddleware, blockSuspiciousInput, inputValidationMiddleware, registerMahasiswa);
 router.post("/register/dosen", registerLimiter, express.json(), registerDosen);
 router.post("/login", loginLimiter, express.json(), loginHandler);
 router.post("/forgot-password", forgotPasswordLimiter, express.json(), forgotPasswordHandler);
