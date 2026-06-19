@@ -49,7 +49,7 @@ const inputValidationMiddleware = (req, res, next) => {
 
 const blockSuspiciousInput = (req, res, next) => {
 const suspiciousPatterns = [
-  /['";`]/,
+  /[";`]/,
   /--/,
   /\/\*/,
   /\*\//,

@@ -27,10 +27,11 @@ const getMahasiswaListController = async (req, res, next) => {
 
 const getDosenListController = async (req, res, next) => {
   try {
-    const { is_active, id_prodi, search, page, limit } = req.query;
+    const { is_active, id_prodi, id_jurusan, search, page, limit } = req.query;
     const result = await getDosenList({
       is_active: is_active !== undefined ? is_active === "true" : undefined,
       id_prodi: id_prodi ? parseInt(id_prodi) : undefined,
+      id_jurusan: id_jurusan ? parseInt(id_jurusan) : undefined,
       search: search || undefined,
       page: page ? parseInt(page) : undefined,
       limit: limit ? parseInt(limit) : undefined,

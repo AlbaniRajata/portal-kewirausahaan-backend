@@ -59,7 +59,7 @@ const getMahasiswaCountDb = async (filters = {}) => {
 };
 
 const getDosenListDb = async (filters = {}) => {
-  const { is_active, id_prodi, search, page, limit } = filters;
+  const { is_active, id_prodi, id_jurusan, search, page, limit } = filters;
   const values = [];
   let idx = 1;
   const offset = (page - 1) * limit;
@@ -82,6 +82,7 @@ const getDosenListDb = async (filters = {}) => {
 
   if (is_active !== undefined && is_active !== null) { q += ` AND u.is_active = $${idx++}`; values.push(is_active); }
   if (id_prodi) { q += ` AND d.id_prodi = $${idx++}`; values.push(id_prodi); }
+  if (id_jurusan) { q += ` AND j.id_jurusan = $${idx++}`; values.push(id_jurusan); }
   if (search) {
     q += ` AND (u.username ILIKE $${idx} OR u.email ILIKE $${idx} OR u.nama_lengkap ILIKE $${idx} OR d.nip ILIKE $${idx})`;
     values.push(`%${search}%`); idx++;
@@ -96,14 +97,15 @@ const getDosenListDb = async (filters = {}) => {
 };
 
 const getDosenCountDb = async (filters = {}) => {
-  const { is_active, id_prodi, search } = filters;
+  const { is_active, id_prodi, id_jurusan, search } = filters;
   const values = [];
   let idx = 1;
 
-  let q = `SELECT COUNT(*) as total FROM m_user u JOIN m_dosen d ON d.id_user = u.id_user JOIN m_prodi p ON p.id_prodi = d.id_prodi WHERE 1=1`;
+  let q = `SELECT COUNT(*) as total FROM m_user u JOIN m_dosen d ON d.id_user = u.id_user JOIN m_prodi p ON p.id_prodi = d.id_prodi JOIN m_jurusan j ON j.id_jurusan = p.id_jurusan WHERE 1=1`;
 
   if (is_active !== undefined && is_active !== null) { q += ` AND u.is_active = $${idx++}`; values.push(is_active); }
   if (id_prodi) { q += ` AND d.id_prodi = $${idx++}`; values.push(id_prodi); }
+  if (id_jurusan) { q += ` AND j.id_jurusan = $${idx++}`; values.push(id_jurusan); }
   if (search) {
     q += ` AND (u.username ILIKE $${idx} OR u.email ILIKE $${idx} OR u.nama_lengkap ILIKE $${idx} OR d.nip ILIKE $${idx})`;
     values.push(`%${search}%`); idx++;
